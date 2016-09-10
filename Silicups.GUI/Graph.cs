@@ -32,12 +32,14 @@ namespace Silicups.GUI
         public BoundingBox DataBB { get; set; }
         public BoundingBox ViewBB { get; set; }
 
-        public Pen GraphBorder = Pens.Black;
-        public Pen DataPointError = Pens.LightGray;
         public int GraphBorderPaddingRatio = 20;
         public int MarkRatio = 100;
         public int MinorTickCount = 20;
         public int MajorTickEvery = 5;
+
+        public Pen GraphBorder = Pens.Black;
+        public Pen DataPointError = Pens.Gray;
+        public Pen CoordMark = Pens.LightGray;
 
         public Brush DataPointBrush = Brushes.Black;
         public Brush AxisTextBrush = Brushes.Black;
@@ -103,7 +105,14 @@ namespace Silicups.GUI
                 }
 
                 ViewBB = DataBB.Clone();
+                Invalidate();
             }
+        }
+
+        public void UpdateDataSource(DataSourceDelegate updatedDataSource)
+        {
+            dataSource = updatedDataSource;
+            Invalidate();
         }
 
         #region test
@@ -157,7 +166,7 @@ namespace Silicups.GUI
         {
             ViewBB.ScaleX(0.001 * -e.Delta);
 
-            if ((Control.ModifierKeys & Keys.Shift) == 0)
+            if ((Control.ModifierKeys & Keys.Shift) != 0)
             { ViewBB.ScaleY(0.001 * -e.Delta); }
             ViewBB.TruncateTo(DataBB);
             Invalidate();
@@ -171,9 +180,12 @@ namespace Silicups.GUI
             if ((this.Width < 20) || (this.Height < 20))
             { return; }
 
-            int graphBorderPadding = this.Height / GraphBorderPaddingRatio;
-            float markSize = this.Height * 1f / MarkRatio;
+            int sideSize = Math.Min(this.Width, this.Height);
+            int graphBorderPadding = sideSize / GraphBorderPaddingRatio;
+            float markSize = MathEx.MinMax(2, sideSize * 1f / MarkRatio, 5);
             float markSize2 = markSize / 2;
+            float tickSize = graphBorderPadding / 3f;
+            int tickLength = (int)Math.Round(tickSize);
 
             g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
             g.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
@@ -187,6 +199,64 @@ namespace Silicups.GUI
             int graphLeft = graphBorderPadding;
             int graphTop = graphBorderPadding;
             int graphBottom = this.Height - graphBorderPadding;
+
+            // X axis (prep)
+            var xTicks = new List<TickPoint>();
+            {
+                double tick = NormalizeTick(ViewBB.Width / (MinorTickCount + 1));
+                double start = NormalizeStart(ViewBB.Left, tick);
+                int tickIndex = 0;
+                double value = start;
+                while (value < ViewBB.Right)
+                {
+                    float coord = graphLeft + (float)(((value - ViewBB.Left) / ViewBB.Width) * graphWidth);
+                    xTicks.Add(new TickPoint() {
+                        value = value,
+                        coord = coord,
+                        intCoord = (int)Math.Round(coord),
+                        index = tickIndex
+                    });
+
+                    tickIndex++;
+                    value = start + tickIndex * tick;
+                }
+            }
+
+            // Y axis
+            var yTicks = new List<TickPoint>();
+            {
+                double tick = NormalizeTick(ViewBB.Height / (MinorTickCount + 1));
+                double start = NormalizeStart(ViewBB.Top, tick);
+
+                int tickIndex = 0;
+                double value = start;
+                while (value < ViewBB.Bottom)
+                {
+                    float coord = graphTop + (float)(((value - ViewBB.Top) / ViewBB.Height) * graphHeight);
+                    yTicks.Add(new TickPoint() {
+                        value = value,
+                        coord = coord,
+                        intCoord = (int)Math.Round(coord),
+                        index = tickIndex
+                    });
+
+                    tickIndex++;
+                    value = start + tickIndex * tick;
+                }
+            }
+
+            // crosses
+            {
+                int crossLength = (int)Math.Ceiling(tickSize / 2);
+                foreach (TickPoint yTick in yTicks)
+                {
+                    foreach (TickPoint xTick in xTicks)
+                    {
+                        g.DrawLine(CoordMark, xTick.intCoord - crossLength, yTick.intCoord, xTick.intCoord + crossLength, yTick.intCoord);
+                        g.DrawLine(CoordMark, xTick.intCoord, yTick.intCoord - crossLength, xTick.intCoord, yTick.intCoord + crossLength);
+                    }
+                }
+            }
 
             // data
             if (DataSource != null)
@@ -219,59 +289,33 @@ namespace Silicups.GUI
             g.DrawRectangle(GraphBorder, graphLeft, graphTop, graphWidth, graphHeight);
 
             // X axis
+            foreach (TickPoint tick in xTicks)
             {
-                double tick = NormalizeTick(ViewBB.Width / (MinorTickCount + 1));
-                double start = NormalizeStart(ViewBB.Left, tick);
-
-                int tickIndex = 0;
-                double value = start;
-                while (value < ViewBB.Right)
+                int length = tickLength;
+                if ((tick.index % MajorTickEvery) == 0)
                 {
-                    float coord = graphLeft + (float)(((value - ViewBB.Left) / ViewBB.Width) * graphWidth);
-                    int length = 5;
-
-                    if ((tickIndex % MajorTickEvery) == 0)
-                    {
-                        length = 10;
-                        string tickMark = value.ToString();
-                        SizeF stringSize = g.MeasureString(tickMark, axisTextFont);
-                        float stringCoord = Math.Min(Math.Max(0, coord - stringSize.Width / 2), this.Width);
-                        g.DrawString(tickMark, axisTextFont, AxisTextBrush, stringCoord, graphBottom);
-                    }
-
-                    g.DrawLine(GraphBorder, coord, graphBottom - length, coord, graphBottom);
-
-                    tickIndex++;
-                    value = start + tickIndex * tick;
+                    length *= 2;
+                    string tickMark = tick.value.ToString();
+                    SizeF stringSize = g.MeasureString(tickMark, axisTextFont);
+                    float stringCoord = MathEx.MinMax(0, tick.coord - stringSize.Width / 2, this.Width);
+                    g.DrawString(tickMark, axisTextFont, AxisTextBrush, stringCoord, graphBottom);
                 }
+                g.DrawLine(GraphBorder, tick.intCoord, graphBottom - length, tick.intCoord, graphBottom);
             }
 
             // Y axis
+            foreach (TickPoint tick in yTicks)
             {
-                double tick = NormalizeTick(ViewBB.Height / (MinorTickCount + 1));
-                double start = NormalizeStart(ViewBB.Top, tick);
-
-                int tickIndex = 0;
-                double value = start;
-                while (value < ViewBB.Bottom)
+                int length = tickLength;
+                if ((tick.index % MajorTickEvery) == 0)
                 {
-                    float coord = graphTop + (float)(((value - ViewBB.Top) / ViewBB.Height) * graphHeight);
-                    int length = 5;
-
-                    if ((tickIndex % MajorTickEvery) == 0)
-                    {
-                        length = 10;
-                        string tickMark = value.ToString();
-                        SizeF stringSize = g.MeasureString(tickMark, axisTextFont);
-                        float stringCoord = Math.Min(Math.Max(graphTop, coord - stringSize.Height / 2), graphBottom - stringSize.Height);
-                        g.DrawString(tickMark, axisTextFont, AxisTextBrush, graphLeft, stringCoord);
-                    }
-
-                    g.DrawLine(GraphBorder, graphLeft - length, coord, graphLeft, coord);
-
-                    tickIndex++;
-                    value = start + tickIndex * tick;
+                    length *= 2;
+                    string tickMark = tick.value.ToString();
+                    SizeF stringSize = g.MeasureString(tickMark, axisTextFont);
+                    float stringCoord = MathEx.MinMax(graphTop, tick.coord - stringSize.Height / 2, graphBottom - stringSize.Height);
+                    g.DrawString(tickMark, axisTextFont, AxisTextBrush, graphLeft, stringCoord);
                 }
+                g.DrawLine(GraphBorder, graphLeft - length, tick.intCoord, graphLeft, tick.intCoord);
             }
         }
 
@@ -308,6 +352,14 @@ namespace Silicups.GUI
         public double X;
         public double Y;
         public double Yerr;
+    }
+
+    public class TickPoint
+    {
+        public double value;
+        public float coord;
+        public int intCoord;
+        public int index;
     }
 
     public class BoundingBox
@@ -381,6 +433,19 @@ namespace Silicups.GUI
             double addition2 = Height * factor / 2;
             Top -= addition2;
             Bottom += addition2;
+        }
+    }
+
+    public static class MathEx
+    {
+        public static float MinMax(float min, float value, float max)
+        {
+            return Math.Min(Math.Max(min, value), max);
+        }
+
+        public static double MinMax(double min, double value, double max)
+        {
+            return Math.Min(Math.Max(min, value), max);
         }
     }
 }
