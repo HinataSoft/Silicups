@@ -93,6 +93,12 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Silicups.Core\Silicups.Core.csproj">
+      <Project>{6D4F9A7A-444B-4D68-8F77-D482D4FF599E}</Project>
+      <Name>Silicups.Core</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

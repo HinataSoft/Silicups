@@ -35,6 +35,8 @@
             this.buttonOK = new System.Windows.Forms.Button();
             this.buttonCancel = new System.Windows.Forms.Button();
             this.buttonChoose = new System.Windows.Forms.Button();
+            this.label3 = new System.Windows.Forms.Label();
+            this.textBoxFilter = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // textBoxDirectory
@@ -71,7 +73,7 @@
             // 
             // buttonOK
             // 
-            this.buttonOK.Location = new System.Drawing.Point(225, 64);
+            this.buttonOK.Location = new System.Drawing.Point(225, 91);
             this.buttonOK.Name = "buttonOK";
             this.buttonOK.Size = new System.Drawing.Size(75, 23);
             this.buttonOK.TabIndex = 4;
@@ -82,7 +84,7 @@
             // buttonCancel
             // 
             this.buttonCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.buttonCancel.Location = new System.Drawing.Point(327, 64);
+            this.buttonCancel.Location = new System.Drawing.Point(327, 91);
             this.buttonCancel.Name = "buttonCancel";
             this.buttonCancel.Size = new System.Drawing.Size(75, 23);
             this.buttonCancel.TabIndex = 5;
@@ -91,7 +93,7 @@
             // 
             // buttonChoose
             // 
-            this.buttonChoose.Location = new System.Drawing.Point(15, 65);
+            this.buttonChoose.Location = new System.Drawing.Point(15, 92);
             this.buttonChoose.Name = "buttonChoose";
             this.buttonChoose.Size = new System.Drawing.Size(106, 23);
             this.buttonChoose.TabIndex = 6;
@@ -99,12 +101,30 @@
             this.buttonChoose.UseVisualStyleBackColor = true;
             this.buttonChoose.Click += new System.EventHandler(this.buttonChoose_Click);
             // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(12, 68);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(29, 13);
+            this.label3.TabIndex = 8;
+            this.label3.Text = "Filter";
+            // 
+            // textBoxFilter
+            // 
+            this.textBoxFilter.Location = new System.Drawing.Point(74, 65);
+            this.textBoxFilter.Name = "textBoxFilter";
+            this.textBoxFilter.Size = new System.Drawing.Size(328, 20);
+            this.textBoxFilter.TabIndex = 7;
+            // 
             // FilesSelectForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.buttonCancel;
-            this.ClientSize = new System.Drawing.Size(414, 100);
+            this.ClientSize = new System.Drawing.Size(414, 126);
+            this.Controls.Add(this.label3);
+            this.Controls.Add(this.textBoxFilter);
             this.Controls.Add(this.buttonChoose);
             this.Controls.Add(this.buttonCancel);
             this.Controls.Add(this.buttonOK);
@@ -129,5 +149,7 @@
         private System.Windows.Forms.Button buttonOK;
         private System.Windows.Forms.Button buttonCancel;
         private System.Windows.Forms.Button buttonChoose;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.TextBox textBoxFilter;
     }
 }

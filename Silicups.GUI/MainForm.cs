@@ -7,153 +7,100 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
+using Silicups.Core;
+
 namespace Silicups.GUI
 {
     public partial class MainForm : Form
     {
-        public List<DataPoint> DataList = null;
-        public List<DataPoint> PhaseList = null;
+        private Project Project = null;
+        private bool IsInitializing = false;
 
         public MainForm()
         {
             InitializeComponent();
 
+            radioButtonTimeseries.CheckedChanged += new EventHandler(radioButtonTimeseries_CheckedChanged);
             radioButtonPhased.CheckedChanged += new EventHandler(radioButtonPhased_CheckedChanged);
+            radioButtonCompressed.CheckedChanged += new EventHandler(radioButtonCompressed_CheckedChanged);
 
             if (System.IO.File.Exists("autoload.txt"))
             { LoadFile("autoload.txt"); }
         }
 
+        void radioButtonTimeseries_CheckedChanged(object sender, EventArgs e)
+        {
+            if (!IsInitializing && radioButtonTimeseries.Checked)
+            { SetDataSource(Project.GetTimeSeries()); }
+        }
+
+        void radioButtonCompressed_CheckedChanged(object sender, EventArgs e)
+        {
+            if (!IsInitializing && radioButtonCompressed.Checked)
+            { SetDataSource(Project.GetCompressedSeries()); }
+        }
+
         void radioButtonPhased_CheckedChanged(object sender, EventArgs e)
         {
-            if (radioButtonPhased.Checked)
-            {
-                if ((DataList == null) || String.IsNullOrEmpty(textBoxM0.Text) || String.IsNullOrEmpty(textBoxP.Text))
-                { radioButtonTimeseries.Checked = true; }
-                else
-                {
-                    try
-                    { MakePhaseList(false); }
-                    catch
-                    { radioButtonTimeseries.Checked = true; }
-                }
-            }
-            else
-            {
-                SetDataSource(DataList);
-            }
-        }
-
-        private void SetDataSource(List<DataPoint> list)
-        {
-            if (list == null)
-            { graph.DataSource = null; }
-            else
-            { graph.DataSource = () => list; }
-        }
-
-        private void LoadFile(string filename)
-        {
-            StartLoadFile();
-            AppendFile(filename);
-            FinishLoadFile();
-        }
-
-        private void StartLoadFile()
-        {
-            listBoxObs.Items.Clear();
-            DataList = new List<DataPoint>();
-            PhaseList = null;
-            radioButtonTimeseries.Checked = true;
-            textBoxM0.Text = "";
-            textBoxP.Text = "";
-        }
-
-        private void FinishLoadFile()
-        {
-            SetDataSource(DataList);
-        }
-
-        private readonly static string PhasedTag = "Phased with elements ";
-        private void AppendFile(string filename)
-        {
-            foreach (string s in System.IO.File.ReadAllLines(filename))
-            {
-                try
-                {
-                    if (s.StartsWith("24"))
-                    {
-                        string[] parts = s.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                        var x = ParseDouble(parts[0]);
-                        var y = ParseDouble(parts[1]);
-                        var yerr = ParseDouble(parts[2]);
-                        if (y > 50)
-                        { continue; }
-
-                        DataList.Add(new DataPoint() { X = x, Y = y, Yerr = yerr });
-                    }
-                    else
-                    {
-                        int i = s.IndexOf(PhasedTag);
-                        if (i > 0)
-                        {
-                            string[] parts = s.Substring(i + PhasedTag.Length).Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                            textBoxM0.Text = parts[0];
-                            textBoxP.Text = parts[2];
-                        }
-                    }
-                }
-                catch
-                { }
-            }
-            listBoxObs.Items.Add(filename, true);
-        }
-
-        private void MakePhaseList(bool updateOnly)
-        {
-            double m0 = ParseDouble(textBoxM0.Text);
-            double per = ParseDouble(textBoxP.Text);
-
-            bool doUpdate = (PhaseList != null) && updateOnly;
-            if (doUpdate)
-            { PhaseList.Clear(); }
-            else
-            { PhaseList = new List<DataPoint>(); }
-
-            foreach (DataPoint p in DataList)
-            {
-                double phased = (p.X - m0) / per;
-                double phase = phased - Math.Floor(phased);
-                PhaseList.Add(new DataPoint() { X = phase, Y = p.Y, Yerr = p.Yerr });
-                PhaseList.Add(new DataPoint() { X = phase - 1, Y = p.Y, Yerr = p.Yerr });
-            }
-
-            if (doUpdate)
-            { graph.Invalidate(); }
-            else
-            { SetDataSource(PhaseList); }
+            if (!IsInitializing && radioButtonPhased.Checked)
+            { SetDataSource(Project.GetPhasedSeries()); }
         }
 
         private void textBoxP_TextChanged(object sender, EventArgs e)
         {
+            if (IsInitializing)
+            { return; }
+
+            Project.SetM0AndPString(textBoxM0.Text, textBoxP.Text);
+            if (radioButtonPhased.Checked)
+            { SetDataSource(Project.GetPhasedSeries(), true); }
+        }
+
+        private void SetDataSource(IDataSeries dataSeries, bool doUpdate = false)
+        {
+            if (doUpdate && (dataSeries != null))
+            { graph.UpdateDataSource(dataSeries); }
+            else
+            { graph.SetDataSource(dataSeries); }
+        }
+
+        private void LoadFile(string filename)
+        {
+            LoadFiles(new string[] { filename });
+        }
+
+        private void LoadFiles(IEnumerable<string> filenames)
+        {
             try
             {
-                if (radioButtonPhased.Checked)
-                { MakePhaseList(true); }
+                IsInitializing = true;
+                var project = Silicups.Core.Project.CreateFromDataFiles(filenames);
+                this.Project = project;
+                FinishLoadFile();
             }
-            catch
-            { }
+            finally
+            {
+                IsInitializing = false;
+            }
         }
 
-        private double ParseDouble(string s)
+        private void FinishLoadFile()
         {
-            return Double.Parse(s.Replace(',', '.'), System.Globalization.CultureInfo.InvariantCulture);
+            textBoxM0.Text = Project.GetM0String();
+            textBoxP.Text = Project.GetPString();
+
+            listBoxObs.Items.Clear();
+            if(Project != null)
+            {
+                foreach (DataSetDescription description in Project.GetDescriptions())
+                { listBoxObs.Items.Add(description.Path, true); }
+            }
+
+            radioButtonTimeseries.Checked = true;
+            SetDataSource(Project.GetTimeSeries());
         }
 
-        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            Application.Exit();
-        }
+        // menu
 
         private void loadFileToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -162,12 +109,7 @@ namespace Silicups.GUI
             fd.Multiselect = true;
             DialogResult dialogResult = fd.ShowDialog();
             if (dialogResult == DialogResult.OK)
-            {
-                StartLoadFile();
-                foreach (string filename in fd.FileNames)
-                { AppendFile(filename); }
-                FinishLoadFile();
-            }
+            { LoadFiles(fd.FileNames); }
         }
 
         private void loadFilesToolStripMenuItem_Click(object sender, EventArgs e)
@@ -178,16 +120,18 @@ namespace Silicups.GUI
             {
                 try
                 {
-                    StartLoadFile();
-                    foreach (string filename in fd.FileNames)
-                    { AppendFile(filename); }
-                    FinishLoadFile();                    
+                    LoadFiles(fd.FileNames);
                 }
                 catch (Exception ex)
                 {
                     MessageBox.Show(ex.Message, "Exception", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
+        }
+
+        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
         }
     }
 }

@@ -29,10 +29,9 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            Silicups.GUI.BoundingBox boundingBox1 = new Silicups.GUI.BoundingBox();
-            Silicups.GUI.BoundingBox boundingBox2 = new Silicups.GUI.BoundingBox();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.splitContainerMain = new System.Windows.Forms.SplitContainer();
+            this.listBoxObs = new System.Windows.Forms.CheckedListBox();
             this.graph = new Silicups.GUI.Graph(this.components);
             this.panelTools = new System.Windows.Forms.Panel();
             this.label2 = new System.Windows.Forms.Label();
@@ -47,7 +46,8 @@
             this.loadFilesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip = new System.Windows.Forms.StatusStrip();
-            this.listBoxObs = new System.Windows.Forms.CheckedListBox();
+            this.radioButtonCompressed = new System.Windows.Forms.RadioButton();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainerMain)).BeginInit();
             this.splitContainerMain.Panel1.SuspendLayout();
             this.splitContainerMain.Panel2.SuspendLayout();
             this.splitContainerMain.SuspendLayout();
@@ -57,9 +57,9 @@
             // 
             // splitContainerMain
             // 
-            this.splitContainerMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.splitContainerMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.splitContainerMain.Location = new System.Drawing.Point(0, 27);
             this.splitContainerMain.Name = "splitContainerMain";
             // 
@@ -75,32 +75,31 @@
             this.splitContainerMain.SplitterDistance = 207;
             this.splitContainerMain.TabIndex = 2;
             // 
+            // listBoxObs
+            // 
+            this.listBoxObs.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.listBoxObs.FormattingEnabled = true;
+            this.listBoxObs.Location = new System.Drawing.Point(0, 0);
+            this.listBoxObs.Name = "listBoxObs";
+            this.listBoxObs.Size = new System.Drawing.Size(207, 527);
+            this.listBoxObs.TabIndex = 0;
+            // 
             // graph
             // 
-            this.graph.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.graph.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.graph.BackColor = System.Drawing.Color.White;
-            boundingBox1.Bottom = 14;
-            boundingBox1.Left = 2457658.583;
-            boundingBox1.Right = 2457658.925;
-            boundingBox1.Top = 13;
-            this.graph.DataBB = boundingBox1;
-            this.graph.DataSource = null;
             this.graph.Location = new System.Drawing.Point(2, 0);
             this.graph.Name = "graph";
             this.graph.Size = new System.Drawing.Size(768, 421);
             this.graph.TabIndex = 1;
-            boundingBox2.Bottom = 14;
-            boundingBox2.Left = 2457658.6;
-            boundingBox2.Right = 2457658.9;
-            boundingBox2.Top = 13;
-            this.graph.ViewBB = boundingBox2;
             // 
             // panelTools
             // 
-            this.panelTools.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.panelTools.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.panelTools.Controls.Add(this.radioButtonCompressed);
             this.panelTools.Controls.Add(this.label2);
             this.panelTools.Controls.Add(this.textBoxP);
             this.panelTools.Controls.Add(this.label1);
@@ -115,7 +114,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(309, 7);
+            this.label2.Location = new System.Drawing.Point(406, 6);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(14, 13);
             this.label2.TabIndex = 5;
@@ -123,7 +122,7 @@
             // 
             // textBoxP
             // 
-            this.textBoxP.Location = new System.Drawing.Point(329, 3);
+            this.textBoxP.Location = new System.Drawing.Point(426, 3);
             this.textBoxP.Name = "textBoxP";
             this.textBoxP.Size = new System.Drawing.Size(100, 20);
             this.textBoxP.TabIndex = 4;
@@ -132,7 +131,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(169, 6);
+            this.label1.Location = new System.Drawing.Point(266, 6);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(22, 13);
             this.label1.TabIndex = 3;
@@ -140,7 +139,7 @@
             // 
             // textBoxM0
             // 
-            this.textBoxM0.Location = new System.Drawing.Point(197, 3);
+            this.textBoxM0.Location = new System.Drawing.Point(294, 3);
             this.textBoxM0.Name = "textBoxM0";
             this.textBoxM0.Size = new System.Drawing.Size(100, 20);
             this.textBoxM0.TabIndex = 2;
@@ -149,7 +148,7 @@
             // radioButtonPhased
             // 
             this.radioButtonPhased.AutoSize = true;
-            this.radioButtonPhased.Location = new System.Drawing.Point(94, 3);
+            this.radioButtonPhased.Location = new System.Drawing.Point(177, 3);
             this.radioButtonPhased.Name = "radioButtonPhased";
             this.radioButtonPhased.Size = new System.Drawing.Size(61, 17);
             this.radioButtonPhased.TabIndex = 1;
@@ -217,14 +216,16 @@
             this.statusStrip.TabIndex = 4;
             this.statusStrip.Text = "statusStrip1";
             // 
-            // listBoxObs
+            // radioButtonCompressed
             // 
-            this.listBoxObs.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.listBoxObs.FormattingEnabled = true;
-            this.listBoxObs.Location = new System.Drawing.Point(0, 0);
-            this.listBoxObs.Name = "listBoxObs";
-            this.listBoxObs.Size = new System.Drawing.Size(207, 514);
-            this.listBoxObs.TabIndex = 0;
+            this.radioButtonCompressed.AutoSize = true;
+            this.radioButtonCompressed.Location = new System.Drawing.Point(88, 3);
+            this.radioButtonCompressed.Name = "radioButtonCompressed";
+            this.radioButtonCompressed.Size = new System.Drawing.Size(83, 17);
+            this.radioButtonCompressed.TabIndex = 6;
+            this.radioButtonCompressed.TabStop = true;
+            this.radioButtonCompressed.Text = "Compressed";
+            this.radioButtonCompressed.UseVisualStyleBackColor = true;
             // 
             // MainForm
             // 
@@ -240,6 +241,7 @@
             this.Text = "SILICUPS";
             this.splitContainerMain.Panel1.ResumeLayout(false);
             this.splitContainerMain.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainerMain)).EndInit();
             this.splitContainerMain.ResumeLayout(false);
             this.panelTools.ResumeLayout(false);
             this.panelTools.PerformLayout();
@@ -268,6 +270,7 @@
         private System.Windows.Forms.ToolStripMenuItem loadFileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem loadFilesToolStripMenuItem;
         private System.Windows.Forms.CheckedListBox listBoxObs;
+        private System.Windows.Forms.RadioButton radioButtonCompressed;
 
     }
 }

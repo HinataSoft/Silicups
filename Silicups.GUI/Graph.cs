@@ -5,6 +5,8 @@ using System.ComponentModel;
 using System.Text;
 using System.Windows.Forms;
 
+using Silicups.Core;
+
 namespace Silicups.GUI
 {
     public partial class Graph : Panel
@@ -27,10 +29,8 @@ namespace Silicups.GUI
 
         #endregion
 
-        public delegate IEnumerable<DataPoint> DataSourceDelegate();
-
-        public BoundingBox DataBB { get; set; }
-        public BoundingBox ViewBB { get; set; }
+        private BoundingBox DataBB = BoundingBox.CloneUnary();
+        private BoundingBox ViewBB = BoundingBox.CloneUnary();
 
         public int GraphBorderPaddingRatio = 20;
         public int MarkRatio = 100;
@@ -45,7 +45,8 @@ namespace Silicups.GUI
         public Brush AxisTextBrush = Brushes.Black;
 
         private Point MouseLastLocation = Point.Empty;
-        private DataSourceDelegate dataSource = null;
+        private IDataSeries DataSource = null;
+        private bool DataSourceInited = false;
 
         private void InitializeGraph()
         {
@@ -58,79 +59,60 @@ namespace Silicups.GUI
             this.UpdateStyles();
 
             DataSource = null;
+            DataSourceInited = false;
 
             this.MouseDown += new MouseEventHandler(Graph_MouseDown);
             this.MouseMove += new MouseEventHandler(Graph_MouseMove);
             this.MouseUp += new MouseEventHandler(Graph_MouseUp);
             this.MouseWheel += new MouseEventHandler(Graph_MouseWheel);
-
-            _t();
         }
 
-        public DataSourceDelegate DataSource
+        public void SetDataSource(IDataSeries dataSeries)
         {
-            get
+            if (dataSeries == null)
             {
-                return dataSource;
+                DisableDataSource();
+                return;
             }
 
-            set
-            {
-                dataSource = value;
-                DataBB = null;
-
-                if(dataSource != null)
-                {
-                    DataBB = new BoundingBox() {
-                        Left = Double.PositiveInfinity, Right = Double.NegativeInfinity,
-                        Top = Double.PositiveInfinity, Bottom = Double.NegativeInfinity
-                    };
-                    foreach (DataPoint p in DataSource())
-                    { DataBB.Union(p.X, p.Y); }
-                    if ((DataBB.Left > DataBB.Right) || (DataBB.Bottom < DataBB.Top))
-                    { DataBB = null; }
-                }
-
-                if (DataBB == null)
-                {
-                    DataBB = new BoundingBox() {
-                        Left = 2457658.583, Right = 2457658.925,
-                        Top = 13, Bottom = 14
-                    };
-                }
-                else
-                {
-                    DataBB.ScaleX(0.1);
-                    DataBB.ScaleY(0.1);
-                }
-
-                ViewBB = DataBB.Clone();
-                Invalidate();
-            }
-        }
-
-        public void UpdateDataSource(DataSourceDelegate updatedDataSource)
-        {
-            dataSource = updatedDataSource;
+            DataSource = dataSeries;
+            DataSourceInited = true;
+            DataBB = DataSource.BoundingBox.Clone();
+            DataBB.AddScale(0.1);
+            ViewBB = DataBB.Clone();
             Invalidate();
         }
 
-        #region test
-
-        private void _t()
+        public void UpdateDataSource(IDataSeries dataSeries)
         {
-            //_t(0.056);
-            //_t(0.046);
-            //_t(210.056);
-            //_t(190.056);
+            if (!DataSourceInited)
+            {
+                SetDataSource(dataSeries);
+                return;
+            }
+
+            DataSource = dataSeries;
+            Invalidate();
         }
 
-        private void _t(double t)
+        public void DisableDataSource()
         {
-            System.Diagnostics.Trace.WriteLine(String.Format("N({0}) = {1}", t, NormalizeTick(t)));
+            DataSource = null;
+            DataSourceInited = false;
+            DataBB = BoundingBox.CloneUnary();
+            DataBB.AddScale(0.1);
+            ViewBB = DataBB.Clone();
+            Invalidate();
         }
 
-        #endregion
+        private float GraphBorderPadding
+        {
+            get
+            {
+                int sideSize = Math.Min(this.Width, this.Height);
+                return sideSize / GraphBorderPaddingRatio;
+            }
+        }
 
         void Graph_MouseDown(object sender, MouseEventArgs e)
         {
@@ -164,10 +146,11 @@ namespace Silicups.GUI
 
         void Graph_MouseWheel(object sender, MouseEventArgs e)
         {
-            ViewBB.ScaleX(0.001 * -e.Delta);
+            float graphBorderPadding = GraphBorderPadding;
+            ViewBB.AddScaleX(0.001 * -e.Delta, (e.Location.X - graphBorderPadding) / (this.Width - 2 * graphBorderPadding));
 
             if ((Control.ModifierKeys & Keys.Shift) != 0)
-            { ViewBB.ScaleY(0.001 * -e.Delta); }
+            { ViewBB.AddScaleY(0.001 * -e.Delta, (e.Location.Y - graphBorderPadding) / (this.Height - 2 * graphBorderPadding)); }
             ViewBB.TruncateTo(DataBB);
             Invalidate();
         }
@@ -261,27 +244,33 @@ namespace Silicups.GUI
             // data
             if (DataSource != null)
             {
-                foreach (DataPoint p in DataSource())
+                foreach (IDataSet set in DataSource.Series)
                 {
-                    float x = (float)(((p.X - ViewBB.Left) / ViewBB.Width) * graphWidth);
-                    float y = (float)(((p.Y - ViewBB.Top) / ViewBB.Height) * graphHeight);
-                    float yerr = (float)(p.Yerr / ViewBB.Height * graphHeight);
-                    if ((x < markSize2) || (x > graphWidth - markSize2) || (y < markSize2) || (y > graphHeight - markSize2))
-                    { continue; }
+                    foreach (DataPoint p in set.Set)
+                    {
+                        float x = (float)(((p.X - ViewBB.Left) / ViewBB.Width) * graphWidth);
+                        float y = (float)(((p.Y - ViewBB.Top) / ViewBB.Height) * graphHeight);
+                        float yerr = (float)(p.Yerr / ViewBB.Height * graphHeight);
+                        if ((x < markSize2) || (x > graphWidth - markSize2) || (y < markSize2) || (y > graphHeight - markSize2))
+                        { continue; }
 
-                    g.DrawLine(DataPointError, graphLeft + x, Math.Max(graphTop + y - yerr, graphTop), graphLeft + x, Math.Min(graphTop + y + yerr, graphBottom));
-                    //g.FillEllipse(DataPointBrush, graphLeft + x - markSize2, graphTop + y - markSize2, markSize, markSize);
+                        g.DrawLine(DataPointError, graphLeft + x, Math.Max(graphTop + y - yerr, graphTop), graphLeft + x, Math.Min(graphTop + y + yerr, graphBottom));
+                        //g.FillEllipse(DataPointBrush, graphLeft + x - markSize2, graphTop + y - markSize2, markSize, markSize);
+                    }
                 }
-                foreach (DataPoint p in DataSource())
+                foreach (IDataSet set in DataSource.Series)
                 {
-                    float x = (float)(((p.X - ViewBB.Left) / ViewBB.Width) * graphWidth);
-                    float y = (float)(((p.Y - ViewBB.Top) / ViewBB.Height) * graphHeight);
-                    float yerr = (float)(p.Yerr / ViewBB.Height * graphHeight);
-                    if ((x < markSize2) || (x > graphWidth - markSize2) || (y < markSize2) || (y > graphHeight - markSize2))
-                    { continue; }
+                    foreach (DataPoint p in set.Set)
+                    {
+                        float x = (float)(((p.X - ViewBB.Left) / ViewBB.Width) * graphWidth);
+                        float y = (float)(((p.Y - ViewBB.Top) / ViewBB.Height) * graphHeight);
+                        float yerr = (float)(p.Yerr / ViewBB.Height * graphHeight);
+                        if ((x < markSize2) || (x > graphWidth - markSize2) || (y < markSize2) || (y > graphHeight - markSize2))
+                        { continue; }
 
-                    //g.DrawLine(DataPointError, graphLeft + x, Math.Max(graphTop + y - yerr, graphTop), graphLeft + x, Math.Min(graphTop + y + yerr, graphBottom));
-                    g.FillEllipse(DataPointBrush, graphLeft + x - markSize2, graphTop + y - markSize2, markSize, markSize);
+                        //g.DrawLine(DataPointError, graphLeft + x, Math.Max(graphTop + y - yerr, graphTop), graphLeft + x, Math.Min(graphTop + y + yerr, graphBottom));
+                        g.FillEllipse(DataPointBrush, graphLeft + x - markSize2, graphTop + y - markSize2, markSize, markSize);
+                    }
                 }
             }
 
@@ -347,105 +336,11 @@ namespace Silicups.GUI
         }
     }
 
-    public class DataPoint
-    {
-        public double X;
-        public double Y;
-        public double Yerr;
-    }
-
     public class TickPoint
     {
         public double value;
         public float coord;
         public int intCoord;
         public int index;
-    }
-
-    public class BoundingBox
-    {
-        public double Left { get; set; }
-        public double Right { get; set; }
-        public double Top { get; set; }
-        public double Bottom { get; set; }
-
-        public double Width { get { return Math.Abs(Left - Right); } }
-        public double Height { get { return Math.Abs(Top - Bottom); } }
-
-        public BoundingBox Clone()
-        {
-            return new BoundingBox() {
-                Left = this.Left, Right = this.Right,
-                Top = this.Top, Bottom = this.Bottom
-            };
-        }
-
-        public void TruncateTo(BoundingBox other)
-        {
-            Left = Math.Max(Left, other.Left);
-            Right = Math.Min(Right, other.Right);
-            Top = Math.Max(Top, other.Top);
-            Bottom = Math.Min(Bottom, other.Bottom);
-        }
-
-        public void ShiftTo(BoundingBox other)
-        {
-            if (other.Left > Left)
-            { TranslateX(other.Left - Left); }
-            else if (other.Right < Right)
-            { TranslateX(other.Right - Right); }
-
-            if (other.Top > Top)
-            { TranslateY(other.Top - Top); }
-            else if (other.Bottom < Bottom)
-            { TranslateY(other.Bottom - Bottom); }
-        }
-
-        public void TranslateX(double dx)
-        {
-            Left += dx;
-            Right += dx;
-        }
-
-        public void TranslateY(double dy)
-        {
-            Top += dy;
-            Bottom += dy;
-        }
-
-        public void Union(double x, double y)
-        {
-            if (Left > x) { Left = x; }
-            if (Right < x) { Right = x; }
-            if (Top > y) { Top = y; }
-            if (Bottom < y) { Bottom = y; }
-        }
-
-        public void ScaleX(double factor)
-        {
-            double addition2 = Width * factor / 2;
-            Left -= addition2;
-            Right += addition2;
-        }
-
-        public void ScaleY(double factor)
-        {
-            double addition2 = Height * factor / 2;
-            Top -= addition2;
-            Bottom += addition2;
-        }
-    }
-
-    public static class MathEx
-    {
-        public static float MinMax(float min, float value, float max)
-        {
-            return Math.Min(Math.Max(min, value), max);
-        }
-
-        public static double MinMax(double min, double value, double max)
-        {
-            return Math.Min(Math.Max(min, value), max);
-        }
     }
 }
