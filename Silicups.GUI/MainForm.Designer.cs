@@ -34,6 +34,7 @@
             this.listBoxObs = new System.Windows.Forms.CheckedListBox();
             this.graph = new Silicups.GUI.Graph(this.components);
             this.panelTools = new System.Windows.Forms.Panel();
+            this.radioButtonCompressed = new System.Windows.Forms.RadioButton();
             this.label2 = new System.Windows.Forms.Label();
             this.textBoxP = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
@@ -46,7 +47,8 @@
             this.loadFilesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip = new System.Windows.Forms.StatusStrip();
-            this.radioButtonCompressed = new System.Windows.Forms.RadioButton();
+            this.textBoxOffset = new System.Windows.Forms.TextBox();
+            this.label3 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerMain)).BeginInit();
             this.splitContainerMain.Panel1.SuspendLayout();
             this.splitContainerMain.Panel2.SuspendLayout();
@@ -99,6 +101,8 @@
             // 
             this.panelTools.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.panelTools.Controls.Add(this.label3);
+            this.panelTools.Controls.Add(this.textBoxOffset);
             this.panelTools.Controls.Add(this.radioButtonCompressed);
             this.panelTools.Controls.Add(this.label2);
             this.panelTools.Controls.Add(this.textBoxP);
@@ -110,6 +114,17 @@
             this.panelTools.Name = "panelTools";
             this.panelTools.Size = new System.Drawing.Size(768, 97);
             this.panelTools.TabIndex = 0;
+            // 
+            // radioButtonCompressed
+            // 
+            this.radioButtonCompressed.AutoSize = true;
+            this.radioButtonCompressed.Location = new System.Drawing.Point(88, 3);
+            this.radioButtonCompressed.Name = "radioButtonCompressed";
+            this.radioButtonCompressed.Size = new System.Drawing.Size(83, 17);
+            this.radioButtonCompressed.TabIndex = 6;
+            this.radioButtonCompressed.TabStop = true;
+            this.radioButtonCompressed.Text = "Compressed";
+            this.radioButtonCompressed.UseVisualStyleBackColor = true;
             // 
             // label2
             // 
@@ -216,16 +231,22 @@
             this.statusStrip.TabIndex = 4;
             this.statusStrip.Text = "statusStrip1";
             // 
-            // radioButtonCompressed
+            // textBoxOffset
             // 
-            this.radioButtonCompressed.AutoSize = true;
-            this.radioButtonCompressed.Location = new System.Drawing.Point(88, 3);
-            this.radioButtonCompressed.Name = "radioButtonCompressed";
-            this.radioButtonCompressed.Size = new System.Drawing.Size(83, 17);
-            this.radioButtonCompressed.TabIndex = 6;
-            this.radioButtonCompressed.TabStop = true;
-            this.radioButtonCompressed.Text = "Compressed";
-            this.radioButtonCompressed.UseVisualStyleBackColor = true;
+            this.textBoxOffset.Enabled = false;
+            this.textBoxOffset.Location = new System.Drawing.Point(294, 29);
+            this.textBoxOffset.Name = "textBoxOffset";
+            this.textBoxOffset.Size = new System.Drawing.Size(100, 20);
+            this.textBoxOffset.TabIndex = 7;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(253, 32);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(35, 13);
+            this.label3.TabIndex = 8;
+            this.label3.Text = "Offset";
             // 
             // MainForm
             // 
@@ -271,6 +292,8 @@
         private System.Windows.Forms.ToolStripMenuItem loadFilesToolStripMenuItem;
         private System.Windows.Forms.CheckedListBox listBoxObs;
         private System.Windows.Forms.RadioButton radioButtonCompressed;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.TextBox textBoxOffset;
 
     }
 }

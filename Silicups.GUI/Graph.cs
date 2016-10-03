@@ -42,6 +42,7 @@ namespace Silicups.GUI
         public Pen CoordMark = Pens.LightGray;
 
         public Brush DataPointBrush = Brushes.Black;
+        public Brush DataPointHighlightedBrush = Brushes.Red;
         public Brush AxisTextBrush = Brushes.Black;
 
         private Point MouseLastLocation = Point.Empty;
@@ -246,6 +247,8 @@ namespace Silicups.GUI
             {
                 foreach (IDataSet set in DataSource.Series)
                 {
+                    if (!set.Metadata.Enabled)
+                    { continue; }
                     foreach (DataPoint p in set.Set)
                     {
                         float x = (float)(((p.X - ViewBB.Left) / ViewBB.Width) * graphWidth);
@@ -255,11 +258,12 @@ namespace Silicups.GUI
                         { continue; }
 
                         g.DrawLine(DataPointError, graphLeft + x, Math.Max(graphTop + y - yerr, graphTop), graphLeft + x, Math.Min(graphTop + y + yerr, graphBottom));
-                        //g.FillEllipse(DataPointBrush, graphLeft + x - markSize2, graphTop + y - markSize2, markSize, markSize);
                     }
                 }
                 foreach (IDataSet set in DataSource.Series)
                 {
+                    if (!set.Metadata.Enabled || set.Metadata.Hightlighted)
+                    { continue; }
                     foreach (DataPoint p in set.Set)
                     {
                         float x = (float)(((p.X - ViewBB.Left) / ViewBB.Width) * graphWidth);
@@ -268,8 +272,22 @@ namespace Silicups.GUI
                         if ((x < markSize2) || (x > graphWidth - markSize2) || (y < markSize2) || (y > graphHeight - markSize2))
                         { continue; }
 
-                        //g.DrawLine(DataPointError, graphLeft + x, Math.Max(graphTop + y - yerr, graphTop), graphLeft + x, Math.Min(graphTop + y + yerr, graphBottom));
                         g.FillEllipse(DataPointBrush, graphLeft + x - markSize2, graphTop + y - markSize2, markSize, markSize);
+                    }
+                }
+                foreach (IDataSet set in DataSource.Series)
+                {
+                    if (!set.Metadata.Enabled || !set.Metadata.Hightlighted)
+                    { continue; }
+                    foreach (DataPoint p in set.Set)
+                    {
+                        float x = (float)(((p.X - ViewBB.Left) / ViewBB.Width) * graphWidth);
+                        float y = (float)(((p.Y - ViewBB.Top) / ViewBB.Height) * graphHeight);
+                        float yerr = (float)(p.Yerr / ViewBB.Height * graphHeight);
+                        if ((x < markSize2) || (x > graphWidth - markSize2) || (y < markSize2) || (y > graphHeight - markSize2))
+                        { continue; }
+
+                        g.FillEllipse(DataPointHighlightedBrush, graphLeft + x - markSize2, graphTop + y - markSize2, markSize, markSize);
                     }
                 }
             }

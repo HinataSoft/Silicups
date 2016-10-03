@@ -13,7 +13,17 @@ namespace Silicups.GUI
 {
     public partial class MainForm : Form
     {
+        enum SeriesTypeEnum
+        {
+            Timed,
+            Compressed,
+            Phased,
+        }
+
         private Project Project = null;
+        private IDataSeries CurrentDataSeries = null;
+        private SeriesTypeEnum CurrentDataSeriesType = SeriesTypeEnum.Timed;
+        private IDataSetMetadata SelectedMetadata = null;
         private bool IsInitializing = false;
 
         public MainForm()
@@ -23,6 +33,9 @@ namespace Silicups.GUI
             radioButtonTimeseries.CheckedChanged += new EventHandler(radioButtonTimeseries_CheckedChanged);
             radioButtonPhased.CheckedChanged += new EventHandler(radioButtonPhased_CheckedChanged);
             radioButtonCompressed.CheckedChanged += new EventHandler(radioButtonCompressed_CheckedChanged);
+            listBoxObs.ItemCheck += new ItemCheckEventHandler(listBoxObs_ItemCheck);
+            listBoxObs.SelectedIndexChanged += new EventHandler(listBoxObs_SelectedIndexChanged);
+            textBoxOffset.TextChanged += new EventHandler(textBoxOffset_TextChanged);
 
             if (System.IO.File.Exists("autoload.txt"))
             { LoadFile("autoload.txt"); }
@@ -31,19 +44,19 @@ namespace Silicups.GUI
         void radioButtonTimeseries_CheckedChanged(object sender, EventArgs e)
         {
             if (!IsInitializing && radioButtonTimeseries.Checked)
-            { SetDataSource(Project.GetTimeSeries()); }
+            { SetDataSource(SeriesTypeEnum.Timed); }
         }
 
         void radioButtonCompressed_CheckedChanged(object sender, EventArgs e)
         {
             if (!IsInitializing && radioButtonCompressed.Checked)
-            { SetDataSource(Project.GetCompressedSeries()); }
+            { SetDataSource(SeriesTypeEnum.Compressed); }
         }
 
         void radioButtonPhased_CheckedChanged(object sender, EventArgs e)
         {
             if (!IsInitializing && radioButtonPhased.Checked)
-            { SetDataSource(Project.GetPhasedSeries()); }
+            { SetDataSource(SeriesTypeEnum.Phased); }
         }
 
         private void textBoxP_TextChanged(object sender, EventArgs e)
@@ -53,15 +66,98 @@ namespace Silicups.GUI
 
             Project.SetM0AndPString(textBoxM0.Text, textBoxP.Text);
             if (radioButtonPhased.Checked)
-            { SetDataSource(Project.GetPhasedSeries(), true); }
+            { SetDataSource(SeriesTypeEnum.Phased, true); }
         }
 
-        private void SetDataSource(IDataSeries dataSeries, bool doUpdate = false)
+        void listBoxObs_ItemCheck(object sender, ItemCheckEventArgs e)
         {
-            if (doUpdate && (dataSeries != null))
-            { graph.UpdateDataSource(dataSeries); }
+            if (IsInitializing)
+            { return; }
+
+            var metadata = (IDataSetMetadata)listBoxObs.Items[e.Index];
+            metadata.Enabled = (e.NewValue == CheckState.Checked);
+            RefreshDataSource();
+        }
+
+        void listBoxObs_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (IsInitializing)
+            { return; }
+
+            SelectedMetadata = null;
+            IDataSetMetadata selectedMetadata = null;
+            int selectedIndex = listBoxObs.SelectedIndex;
+            for (int i = 0; i < listBoxObs.Items.Count; i++)
+            {
+                var metadata = (IDataSetMetadata)listBoxObs.Items[i];
+                if(i == selectedIndex)
+                {
+                    metadata.Hightlighted = true;
+                    selectedMetadata = metadata;
+                }
+                else
+                {
+                    metadata.Hightlighted = false;
+                }
+            }
+            if (selectedMetadata != null)
+            {
+                textBoxOffset.Text = MathEx.FormatDouble(selectedMetadata.OffsetY);
+                textBoxOffset.Enabled = true;
+            }
             else
-            { graph.SetDataSource(dataSeries); }
+            {
+                textBoxOffset.Text = "";
+                textBoxOffset.Enabled = false;
+            }
+            SelectedMetadata = selectedMetadata;
+            UpdateDataSource(true);
+        }
+
+        void textBoxOffset_TextChanged(object sender, EventArgs e)
+        {
+            if (IsInitializing || (SelectedMetadata == null))
+            { return; }
+
+            try
+            {
+                SelectedMetadata.OffsetY = MathEx.ParseDouble(textBoxOffset.Text);
+                RefreshDataSource();
+            }
+            catch
+            { }
+        }
+
+        private void SetDataSource(SeriesTypeEnum dataSeriesType, bool doUpdate = false)
+        {
+            IDataSeries dataSeries = null;
+            switch (dataSeriesType)
+            {
+                case SeriesTypeEnum.Timed: dataSeries = Project.GetTimeSeries(); break;
+                case SeriesTypeEnum.Compressed: dataSeries = Project.GetCompressedSeries(); break;
+                case SeriesTypeEnum.Phased: dataSeries = Project.GetPhasedSeries(); break;
+            }
+            CurrentDataSeriesType = dataSeriesType;
+
+            if (CurrentDataSeries != dataSeries)
+            { doUpdate = false; }
+            CurrentDataSeries = dataSeries;
+
+            if (doUpdate && (CurrentDataSeries != null))
+            { graph.UpdateDataSource(CurrentDataSeries); }
+            else
+            { graph.SetDataSource(CurrentDataSeries); }
+        }
+
+        private void UpdateDataSource(bool doUpdate = false)
+        {
+            SetDataSource(CurrentDataSeriesType, doUpdate);
+        }
+
+        private void RefreshDataSource(bool doUpdate = false)
+        {
+            Project.Refresh();
+            SetDataSource(CurrentDataSeriesType, doUpdate);
         }
 
         private void LoadFile(string filename)
@@ -89,15 +185,16 @@ namespace Silicups.GUI
             textBoxM0.Text = Project.GetM0String();
             textBoxP.Text = Project.GetPString();
 
+            SelectedMetadata = null;
             listBoxObs.Items.Clear();
             if(Project != null)
             {
-                foreach (DataSetDescription description in Project.GetDescriptions())
-                { listBoxObs.Items.Add(description.Path, true); }
+                foreach (IDataSetMetadata metadata in Project.GetMetadata())
+                { listBoxObs.Items.Add(metadata, metadata.Enabled); }
             }
 
             radioButtonTimeseries.Checked = true;
-            SetDataSource(Project.GetTimeSeries());
+            SetDataSource(SeriesTypeEnum.Timed);
         }
 
         // menu

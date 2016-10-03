@@ -4,9 +4,20 @@ using System.Text;
 
 namespace Silicups.Core
 {
+    public interface IDataSetMetadata
+    {
+        int Id { get; }
+        string Path { get; }
+
+        bool Enabled { get; set; }
+        bool Hightlighted { get; set; }
+        double OffsetY { get; set; }
+    }
+
     public interface IDataSet
     {
         BoundingBox BoundingBox { get; }
+        IDataSetMetadata Metadata { get; }
         IEnumerable<DataPoint> Set { get; }
     }
 
@@ -22,10 +33,18 @@ namespace Silicups.Core
         void Refresh();
     }
 
-    public class DataSetDescription
+    public class DataSetMetadata : IDataSetMetadata
     {
         public int Id { get; internal set; }
         public string Path { get; internal set; }
+        public bool Enabled { get; set; }
+        public bool Hightlighted { get; set; }
+        public double OffsetY { get; set; }
+
+        public override string ToString()
+        {
+            return String.Format("({0}) {1}", Id, Path);
+        }
     }
 
     public struct DataPoint
@@ -46,17 +65,27 @@ namespace Silicups.Core
     {
         public BoundingBox BoundingBox { get; private set; }
 
-        public bool Enabled { get; set; }
-        public double OffsetY { get; set; }
-        public DataSetDescription Description { get; set; }
+        public IDataSetMetadata Metadata { get; internal set; }
 
         private List<DataPoint> list = new List<DataPoint>();
 
-        public DataPointSet()
+        public DataPointSet(IDataSet templateSet)
         {
             this.BoundingBox = BoundingBox.CloneEmpty();
-            this.Enabled = true;
-            this.OffsetY = 0;
+            this.Metadata = templateSet.Metadata;
+        }
+
+        public DataPointSet(int id, string path)
+        {
+            this.BoundingBox = BoundingBox.CloneEmpty();
+            this.Metadata = new DataSetMetadata()
+            {
+                Id = id,
+                Path = path,
+                Enabled = true,
+                Hightlighted = false,
+                OffsetY = 0,
+            };
         }
 
         public void Add(DataPoint p)
@@ -87,16 +116,6 @@ namespace Silicups.Core
             this.BoundingBox = BoundingBox.CloneEmpty();
         }
 
-        public void AddSet(IEnumerable<DataPoint> set)
-        {
-            var pointSet = new DataPointSet();
-            foreach (DataPoint p in set)
-            { pointSet.Add(p); }
-
-            list.Add(pointSet);
-            BoundingBox.Union(pointSet.BoundingBox);
-        }
-
         public void AddSet(DataPointSet pointSet)
         {
             list.Add(pointSet);
@@ -125,7 +144,7 @@ namespace Silicups.Core
 
     public class DerivedSeries : IDataSeries
     {
-        protected DataPointSeries DataSeries { get; private set; }
+        protected DataPointSeries DataSeries { get; set; }
         protected List<DataPointSet> List = new List<DataPointSet>();
 
         public BoundingBox BoundingBox { get; protected set; }
@@ -172,11 +191,11 @@ namespace Silicups.Core
             Clean();
             foreach (DataPointSet originalSet in DataSeries.DataSetSeries)
             {
-                if (!originalSet.Enabled)
+                if (!originalSet.Metadata.Enabled)
                 { continue; }
-                var set = new DataPointSet();
+                var set = new DataPointSet(originalSet);
                 foreach (DataPoint p in originalSet.Set)
-                { set.Add(p.X, p.Y - originalSet.OffsetY, p.Yerr); }
+                { set.Add(p.X, p.Y - originalSet.Metadata.OffsetY, p.Yerr); }
                 Add(set);
             }
         }
@@ -195,14 +214,14 @@ namespace Silicups.Core
             double x = 0;
             foreach (DataPointSet originalSet in DataSeries.DataSetSeries)
             {
-                if (!originalSet.Enabled)
+                if (!originalSet.Metadata.Enabled)
                 { continue; }
 
-                var set = new DataPointSet();
+                var set = new DataPointSet(originalSet);
                 double xOffset = x - originalSet.BoundingBox.Left;
 
                 foreach (DataPoint p in originalSet.Set)
-                { set.Add(p.X + xOffset, p.Y - originalSet.OffsetY, p.Yerr); }
+                { set.Add(p.X + xOffset, p.Y - originalSet.Metadata.OffsetY, p.Yerr); }
 
                 Add(set);
                 x += originalSet.BoundingBox.Width * 1.1;
@@ -233,16 +252,16 @@ namespace Silicups.Core
 
             foreach (DataPointSet originalSet in DataSeries.DataSetSeries)
             {
-                if (!originalSet.Enabled)
+                if (!originalSet.Metadata.Enabled)
                 { continue; }
 
-                var set = new DataPointSet();
+                var set = new DataPointSet(originalSet);
                 foreach (DataPoint p in originalSet.Set)
                 {
                     double phased = (p.X - M0) / P;
                     double phase = phased - Math.Floor(phased);
-                    set.Add(phase, p.Y - originalSet.OffsetY, p.Yerr);
-                    set.Add(phase - 1, p.Y - originalSet.OffsetY, p.Yerr);
+                    set.Add(phase, p.Y - originalSet.Metadata.OffsetY, p.Yerr);
+                    set.Add(phase - 1, p.Y - originalSet.Metadata.OffsetY, p.Yerr);
                 }
                 Add(set);
                 BoundingBox.Union(set.BoundingBox);

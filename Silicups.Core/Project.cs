@@ -65,12 +65,8 @@ namespace Silicups.Core
             int id = 0;
             foreach (string file in files)
             {
-                var set = new DataPointSet();
+                var set = new DataPointSet(id, file);
                 AppendMagFile(project, set, file);
-                set.Description = new DataSetDescription() {
-                    Id = id,
-                    Path = file,
-                };
                 project.DataSeries.AddSet(set);
                 project.SetDict.Add(id, set);
                 id++;
@@ -131,12 +127,12 @@ namespace Silicups.Core
             return (project != null) && !project.PhasedSeries.IsEmpty ? project.PhasedSeries : null;
         }
 
-        public static IEnumerable<DataSetDescription> GetDescriptions(this Project project)
+        public static IEnumerable<IDataSetMetadata> GetMetadata(this Project project)
         {
             if (project == null)
             { yield break; }
             foreach (DataPointSet set in project.SetDict.Values)
-            { yield return set.Description; }
+            { yield return set.Metadata; }
         }
 
         public static string GetM0String(this Project project)
