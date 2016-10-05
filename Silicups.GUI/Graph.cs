@@ -187,8 +187,8 @@ namespace Silicups.GUI
             // X axis (prep)
             var xTicks = new List<TickPoint>();
             {
-                double tick = NormalizeTick(ViewBB.Width / (MinorTickCount + 1));
-                double start = NormalizeStart(ViewBB.Left, tick);
+                double tick = MathEx.GetHigher125Base(ViewBB.Width / (MinorTickCount + 1));
+                double start = MathEx.RoundToHigher(ViewBB.Left, tick);
                 int tickIndex = 0;
                 double value = start;
                 while (value < ViewBB.Right)
@@ -209,8 +209,8 @@ namespace Silicups.GUI
             // Y axis
             var yTicks = new List<TickPoint>();
             {
-                double tick = NormalizeTick(ViewBB.Height / (MinorTickCount + 1));
-                double start = NormalizeStart(ViewBB.Top, tick);
+                double tick = MathEx.GetHigher125Base(ViewBB.Height / (MinorTickCount + 1));
+                double start = MathEx.RoundToHigher(ViewBB.Top, tick);
 
                 int tickIndex = 0;
                 double value = start;
@@ -324,33 +324,6 @@ namespace Silicups.GUI
                 }
                 g.DrawLine(GraphBorder, graphLeft - length, tick.intCoord, graphLeft, tick.intCoord);
             }
-        }
-
-        private double NormalizeTick(double tick)
-        {
-            double power = Math.Log10(tick);
-            double powerfloor = Math.Floor(power);
-            double tickbase1 = Math.Pow(10, powerfloor);
-            double tickbase2 = tickbase1 * 2;
-            double tickbase5 = tickbase1 * 5;
-            double tickbase10 = tickbase1 * 10;
-
-            if (tick <= tickbase2)
-            { return tickbase2; }
-            if (tick <= tickbase5)
-            { return tickbase5; }
-            return tickbase10;
-
-            //if (tick >= tickbase5)
-            //{ return tickbase5; }
-            //if (tick >= tickbase2)
-            //{ return tickbase2; }
-            //return tickbase1;
-        }
-
-        private double NormalizeStart(double value, double tick)
-        {
-            return Math.Ceiling(value / tick) * tick;
         }
     }
 

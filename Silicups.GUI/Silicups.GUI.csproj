@@ -51,6 +51,12 @@
     <Compile Include="FilesSelectForm.Designer.cs">
       <DependentUpon>FilesSelectForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Glider.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Glider.Designer.cs">
+      <DependentUpon>Glider.cs</DependentUpon>
+    </Compile>
     <Compile Include="Graph.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -67,6 +73,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="FilesSelectForm.resx">
       <DependentUpon>FilesSelectForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Glider.resx">
+      <DependentUpon>Glider.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Graph.resx">
       <DependentUpon>Graph.cs</DependentUpon>

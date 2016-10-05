@@ -26,6 +26,9 @@ namespace Silicups.GUI
         private IDataSetMetadata SelectedMetadata = null;
         private bool IsInitializing = false;
 
+        private double? OriginalP = null;
+        private double? OriginalOffset = null;
+
         public MainForm()
         {
             InitializeComponent();
@@ -36,10 +39,16 @@ namespace Silicups.GUI
             listBoxObs.ItemCheck += new ItemCheckEventHandler(listBoxObs_ItemCheck);
             listBoxObs.SelectedIndexChanged += new EventHandler(listBoxObs_SelectedIndexChanged);
             textBoxOffset.TextChanged += new EventHandler(textBoxOffset_TextChanged);
+            gliderP.GliderValueChanged += new Glider.GliderEventHandler(gliderP_GliderValueChanged);
+            gliderP.GliderValueConfirmed += new Glider.GliderEventHandler(gliderP_GliderValueConfirmed);
+            gliderOffset.GliderValueChanged += new Glider.GliderEventHandler(gliderOffset_GliderValueChanged);
+            gliderOffset.GliderValueConfirmed += new Glider.GliderEventHandler(gliderOffset_GliderValueConfirmed);
 
             if (System.IO.File.Exists("autoload.txt"))
             { LoadFile("autoload.txt"); }
         }
+
+        // radio buttons
 
         void radioButtonTimeseries_CheckedChanged(object sender, EventArgs e)
         {
@@ -59,6 +68,8 @@ namespace Silicups.GUI
             { SetDataSource(SeriesTypeEnum.Phased); }
         }
 
+        // M0 + P
+
         private void textBoxP_TextChanged(object sender, EventArgs e)
         {
             if (IsInitializing)
@@ -68,6 +79,66 @@ namespace Silicups.GUI
             if (radioButtonPhased.Checked)
             { SetDataSource(SeriesTypeEnum.Phased, true); }
         }
+
+        void gliderP_GliderValueChanged(object sender, Glider.GliderEventArgs e)
+        {
+            if (OriginalP == null)
+            { return; }
+            try
+            { textBoxP.Text = MathEx.FormatDouble(OriginalP.Value + e.GliderValue * MathEx.ParseDouble(textBoxPPM.Text));  }
+            catch { }
+        }
+
+        void gliderP_GliderValueConfirmed(object sender, Glider.GliderEventArgs e)
+        {
+            if (OriginalP == null)
+            { return; }
+            try
+            {
+                OriginalP += e.GliderValue * MathEx.ParseDouble(textBoxPPM.Text);
+                textBoxP.Text = MathEx.FormatDouble(OriginalP.Value);
+            }
+            catch { }
+        }
+
+        // offset
+
+        void textBoxOffset_TextChanged(object sender, EventArgs e)
+        {
+            if (IsInitializing || (SelectedMetadata == null))
+            { return; }
+
+            try
+            {
+                SelectedMetadata.OffsetY = MathEx.ParseDouble(textBoxOffset.Text);
+                RefreshDataSource();
+            }
+            catch
+            { }
+        }
+
+        void gliderOffset_GliderValueChanged(object sender, Glider.GliderEventArgs e)
+        {
+            if (OriginalOffset == null)
+            { return; }
+            try
+            { textBoxOffset.Text = MathEx.FormatDouble(OriginalOffset.Value + e.GliderValue * MathEx.ParseDouble(textBoxOffsetPM.Text)); }
+            catch { }
+        }
+
+        void gliderOffset_GliderValueConfirmed(object sender, Glider.GliderEventArgs e)
+        {
+            if (OriginalOffset == null)
+            { return; }
+            try
+            {
+                OriginalOffset += e.GliderValue * MathEx.ParseDouble(textBoxOffsetPM.Text);
+                textBoxOffset.Text = MathEx.FormatDouble(OriginalOffset.Value);
+            }
+            catch { }
+        }
+
+        // list box
 
         void listBoxObs_ItemCheck(object sender, ItemCheckEventArgs e)
         {
@@ -102,31 +173,23 @@ namespace Silicups.GUI
             }
             if (selectedMetadata != null)
             {
+                OriginalOffset = selectedMetadata.OffsetY;
                 textBoxOffset.Text = MathEx.FormatDouble(selectedMetadata.OffsetY);
                 textBoxOffset.Enabled = true;
+                gliderOffset.Enabled = true;
             }
             else
             {
+                OriginalOffset = null;
                 textBoxOffset.Text = "";
                 textBoxOffset.Enabled = false;
+                gliderOffset.Enabled = false;
             }
             SelectedMetadata = selectedMetadata;
             UpdateDataSource(true);
         }
 
-        void textBoxOffset_TextChanged(object sender, EventArgs e)
-        {
-            if (IsInitializing || (SelectedMetadata == null))
-            { return; }
-
-            try
-            {
-                SelectedMetadata.OffsetY = MathEx.ParseDouble(textBoxOffset.Text);
-                RefreshDataSource();
-            }
-            catch
-            { }
-        }
+        // data sources
 
         private void SetDataSource(SeriesTypeEnum dataSeriesType, bool doUpdate = false)
         {
@@ -160,6 +223,8 @@ namespace Silicups.GUI
             SetDataSource(CurrentDataSeriesType, doUpdate);
         }
 
+        // files
+
         private void LoadFile(string filename)
         {
             LoadFiles(new string[] { filename });
@@ -182,8 +247,21 @@ namespace Silicups.GUI
 
         private void FinishLoadFile()
         {
+            OriginalP = Project.P;
             textBoxM0.Text = Project.GetM0String();
             textBoxP.Text = Project.GetPString();
+
+            try
+            {
+                double pBase = MathEx.GetLower125Base(Project.P.Value);
+                textBoxPPM.Text = MathEx.FormatDouble(pBase);
+                gliderP.Enabled = true;
+            }
+            catch
+            {
+                textBoxPPM.Text = "";
+                gliderP.Enabled = false;
+            }
 
             SelectedMetadata = null;
             listBoxObs.Items.Clear();
@@ -195,6 +273,12 @@ namespace Silicups.GUI
 
             radioButtonTimeseries.Checked = true;
             SetDataSource(SeriesTypeEnum.Timed);
+
+            textBoxOffsetPM.Text = (CurrentDataSeries != null)
+                ? MathEx.FormatDouble(MathEx.GetLower125Base(CurrentDataSeries.BoundingBox.Height))
+                : null;
+            OriginalOffset = null;
+            gliderOffset.Enabled = false;
         }
 
         // menu

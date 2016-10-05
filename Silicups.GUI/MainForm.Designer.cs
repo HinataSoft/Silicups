@@ -34,6 +34,14 @@
             this.listBoxObs = new System.Windows.Forms.CheckedListBox();
             this.graph = new Silicups.GUI.Graph(this.components);
             this.panelTools = new System.Windows.Forms.Panel();
+            this.label5 = new System.Windows.Forms.Label();
+            this.textBoxOffsetPM = new System.Windows.Forms.TextBox();
+            this.gliderOffset = new Silicups.GUI.Glider();
+            this.label4 = new System.Windows.Forms.Label();
+            this.textBoxPPM = new System.Windows.Forms.TextBox();
+            this.gliderP = new Silicups.GUI.Glider();
+            this.label3 = new System.Windows.Forms.Label();
+            this.textBoxOffset = new System.Windows.Forms.TextBox();
             this.radioButtonCompressed = new System.Windows.Forms.RadioButton();
             this.label2 = new System.Windows.Forms.Label();
             this.textBoxP = new System.Windows.Forms.TextBox();
@@ -47,8 +55,6 @@
             this.loadFilesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip = new System.Windows.Forms.StatusStrip();
-            this.textBoxOffset = new System.Windows.Forms.TextBox();
-            this.label3 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerMain)).BeginInit();
             this.splitContainerMain.Panel1.SuspendLayout();
             this.splitContainerMain.Panel2.SuspendLayout();
@@ -101,6 +107,12 @@
             // 
             this.panelTools.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.panelTools.Controls.Add(this.label5);
+            this.panelTools.Controls.Add(this.textBoxOffsetPM);
+            this.panelTools.Controls.Add(this.gliderOffset);
+            this.panelTools.Controls.Add(this.label4);
+            this.panelTools.Controls.Add(this.textBoxPPM);
+            this.panelTools.Controls.Add(this.gliderP);
             this.panelTools.Controls.Add(this.label3);
             this.panelTools.Controls.Add(this.textBoxOffset);
             this.panelTools.Controls.Add(this.radioButtonCompressed);
@@ -115,10 +127,77 @@
             this.panelTools.Size = new System.Drawing.Size(768, 97);
             this.panelTools.TabIndex = 0;
             // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(278, 55);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(21, 13);
+            this.label5.TabIndex = 14;
+            this.label5.Text = "+/-";
+            // 
+            // textBoxOffsetPM
+            // 
+            this.textBoxOffsetPM.Location = new System.Drawing.Point(411, 52);
+            this.textBoxOffsetPM.Name = "textBoxOffsetPM";
+            this.textBoxOffsetPM.Size = new System.Drawing.Size(60, 20);
+            this.textBoxOffsetPM.TabIndex = 13;
+            // 
+            // gliderOffset
+            // 
+            this.gliderOffset.Cursor = System.Windows.Forms.Cursors.Cross;
+            this.gliderOffset.Enabled = false;
+            this.gliderOffset.Location = new System.Drawing.Point(305, 52);
+            this.gliderOffset.Name = "gliderOffset";
+            this.gliderOffset.Size = new System.Drawing.Size(100, 20);
+            this.gliderOffset.TabIndex = 12;
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(278, 29);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(21, 13);
+            this.label4.TabIndex = 11;
+            this.label4.Text = "+/-";
+            // 
+            // textBoxPPM
+            // 
+            this.textBoxPPM.Location = new System.Drawing.Point(411, 26);
+            this.textBoxPPM.Name = "textBoxPPM";
+            this.textBoxPPM.Size = new System.Drawing.Size(60, 20);
+            this.textBoxPPM.TabIndex = 10;
+            // 
+            // gliderP
+            // 
+            this.gliderP.Cursor = System.Windows.Forms.Cursors.Cross;
+            this.gliderP.Enabled = false;
+            this.gliderP.Location = new System.Drawing.Point(305, 26);
+            this.gliderP.Name = "gliderP";
+            this.gliderP.Size = new System.Drawing.Size(100, 20);
+            this.gliderP.TabIndex = 9;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(95, 55);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(71, 13);
+            this.label3.TabIndex = 8;
+            this.label3.Text = "Vertical offset";
+            // 
+            // textBoxOffset
+            // 
+            this.textBoxOffset.Enabled = false;
+            this.textBoxOffset.Location = new System.Drawing.Point(172, 52);
+            this.textBoxOffset.Name = "textBoxOffset";
+            this.textBoxOffset.Size = new System.Drawing.Size(100, 20);
+            this.textBoxOffset.TabIndex = 7;
+            // 
             // radioButtonCompressed
             // 
             this.radioButtonCompressed.AutoSize = true;
-            this.radioButtonCompressed.Location = new System.Drawing.Point(88, 3);
+            this.radioButtonCompressed.Location = new System.Drawing.Point(124, 3);
             this.radioButtonCompressed.Name = "radioButtonCompressed";
             this.radioButtonCompressed.Size = new System.Drawing.Size(83, 17);
             this.radioButtonCompressed.TabIndex = 6;
@@ -129,7 +208,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(406, 6);
+            this.label2.Location = new System.Drawing.Point(152, 29);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(14, 13);
             this.label2.TabIndex = 5;
@@ -137,7 +216,7 @@
             // 
             // textBoxP
             // 
-            this.textBoxP.Location = new System.Drawing.Point(426, 3);
+            this.textBoxP.Location = new System.Drawing.Point(172, 26);
             this.textBoxP.Name = "textBoxP";
             this.textBoxP.Size = new System.Drawing.Size(100, 20);
             this.textBoxP.TabIndex = 4;
@@ -146,7 +225,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(266, 6);
+            this.label1.Location = new System.Drawing.Point(12, 29);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(22, 13);
             this.label1.TabIndex = 3;
@@ -154,7 +233,7 @@
             // 
             // textBoxM0
             // 
-            this.textBoxM0.Location = new System.Drawing.Point(294, 3);
+            this.textBoxM0.Location = new System.Drawing.Point(40, 26);
             this.textBoxM0.Name = "textBoxM0";
             this.textBoxM0.Size = new System.Drawing.Size(100, 20);
             this.textBoxM0.TabIndex = 2;
@@ -163,7 +242,7 @@
             // radioButtonPhased
             // 
             this.radioButtonPhased.AutoSize = true;
-            this.radioButtonPhased.Location = new System.Drawing.Point(177, 3);
+            this.radioButtonPhased.Location = new System.Drawing.Point(213, 3);
             this.radioButtonPhased.Name = "radioButtonPhased";
             this.radioButtonPhased.Size = new System.Drawing.Size(61, 17);
             this.radioButtonPhased.TabIndex = 1;
@@ -174,7 +253,7 @@
             // 
             this.radioButtonTimeseries.AutoSize = true;
             this.radioButtonTimeseries.Checked = true;
-            this.radioButtonTimeseries.Location = new System.Drawing.Point(3, 3);
+            this.radioButtonTimeseries.Location = new System.Drawing.Point(40, 3);
             this.radioButtonTimeseries.Name = "radioButtonTimeseries";
             this.radioButtonTimeseries.Size = new System.Drawing.Size(78, 17);
             this.radioButtonTimeseries.TabIndex = 0;
@@ -231,23 +310,6 @@
             this.statusStrip.TabIndex = 4;
             this.statusStrip.Text = "statusStrip1";
             // 
-            // textBoxOffset
-            // 
-            this.textBoxOffset.Enabled = false;
-            this.textBoxOffset.Location = new System.Drawing.Point(294, 29);
-            this.textBoxOffset.Name = "textBoxOffset";
-            this.textBoxOffset.Size = new System.Drawing.Size(100, 20);
-            this.textBoxOffset.TabIndex = 7;
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(253, 32);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(35, 13);
-            this.label3.TabIndex = 8;
-            this.label3.Text = "Offset";
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -294,6 +356,12 @@
         private System.Windows.Forms.RadioButton radioButtonCompressed;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TextBox textBoxOffset;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.TextBox textBoxOffsetPM;
+        private Glider gliderOffset;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.TextBox textBoxPPM;
+        private Glider gliderP;
 
     }
 }

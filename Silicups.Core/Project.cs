@@ -11,8 +11,8 @@ namespace Silicups.Core
         internal CompressedSeries CompressedSeries { get; private set; }
         internal PhasedSeries PhasedSeries { get; private set; }
 
-        internal double? M0 { get; set; }
-        internal double? P { get; set; }
+        public double? M0 { get; internal set; }
+        public double? P { get; internal set; }
 
         internal Dictionary<int, DataPointSet> SetDict { get; private set; }
 
@@ -159,6 +159,14 @@ namespace Silicups.Core
                 project.M0 = null;
                 project.P = null;
             }
+            project.RefreshM0AndP();
+        }
+
+        public static void SetP(this Project project, double? p)
+        {
+            if (project == null)
+            { return; }
+            project.P = p;
             project.RefreshM0AndP();
         }
     }
