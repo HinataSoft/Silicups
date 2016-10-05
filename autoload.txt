@@ -1,4 +1,4 @@
-Phased data for CzeV327 Cyg, Phased with elements 2455866.288 + 0.3713408 * E
+Phased data for CzeV327 Cyg, Phased with elements 2457625.32162 + 0.3713408 * E
 
 HJD            MAG     ERROR   PHASE    HELCOR		EPOCH           BAND 	 OBSERVER 
 
