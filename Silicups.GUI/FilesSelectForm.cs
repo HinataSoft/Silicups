@@ -10,6 +10,8 @@ namespace Silicups.GUI
 {
     public partial class FilesSelectForm : Form
     {
+        private static readonly string RegistryPath = @"SOFTWARE\HinataSoft\Silicups\FileSelectDialog";
+
         public string SelectedDirectory { get; private set; }
         public string SelectedPattern { get; private set; }
         public string SelectedFilter { get; private set; }
@@ -17,6 +19,19 @@ namespace Silicups.GUI
         public FilesSelectForm()
         {
             InitializeComponent();
+
+            try
+            {
+                var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(RegistryPath);
+                if (key != null)
+                {
+                    textBoxDirectory.Text = key.GetValue("Directory").ToString();
+                    textBoxPattern.Text = key.GetValue("Pattern").ToString();
+                    textBoxFilter.Text = key.GetValue("Filter").ToString();
+                }
+            }
+            catch
+            { }
         }
 
         public string[] FileNames
@@ -83,6 +98,20 @@ namespace Silicups.GUI
             this.SelectedDirectory = textBoxDirectory.Text;
             this.SelectedPattern = textBoxPattern.Text;
             this.SelectedFilter = textBoxFilter.Text;
+
+            try
+            {
+                var key = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(RegistryPath);
+                if (key != null)
+                {
+                    key.SetValue("Directory", textBoxDirectory.Text);
+                    key.SetValue("Pattern", textBoxPattern.Text);
+                    key.SetValue("Filter", textBoxFilter.Text);
+                }
+            }
+            catch
+            { }
+
             this.DialogResult = DialogResult.OK;
             this.Close();
         }

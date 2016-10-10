@@ -59,7 +59,7 @@
             this.label1.Location = new System.Drawing.Point(12, 15);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(49, 13);
-            this.label1.TabIndex = 2;
+            this.label1.TabIndex = 10;
             this.label1.Text = "Directory";
             // 
             // label2
@@ -68,7 +68,7 @@
             this.label2.Location = new System.Drawing.Point(12, 41);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(41, 13);
-            this.label2.TabIndex = 3;
+            this.label2.TabIndex = 10;
             this.label2.Text = "Pattern";
             // 
             // buttonOK
@@ -76,7 +76,7 @@
             this.buttonOK.Location = new System.Drawing.Point(225, 91);
             this.buttonOK.Name = "buttonOK";
             this.buttonOK.Size = new System.Drawing.Size(75, 23);
-            this.buttonOK.TabIndex = 4;
+            this.buttonOK.TabIndex = 3;
             this.buttonOK.Text = "OK";
             this.buttonOK.UseVisualStyleBackColor = true;
             this.buttonOK.Click += new System.EventHandler(this.buttonOK_Click);
@@ -87,7 +87,7 @@
             this.buttonCancel.Location = new System.Drawing.Point(327, 91);
             this.buttonCancel.Name = "buttonCancel";
             this.buttonCancel.Size = new System.Drawing.Size(75, 23);
-            this.buttonCancel.TabIndex = 5;
+            this.buttonCancel.TabIndex = 4;
             this.buttonCancel.Text = "Cancel";
             this.buttonCancel.UseVisualStyleBackColor = true;
             // 
@@ -96,7 +96,7 @@
             this.buttonChoose.Location = new System.Drawing.Point(15, 92);
             this.buttonChoose.Name = "buttonChoose";
             this.buttonChoose.Size = new System.Drawing.Size(106, 23);
-            this.buttonChoose.TabIndex = 6;
+            this.buttonChoose.TabIndex = 5;
             this.buttonChoose.Text = "Choose example";
             this.buttonChoose.UseVisualStyleBackColor = true;
             this.buttonChoose.Click += new System.EventHandler(this.buttonChoose_Click);
@@ -107,7 +107,7 @@
             this.label3.Location = new System.Drawing.Point(12, 68);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(29, 13);
-            this.label3.TabIndex = 8;
+            this.label3.TabIndex = 10;
             this.label3.Text = "Filter";
             // 
             // textBoxFilter
@@ -115,7 +115,7 @@
             this.textBoxFilter.Location = new System.Drawing.Point(74, 65);
             this.textBoxFilter.Name = "textBoxFilter";
             this.textBoxFilter.Size = new System.Drawing.Size(328, 20);
-            this.textBoxFilter.TabIndex = 7;
+            this.textBoxFilter.TabIndex = 2;
             // 
             // FilesSelectForm
             // 
