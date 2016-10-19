@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
-using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using System.Xml;
 
 using Silicups.Core;
 
@@ -225,6 +225,48 @@ namespace Silicups.GUI
 
         // files
 
+        private void NewProject()
+        {
+            try
+            {
+                IsInitializing = true;
+                Project = new Core.Project();
+                RefreshProject();
+            }
+            finally
+            {
+                IsInitializing = false;
+            }
+        }
+
+        private void LoadProject(string path)
+        {
+            try
+            {
+                IsInitializing = true;
+                var doc = XmlHelper.LoadXml(path);
+                XmlNode rootNode = doc["Silicups"];
+                XmlNode projectNode = rootNode["Project"];
+                Project = new Core.Project();
+                Project.AddFromXml(projectNode);
+                RefreshProject();
+            }
+            finally
+            {
+                IsInitializing = false;
+            }
+        }
+
+        private void SaveProject(string path)
+        {
+            var doc = new XmlDocument();
+            XmlNode rootNode = doc.AppendXmlElement("Silicups");
+            XmlNode projectNode = rootNode.AppendXmlElement("Project");
+            if (Project != null)
+            { Project.SaveToXml(projectNode); }
+            doc.Save(path);
+        }
+
         private void LoadFile(string filename)
         {
             LoadFiles(new string[] { filename });
@@ -235,9 +277,10 @@ namespace Silicups.GUI
             try
             {
                 IsInitializing = true;
-                var project = Silicups.Core.Project.CreateFromDataFiles(filenames);
-                this.Project = project;
-                FinishLoadFile();
+                if (Project == null)
+                { Project = new Core.Project(); }
+                Project.AddDataFiles(filenames);
+                RefreshProject();
             }
             finally
             {
@@ -245,7 +288,7 @@ namespace Silicups.GUI
             }
         }
 
-        private void FinishLoadFile()
+        private void RefreshProject()
         {
             OriginalP = Project.P;
             textBoxM0.Text = Project.GetM0String();
@@ -282,6 +325,30 @@ namespace Silicups.GUI
         }
 
         // menu
+
+
+        private void newProjectToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            NewProject();
+        }
+
+        private void loadProjectToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var fd = new OpenFileDialog();
+            fd.Filter = "XML Files (.xml)|*.xml|All Files (*.*)|*.*";
+            DialogResult dialogResult = fd.ShowDialog();
+            if (dialogResult == DialogResult.OK)
+            { LoadProject(fd.FileName); }
+        }
+
+        private void saveProjectToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var fd = new SaveFileDialog();
+            fd.Filter = "XML Files (.xml)|*.xml|All Files (*.*)|*.*";
+            DialogResult dialogResult = fd.ShowDialog();
+            if (dialogResult == DialogResult.OK)
+            { SaveProject(fd.FileName); }
+        }
 
         private void loadFileToolStripMenuItem_Click(object sender, EventArgs e)
         {

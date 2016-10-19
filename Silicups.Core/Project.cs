@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Xml;
 
 namespace Silicups.Core
 {
@@ -14,9 +15,7 @@ namespace Silicups.Core
         public double? M0 { get; internal set; }
         public double? P { get; internal set; }
 
-        internal Dictionary<int, DataPointSet> SetDict { get; private set; }
-
-        private Project()
+        public Project()
         {
             this.DataSeries = new DataPointSeries();
             this.TimeSeries = new TimeSeries(this.DataSeries);
@@ -24,12 +23,23 @@ namespace Silicups.Core
             this.PhasedSeries = new PhasedSeries(this.DataSeries);
             this.M0 = null;
             this.P = null;
-            this.SetDict = new Dictionary<int, DataPointSet>();
         }
 
-        private void FinishInit()
+        public Project(string file)
+            : this(new string[] { file })
         {
-            Refresh();
+        }
+
+        public Project(IEnumerable<string> files)
+            : this()
+        {
+            AddDataFiles(files);
+        }
+
+        public Project(XmlNode root)
+            : this()
+        {
+            AddFromXml(root);
         }
 
         public void Refresh()
@@ -54,29 +64,48 @@ namespace Silicups.Core
             PhasedSeries.Refresh();
         }
 
-        public static Project CreateFromDataFile(string file)
+        public void AddDataFiles(IEnumerable<string> files)
         {
-            return CreateFromDataFiles(new string[] { file });
-        }
-
-        public static Project CreateFromDataFiles(IEnumerable<string> files)
-        {
-            var project = new Project();
-            int id = 0;
             foreach (string file in files)
             {
-                var set = new DataPointSet(id, file);
-                AppendMagFile(project, set, file);
-                project.DataSeries.AddSet(set);
-                project.SetDict.Add(id, set);
-                id++;
+                var set = new DataPointSet(file);
+                AppendMagFile(set, file);
+                DataSeries.AddSet(set);
             }
-            project.FinishInit();
-            return project;
+            Refresh();
+        }
+
+        public void AddFromXml(XmlNode root)
+        {
+            foreach (XmlNode setNode in root.FindNodes("Set"))
+            {
+                string file = setNode.AsString();
+                var set = new DataPointSet(file);
+                AppendMagFile(set, file);
+                DataSeries.AddSet(set);
+                set.Metadata.OffsetY = setNode.FindAttribute("offsetY").AsDouble(0);
+                set.Metadata.Enabled = setNode.FindAttribute("enabled").AsBoolean(true);
+            }
+            PhasedSeries.M0 = root.FindAttribute("m0").AsDouble(0);
+            PhasedSeries.P = root.FindAttribute("p").AsDouble(0);
+            Refresh();
+        }
+
+        public void SaveToXml(XmlNode root)
+        {
+            root.AppendXmlAttribute("m0", PhasedSeries.M0);
+            root.AppendXmlAttribute("p", PhasedSeries.P);
+            foreach (IDataSet set in DataSeries.Series)
+            {
+                XmlNode setNode = root.AppendXmlElement("Set");
+                setNode.InnerText = set.Metadata.Path;
+                setNode.AppendXmlAttribute("offsetY", set.Metadata.OffsetY);
+                setNode.AppendXmlAttribute("enabled", set.Metadata.Enabled);
+            }
         }
 
         private readonly static string MagFilePhasedTag = "Phased with elements ";
-        private static void AppendMagFile(Project project, DataPointSet set, string filename)
+        private void AppendMagFile(DataPointSet set, string filename)
         {
             foreach (string s in System.IO.File.ReadAllLines(filename))
             {
@@ -99,8 +128,8 @@ namespace Silicups.Core
                         if (i > 0)
                         {
                             string[] parts = s.Substring(i + MagFilePhasedTag.Length).Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                            project.M0 = MathEx.ParseDouble(parts[0]);
-                            project.P = MathEx.ParseDouble(parts[2]);
+                            M0 = MathEx.ParseDouble(parts[0]);
+                            P = MathEx.ParseDouble(parts[2]);
                         }
                     }
                 }
@@ -131,7 +160,7 @@ namespace Silicups.Core
         {
             if (project == null)
             { yield break; }
-            foreach (DataPointSet set in project.SetDict.Values)
+            foreach (IDataSet set in project.DataSeries.Series)
             { yield return set.Metadata; }
         }
 
