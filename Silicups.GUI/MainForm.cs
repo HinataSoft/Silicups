@@ -44,8 +44,12 @@ namespace Silicups.GUI
             gliderOffset.GliderValueChanged += new Glider.GliderEventHandler(gliderOffset_GliderValueChanged);
             gliderOffset.GliderValueConfirmed += new Glider.GliderEventHandler(gliderOffset_GliderValueConfirmed);
 
-            if (System.IO.File.Exists("autoload.txt"))
+#if DEBUG
+            if (System.IO.File.Exists("autoload.xml"))
+            { LoadProject("autoload.xml"); }
+            else if (System.IO.File.Exists("autoload.txt"))
             { LoadFile("autoload.txt"); }
+#endif
         }
 
         // radio buttons
@@ -246,10 +250,20 @@ namespace Silicups.GUI
                 IsInitializing = true;
                 var doc = XmlHelper.LoadXml(path);
                 XmlNode rootNode = doc["Silicups"];
-                XmlNode projectNode = rootNode["Project"];
+
+                XmlNode projectNode = rootNode.FindOneNode("Project");
                 Project = new Core.Project();
-                Project.AddFromXml(projectNode);
+                if (projectNode != null)
+                { Project.AddFromXml(projectNode); }
+
                 RefreshProject();
+
+                XmlNode guiNode = rootNode.FindOneNode("GUI");
+                if (guiNode != null)
+                {
+                    textBoxPPM.Text = guiNode.FindAttribute("pAmplitude").AsString(textBoxPPM.Text);
+                    textBoxOffsetPM.Text = guiNode.FindAttribute("offsetAmplitude").AsString(textBoxOffsetPM.Text);
+                }
             }
             finally
             {
@@ -264,6 +278,9 @@ namespace Silicups.GUI
             XmlNode projectNode = rootNode.AppendXmlElement("Project");
             if (Project != null)
             { Project.SaveToXml(projectNode); }
+            XmlNode guiNode = rootNode.AppendXmlElement("GUI");
+            guiNode.AppendXmlAttribute("pAmplitude", textBoxPPM.Text);
+            guiNode.AppendXmlAttribute("offsetAmplitude", textBoxOffsetPM.Text);
             doc.Save(path);
         }
 
