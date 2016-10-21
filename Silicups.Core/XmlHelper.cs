@@ -60,6 +60,16 @@ namespace System.Xml
         }
 
         /// <summary>
+        /// Appends a double XML attribute to a node (InvariantCulture formatting)
+        /// </summary>
+        /// <returns>XmlNode given as argument for chaining</returns>
+        public static void AppendXmlAttribute(this XmlNode node, string name, double? value)
+        {
+            if (value.HasValue)
+            { AppendXmlAttribute(node, name, value.Value.ToString(System.Globalization.CultureInfo.InvariantCulture)); }
+        }
+
+        /// <summary>
         /// For every pair in <paramref name="pairs"/> a subnode is appended to the node with two attributes with key and value of the pair
         /// </summary>
         /// <param name="node">Node operated on</param>
@@ -220,6 +230,16 @@ namespace System.Xml
         {
             if (node == null)
             { return defaultValue; }
+            return AsDouble(node);
+        }
+
+        /// <summary>
+        /// Returns XML node (element, attribute) value as double
+        /// </summary>
+        public static double? AsNullableDouble(this XmlNode node)
+        {
+            if (node == null)
+            { return null; }
             return AsDouble(node);
         }
 

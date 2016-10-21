@@ -15,6 +15,9 @@ namespace Silicups.Core
         public double? M0 { get; internal set; }
         public double? P { get; internal set; }
 
+        public double? OffsetAmplitude { get; internal set; }
+        public double? PAmplitude { get; internal set; }
+
         public Project()
         {
             this.DataSeries = new DataPointSeries();
@@ -23,6 +26,8 @@ namespace Silicups.Core
             this.PhasedSeries = new PhasedSeries(this.DataSeries);
             this.M0 = null;
             this.P = null;
+            this.OffsetAmplitude = null;
+            this.PAmplitude = null;
         }
 
         public Project(string file)
@@ -46,12 +51,19 @@ namespace Silicups.Core
         {
             TimeSeries.Refresh();
             CompressedSeries.Refresh();
+
+            if (P.HasValue && !PAmplitude.HasValue)
+            { PAmplitude = MathEx.GetLower125Base(P.Value); }
+
+            if(!Double.IsInfinity(DataSeries.BoundingBox.Height) && !OffsetAmplitude.HasValue)
+            { OffsetAmplitude = MathEx.GetLower125Base(DataSeries.BoundingBox.Height); }
+
             RefreshM0AndP();
         }
 
         internal void RefreshM0AndP()
         {
-            if ((M0 != null) && (P != null))
+            if (M0.HasValue && P.HasValue)
             {
                 PhasedSeries.M0 = M0.Value;
                 PhasedSeries.P = P.Value;
@@ -66,8 +78,13 @@ namespace Silicups.Core
 
         public void AddDataFiles(IEnumerable<string> files)
         {
+            var existingFiles = new HashSet<string>();
+            foreach (IDataSet set in DataSeries.Series)
+            { existingFiles.Add(set.Metadata.Path); }
             foreach (string file in files)
             {
+                if (existingFiles.Contains(file))
+                { continue; }
                 var set = new DataPointSet(file);
                 AppendMagFile(set, file);
                 DataSeries.AddSet(set);
@@ -77,24 +94,33 @@ namespace Silicups.Core
 
         public void AddFromXml(XmlNode root)
         {
+            var existingFiles = new HashSet<string>();
+            foreach (IDataSet set in DataSeries.Series)
+            { existingFiles.Add(set.Metadata.Path); }
             foreach (XmlNode setNode in root.FindNodes("Set"))
             {
                 string file = setNode.AsString();
+                if (existingFiles.Contains(file))
+                { continue; }
                 var set = new DataPointSet(file);
                 AppendMagFile(set, file);
                 DataSeries.AddSet(set);
                 set.Metadata.OffsetY = setNode.FindAttribute("offsetY").AsDouble(0);
                 set.Metadata.Enabled = setNode.FindAttribute("enabled").AsBoolean(true);
             }
-            PhasedSeries.M0 = root.FindAttribute("m0").AsDouble(0);
-            PhasedSeries.P = root.FindAttribute("p").AsDouble(0);
+            M0 = root.FindAttribute("m0").AsNullableDouble();
+            P = root.FindAttribute("p").AsNullableDouble();
+            PAmplitude = root.FindAttribute("pAmplitude").AsNullableDouble();
+            OffsetAmplitude = root.FindAttribute("offsetAmplitude").AsNullableDouble();
             Refresh();
         }
 
         public void SaveToXml(XmlNode root)
         {
-            root.AppendXmlAttribute("m0", PhasedSeries.M0);
-            root.AppendXmlAttribute("p", PhasedSeries.P);
+            root.AppendXmlAttribute("m0", M0.Value);
+            root.AppendXmlAttribute("p", P.Value);
+            root.AppendXmlAttribute("pAmplitude", PAmplitude.Value);
+            root.AppendXmlAttribute("offsetAmplitude", OffsetAmplitude.Value);
             foreach (IDataSet set in DataSeries.Series)
             {
                 XmlNode setNode = root.AppendXmlElement("Set");

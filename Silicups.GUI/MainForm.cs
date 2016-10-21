@@ -275,10 +275,11 @@ namespace Silicups.GUI
         {
             var doc = new XmlDocument();
             XmlNode rootNode = doc.AppendXmlElement("Silicups");
-            XmlNode projectNode = rootNode.AppendXmlElement("Project");
+            XmlNode projectsNode = rootNode.AppendXmlElement("Projects");
+            XmlNode projectNode = projectsNode.AppendXmlElement("Project");
             if (Project != null)
             { Project.SaveToXml(projectNode); }
-            XmlNode guiNode = rootNode.AppendXmlElement("GUI");
+            XmlNode guiNode = projectNode.AppendXmlElement("GUI");
             guiNode.AppendXmlAttribute("pAmplitude", textBoxPPM.Text);
             guiNode.AppendXmlAttribute("offsetAmplitude", textBoxOffsetPM.Text);
             doc.Save(path);
