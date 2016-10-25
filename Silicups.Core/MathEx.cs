@@ -27,6 +27,11 @@ namespace Silicups.Core
             return d.ToString(System.Globalization.CultureInfo.InvariantCulture);
         }
 
+        public static string FormatDouble(double? d)
+        {
+            return d.HasValue ? FormatDouble(d.Value) : null;
+        }
+
         public static double GetLower125Base(double d)
         {
             var bases = new Bases125(d);

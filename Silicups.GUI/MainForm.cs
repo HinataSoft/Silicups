@@ -20,7 +20,8 @@ namespace Silicups.GUI
             Phased,
         }
 
-        private Project Project = null;
+        private List<Project> Solution = new List<Project>();
+        private Project CurrentProject = null;
         private IDataSeries CurrentDataSeries = null;
         private SeriesTypeEnum CurrentDataSeriesType = SeriesTypeEnum.Timed;
         private IDataSetMetadata SelectedMetadata = null;
@@ -36,9 +37,13 @@ namespace Silicups.GUI
             radioButtonTimeseries.CheckedChanged += new EventHandler(radioButtonTimeseries_CheckedChanged);
             radioButtonPhased.CheckedChanged += new EventHandler(radioButtonPhased_CheckedChanged);
             radioButtonCompressed.CheckedChanged += new EventHandler(radioButtonCompressed_CheckedChanged);
+            listBoxSolution.SelectedIndexChanged += new EventHandler(listBoxSolution_SelectedIndexChanged);
+            listBoxSolution.KeyDown += new KeyEventHandler(listBoxSolution_KeyDown);
             listBoxObs.ItemCheck += new ItemCheckEventHandler(listBoxObs_ItemCheck);
             listBoxObs.SelectedIndexChanged += new EventHandler(listBoxObs_SelectedIndexChanged);
             textBoxOffset.TextChanged += new EventHandler(textBoxOffset_TextChanged);
+            textBoxPPM.TextChanged += new EventHandler(textBoxPPM_TextChanged);
+            textBoxOffsetPM.TextChanged += new EventHandler(textBoxOffsetPM_TextChanged);
             gliderP.GliderValueChanged += new Glider.GliderEventHandler(gliderP_GliderValueChanged);
             gliderP.GliderValueConfirmed += new Glider.GliderEventHandler(gliderP_GliderValueConfirmed);
             gliderOffset.GliderValueChanged += new Glider.GliderEventHandler(gliderOffset_GliderValueChanged);
@@ -46,9 +51,7 @@ namespace Silicups.GUI
 
 #if DEBUG
             if (System.IO.File.Exists("autoload.xml"))
-            { LoadProject("autoload.xml"); }
-            else if (System.IO.File.Exists("autoload.txt"))
-            { LoadFile("autoload.txt"); }
+            { LoadSolution("autoload.xml"); }
 #endif
         }
 
@@ -79,9 +82,20 @@ namespace Silicups.GUI
             if (IsInitializing)
             { return; }
 
-            Project.SetM0AndPString(textBoxM0.Text, textBoxP.Text);
+            CurrentProject.SetM0AndPString(textBoxM0.Text, textBoxP.Text);
             if (radioButtonPhased.Checked)
             { SetDataSource(SeriesTypeEnum.Phased, true); }
+        }
+
+        void textBoxPPM_TextChanged(object sender, EventArgs e)
+        {
+            if (IsInitializing || (CurrentProject == null))
+            { return; }
+
+            try
+            { CurrentProject.PAmplitude = MathEx.ParseDouble(textBoxPPM.Text); }
+            catch
+            { }
         }
 
         void gliderP_GliderValueChanged(object sender, Glider.GliderEventArgs e)
@@ -121,6 +135,17 @@ namespace Silicups.GUI
             { }
         }
 
+        void textBoxOffsetPM_TextChanged(object sender, EventArgs e)
+        {
+            if (IsInitializing || (CurrentProject == null))
+            { return; }
+
+            try
+            { CurrentProject.OffsetAmplitude = MathEx.ParseDouble(textBoxOffsetPM.Text); }
+            catch
+            { }
+        }
+
         void gliderOffset_GliderValueChanged(object sender, Glider.GliderEventArgs e)
         {
             if (OriginalOffset == null)
@@ -142,7 +167,44 @@ namespace Silicups.GUI
             catch { }
         }
 
-        // list box
+        // solution list box
+
+        void listBoxSolution_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (IsInitializing)
+            { return; }
+
+            CurrentProject = (Project)listBoxSolution.SelectedItem;
+            RefreshCurrentProject();
+        }
+
+        void listBoxSolution_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (IsInitializing || (CurrentProject == null))
+            { return; }
+
+            if (e.KeyCode == Keys.F2)
+            {
+                using (var form = new InputBoxForm("Project name:", CurrentProject.Caption))
+                {
+                    if (form.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                    {
+                        CurrentProject.Caption = form.PromptValue;
+                        listBoxSolution.RefreshItems();
+                    }
+                }
+            }
+
+            if (e.KeyCode == Keys.Delete)
+            {
+                DialogResult result = MessageBox.Show("Really delete the project from the solution?", "Confirmation", MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
+                if(result == DialogResult.OK)
+                { RemoveProjectFromSolution(CurrentProject); }
+            }
+        }
+
+
+        // observation list box
 
         void listBoxObs_ItemCheck(object sender, ItemCheckEventArgs e)
         {
@@ -198,11 +260,14 @@ namespace Silicups.GUI
         private void SetDataSource(SeriesTypeEnum dataSeriesType, bool doUpdate = false)
         {
             IDataSeries dataSeries = null;
-            switch (dataSeriesType)
+            if (CurrentProject != null)
             {
-                case SeriesTypeEnum.Timed: dataSeries = Project.GetTimeSeries(); break;
-                case SeriesTypeEnum.Compressed: dataSeries = Project.GetCompressedSeries(); break;
-                case SeriesTypeEnum.Phased: dataSeries = Project.GetPhasedSeries(); break;
+                switch (dataSeriesType)
+                {
+                    case SeriesTypeEnum.Timed: dataSeries = CurrentProject.TimeSeries; break;
+                    case SeriesTypeEnum.Compressed: dataSeries = CurrentProject.CompressedSeries; break;
+                    case SeriesTypeEnum.Phased: dataSeries = CurrentProject.PhasedSeries; break;
+                }
             }
             CurrentDataSeriesType = dataSeriesType;
 
@@ -223,19 +288,18 @@ namespace Silicups.GUI
 
         private void RefreshDataSource(bool doUpdate = false)
         {
-            Project.Refresh();
+            CurrentProject.Refresh();
             SetDataSource(CurrentDataSeriesType, doUpdate);
         }
 
         // files
 
-        private void NewProject()
+        private void NewSolution()
         {
             try
             {
                 IsInitializing = true;
-                Project = new Core.Project();
-                RefreshProject();
+                RenewSolution(new Project[] { new Project() } );
             }
             finally
             {
@@ -243,27 +307,90 @@ namespace Silicups.GUI
             }
         }
 
-        private void LoadProject(string path)
+        private void AddNewProjectToSolution()
         {
             try
             {
                 IsInitializing = true;
+                AddProjectToSolution(new Project());
+            }
+            finally
+            {
+                IsInitializing = false;
+            }
+        }
+
+        private void RemoveProjectFromSolution(Project project)
+        {
+            try
+            {
+                IsInitializing = true;
+                int currentlySelected = listBoxSolution.SelectedIndex;
+                Solution.Remove(project);
+                listBoxSolution.Items.Remove(project);
+                if (listBoxSolution.Items.Count == 0)
+                { CurrentProject = null; }
+                else
+                {
+                    if (currentlySelected >= listBoxSolution.Items.Count)
+                    { currentlySelected = listBoxSolution.Items.Count - 1; }
+                    listBoxSolution.SelectedIndex = currentlySelected;
+                    CurrentProject = (Project)listBoxSolution.SelectedItem;
+                }
+                RefreshCurrentProject();
+            }
+            finally
+            {
+                IsInitializing = false;
+            }
+        }
+
+        private void LoadSolution(string path)
+        {
+            try
+            {
+                IsInitializing = true;
+                var solution = new List<Project>();
                 var doc = XmlHelper.LoadXml(path);
                 XmlNode rootNode = doc["Silicups"];
 
-                XmlNode projectNode = rootNode.FindOneNode("Project");
-                Project = new Core.Project();
-                if (projectNode != null)
-                { Project.AddFromXml(projectNode); }
-
-                RefreshProject();
-
-                XmlNode guiNode = rootNode.FindOneNode("GUI");
-                if (guiNode != null)
+                var projects = new Dictionary<string, Project>();
+                var projectsUsed = new HashSet<string>();
+                foreach (XmlNode projectNode in rootNode.FindNodes("Projects").FindNodes("Project"))
                 {
-                    textBoxPPM.Text = guiNode.FindAttribute("pAmplitude").AsString(textBoxPPM.Text);
-                    textBoxOffsetPM.Text = guiNode.FindAttribute("offsetAmplitude").AsString(textBoxOffsetPM.Text);
+                    string id = projectNode.GetAttribute("id").AsString();
+                    Project project = new Core.Project();
+                    project.LoadFromXml(projectNode);
+                    projects.Add(id, project);
                 }
+
+                foreach (XmlNode projectNode in rootNode.FindNodes("Solution").FindNodes("Project"))
+                {
+                    string id = projectNode.GetAttribute("id").AsString();
+                    solution.Add(projects[id]);
+                    projectsUsed.Add(id);
+                }
+
+                int projectsNotUsed = 0;
+                foreach (string id in projects.Keys)
+                {
+                    if (!projectsUsed.Contains(id))
+                    { projectsNotUsed++; }
+                }
+                if (projectsNotUsed > 0)
+                { MessageBox.Show(String.Format("{0} project(s) in the solution file has not been included in the solution", projectsNotUsed), "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning); }
+
+                if (solution.Count == 0)
+                {
+                    MessageBox.Show("No project found in the solution file", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                RenewSolution(solution);
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message, "Exception when loading the solution", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
@@ -271,17 +398,18 @@ namespace Silicups.GUI
             }
         }
 
-        private void SaveProject(string path)
+        private void SaveSolution(string path)
         {
             var doc = new XmlDocument();
             XmlNode rootNode = doc.AppendXmlElement("Silicups");
+            XmlNode solutionNode = rootNode.AppendXmlElement("Solution");
             XmlNode projectsNode = rootNode.AppendXmlElement("Projects");
-            XmlNode projectNode = projectsNode.AppendXmlElement("Project");
-            if (Project != null)
-            { Project.SaveToXml(projectNode); }
-            XmlNode guiNode = projectNode.AppendXmlElement("GUI");
-            guiNode.AppendXmlAttribute("pAmplitude", textBoxPPM.Text);
-            guiNode.AppendXmlAttribute("offsetAmplitude", textBoxOffsetPM.Text);
+            foreach (Project project in Solution)
+            {
+                solutionNode.AppendXmlElement("Project").AppendXmlAttribute("id", project.Id);
+                XmlNode projectNode = projectsNode.AppendXmlElement("Project");
+                project.SaveToXml(projectNode);
+            }
             doc.Save(path);
         }
 
@@ -295,10 +423,10 @@ namespace Silicups.GUI
             try
             {
                 IsInitializing = true;
-                if (Project == null)
-                { Project = new Core.Project(); }
-                Project.AddDataFiles(filenames);
-                RefreshProject();
+                if (CurrentProject == null)
+                { CurrentProject = new Core.Project(); }
+                CurrentProject.AddDataFiles(filenames);
+                RefreshCurrentProject();
             }
             finally
             {
@@ -306,98 +434,164 @@ namespace Silicups.GUI
             }
         }
 
-        private void RefreshProject()
+        private void RenewSolution(IEnumerable<Project> projects)
         {
-            OriginalP = Project.P;
-            textBoxM0.Text = Project.GetM0String();
-            textBoxP.Text = Project.GetPString();
+            Solution.Clear();
+            listBoxSolution.Items.Clear();
+            CurrentProject = null;
 
-            try
+            Solution.AddRange(projects);
+            if (Solution.Count > 0)
             {
-                double pBase = MathEx.GetLower125Base(Project.P.Value);
-                textBoxPPM.Text = MathEx.FormatDouble(pBase);
-                gliderP.Enabled = true;
-            }
-            catch
-            {
-                textBoxPPM.Text = "";
-                gliderP.Enabled = false;
-            }
-
-            SelectedMetadata = null;
-            listBoxObs.Items.Clear();
-            if(Project != null)
-            {
-                foreach (IDataSetMetadata metadata in Project.GetMetadata())
-                { listBoxObs.Items.Add(metadata, metadata.Enabled); }
+                foreach (Project project in Solution)
+                { listBoxSolution.Items.Add(project); }
+                listBoxSolution.SelectedIndex = 0;
+                CurrentProject = (Project)listBoxSolution.SelectedItem;
             }
 
             radioButtonTimeseries.Checked = true;
             SetDataSource(SeriesTypeEnum.Timed);
 
-            textBoxOffsetPM.Text = (CurrentDataSeries != null)
-                ? MathEx.FormatDouble(MathEx.GetLower125Base(CurrentDataSeries.BoundingBox.Height))
-                : null;
-            OriginalOffset = null;
+            RefreshCurrentProject();
+        }
+
+        private void AddProjectToSolution(Project project)
+        {
+            Solution.Add(project);
+            listBoxSolution.Items.Add(project);
+            if(CurrentProject == null)
+            {
+                listBoxSolution.SelectedIndex = listBoxSolution.Items.Count - 1;
+                CurrentProject = (Project)listBoxSolution.SelectedItem;
+                radioButtonTimeseries.Checked = true;
+                SetDataSource(SeriesTypeEnum.Timed);
+                RefreshCurrentProject();
+            }
+        }
+
+        private void ToggleControls(IEnumerable<Control> controls, bool enabled)
+        {
+            foreach (Control control in controls)
+            {
+                control.Enabled = enabled;
+                if (!enabled && (control is TextBox))
+                { control.Text = null; }
+            }
+        }
+
+        private void RefreshCurrentProject()
+        {
+            var controls = new Control[] {
+                radioButtonTimeseries,
+                radioButtonCompressed,
+                radioButtonPhased,
+                textBoxM0,
+                textBoxP,
+                textBoxPPM,
+                textBoxOffsetPM,
+                gliderP,
+                gliderOffset
+            };
+
+            SelectedMetadata = null;
+            listBoxObs.Items.Clear();
+
+            if (CurrentProject == null)
+            {
+                OriginalP = null;
+                ToggleControls(controls, false);
+                graph.SetDataSource(null);
+                return;
+            }
+            ToggleControls(controls, true);
+
+            OriginalP = CurrentProject.P;
+            textBoxM0.Text = MathEx.FormatDouble(CurrentProject.M0);
+            textBoxP.Text = MathEx.FormatDouble(CurrentProject.P);
+            textBoxPPM.Text = MathEx.FormatDouble(CurrentProject.PAmplitude);
+            textBoxOffsetPM.Text = MathEx.FormatDouble(CurrentProject.OffsetAmplitude);
+
+            gliderP.Enabled = CurrentProject.P.HasValue && CurrentProject.PAmplitude.HasValue;
             gliderOffset.Enabled = false;
+
+            foreach (IDataSetMetadata metadata in CurrentProject.GetMetadata())
+            { listBoxObs.Items.Add(metadata, metadata.Enabled); }
+
+            UpdateDataSource();
         }
 
         // menu
 
-
         private void newProjectToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            NewProject();
+            NewSolution();
         }
 
-        private void loadProjectToolStripMenuItem_Click(object sender, EventArgs e)
+        private void loadSolutionToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var fd = new OpenFileDialog();
-            fd.Filter = "XML Files (.xml)|*.xml|All Files (*.*)|*.*";
-            DialogResult dialogResult = fd.ShowDialog();
-            if (dialogResult == DialogResult.OK)
-            { LoadProject(fd.FileName); }
-        }
-
-        private void saveProjectToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            var fd = new SaveFileDialog();
-            fd.Filter = "XML Files (.xml)|*.xml|All Files (*.*)|*.*";
-            DialogResult dialogResult = fd.ShowDialog();
-            if (dialogResult == DialogResult.OK)
-            { SaveProject(fd.FileName); }
-        }
-
-        private void loadFileToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            var fd = new OpenFileDialog();
-            fd.Filter = "Text Files (.txt)|*.txt|All Files (*.*)|*.*";
-            fd.Multiselect = true;
-            DialogResult dialogResult = fd.ShowDialog();
-            if (dialogResult == DialogResult.OK)
-            { LoadFiles(fd.FileNames); }
-        }
-
-        private void loadFilesToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            var fd = new FilesSelectForm();
-            DialogResult dialogResult = fd.ShowDialog();
-            if (dialogResult == DialogResult.OK)
+            using(var fd = new OpenFileDialog())
             {
-                try
-                {
-                    LoadFiles(fd.FileNames);
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.Message, "Exception", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
+                fd.Filter = "XML Files (.xml)|*.xml|All Files (*.*)|*.*";
+                DialogResult dialogResult = fd.ShowDialog();
+                if (dialogResult == DialogResult.OK)
+                { LoadSolution(fd.FileName); }
             }
+        }
+
+        private void saveSolutionToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using (var fd = new SaveFileDialog())
+            {
+                fd.Filter = "XML Files (.xml)|*.xml|All Files (*.*)|*.*";
+                DialogResult dialogResult = fd.ShowDialog();
+                if (dialogResult == DialogResult.OK)
+                { SaveSolution(fd.FileName); }
+            }
+        }
+
+        private void addNewProjectToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            AddNewProjectToSolution();
         }
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Application.Exit();
+        }
+
+        private void loadFileToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using (var fd = new OpenFileDialog())
+            {
+                fd.Filter = "Text Files (.txt)|*.txt|All Files (*.*)|*.*";
+                fd.Multiselect = true;
+                DialogResult dialogResult = fd.ShowDialog();
+                if (dialogResult == DialogResult.OK)
+                { LoadFiles(fd.FileNames); }
+            }
+        }
+
+        private void loadFilesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using (var fd = new FilesSelectForm())
+            {
+                DialogResult dialogResult = fd.ShowDialog();
+                if (dialogResult == DialogResult.OK)
+                {
+                    try
+                    { LoadFiles(fd.FileNames); }
+                    catch (Exception ex)
+                    { MessageBox.Show(ex.Message, "Exception", MessageBoxButtons.OK, MessageBoxIcon.Error); }
+                }
+            }
+        }
+    }
+
+    public class MyListBox : ListBox
+    {
+        public new void RefreshItems()
+        {
+            base.RefreshItems();
         }
     }
 }

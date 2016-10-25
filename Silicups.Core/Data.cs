@@ -6,7 +6,8 @@ namespace Silicups.Core
 {
     public interface IDataSetMetadata
     {
-        string Path { get; }
+        string AbsolutePath { get; }
+        string RelativePath { get; }
 
         bool Enabled { get; set; }
         bool Hightlighted { get; set; }
@@ -34,14 +35,15 @@ namespace Silicups.Core
 
     public class DataSetMetadata : IDataSetMetadata
     {
-        public string Path { get; internal set; }
+        public string AbsolutePath { get; internal set; }
+        public string RelativePath { get; internal set; }
         public bool Enabled { get; set; }
         public bool Hightlighted { get; set; }
         public double OffsetY { get; set; }
 
         public override string ToString()
         {
-            return Path;
+            return RelativePath;
         }
     }
 
@@ -73,12 +75,13 @@ namespace Silicups.Core
             this.Metadata = templateSet.Metadata;
         }
 
-        public DataPointSet(string path)
+        public DataPointSet(string absolutePath, string relativePath)
         {
             this.BoundingBox = BoundingBox.CloneEmpty();
             this.Metadata = new DataSetMetadata()
             {
-                Path = path,
+                AbsolutePath = absolutePath,
+                RelativePath = relativePath,
                 Enabled = true,
                 Hightlighted = false,
                 OffsetY = 0,

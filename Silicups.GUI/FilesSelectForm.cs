@@ -83,13 +83,15 @@ namespace Silicups.GUI
 
         private void buttonChoose_Click(object sender, EventArgs e)
         {
-            var fd = new OpenFileDialog();
-            fd.Filter = "Text Files (.txt)|*.txt|All Files (*.*)|*.*";
-            DialogResult dialogResult = fd.ShowDialog();
-            if (dialogResult == DialogResult.OK)
+            using (var fd = new OpenFileDialog())
             {
-                textBoxDirectory.Text = System.IO.Path.GetDirectoryName(fd.FileName);
-                textBoxPattern.Text = System.IO.Path.GetFileName(fd.FileName);
+                fd.Filter = "Text Files (.txt)|*.txt|All Files (*.*)|*.*";
+                DialogResult dialogResult = fd.ShowDialog();
+                if (dialogResult == DialogResult.OK)
+                {
+                    textBoxDirectory.Text = System.IO.Path.GetDirectoryName(fd.FileName);
+                    textBoxPattern.Text = System.IO.Path.GetFileName(fd.FileName);
+                }
             }
         }
 
