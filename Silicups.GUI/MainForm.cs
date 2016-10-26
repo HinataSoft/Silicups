@@ -54,6 +54,7 @@ namespace Silicups.GUI
             listBoxSolution.KeyDown += new KeyEventHandler(listBoxSolution_KeyDown);
             listBoxObs.ItemCheck += new ItemCheckEventHandler(listBoxObs_ItemCheck);
             listBoxObs.SelectedIndexChanged += new EventHandler(listBoxObs_SelectedIndexChanged);
+            listBoxObs.KeyDown += new KeyEventHandler(listBoxObs_KeyDown);
             textBoxOffset.TextChanged += new EventHandler(textBoxOffset_TextChanged);
             textBoxPPM.TextChanged += new EventHandler(textBoxPPM_TextChanged);
             textBoxOffsetPM.TextChanged += new EventHandler(textBoxOffsetPM_TextChanged);
@@ -82,7 +83,7 @@ namespace Silicups.GUI
 
         void MainForm_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.KeyCode == Keys.Space)
+            if (e.KeyCode == Keys.Enter)
             {
                 gliderP.ConfirmPosition();
                 gliderOffset.ConfirmPosition();
@@ -265,7 +266,7 @@ namespace Silicups.GUI
 
             if (e.KeyCode == Keys.F2)
             {
-                using (var form = new InputBoxForm("Project name:", CurrentProject.Caption))
+                using (var form = new InputBoxForm("Object name:", CurrentProject.Caption))
                 {
                     if (form.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                     {
@@ -277,7 +278,7 @@ namespace Silicups.GUI
 
             if (e.KeyCode == Keys.Delete)
             {
-                DialogResult result = MessageBox.Show("Really delete the project from the solution?", "Confirmation", MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
+                DialogResult result = MessageBox.Show("Really delete the object from the solution?", "Confirmation", MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
                 if(result == DialogResult.OK)
                 { RemoveProjectFromSolution(CurrentProject); }
             }
@@ -332,6 +333,31 @@ namespace Silicups.GUI
             }
             SelectedMetadata = selectedMetadata;
             UpdateDataSource(true);
+        }
+
+        void listBoxObs_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (IsInitializing || (SelectedMetadata == null))
+            { return; }
+
+            if (e.KeyCode == Keys.F2)
+            {
+                using (var form = new InputBoxForm("Set name:", SelectedMetadata.Caption))
+                {
+                    if (form.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                    {
+                        SelectedMetadata.Caption = form.PromptValue;
+                        listBoxObs.Refresh();
+                    }
+                }
+            }
+
+            if (e.KeyCode == Keys.Delete)
+            {
+                DialogResult result = MessageBox.Show("Really delete the set from the project?", "Confirmation", MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
+                if (result == DialogResult.OK)
+                { RemoveSetFromProject(SelectedMetadata); }
+            }
         }
 
         // glider style toggle
@@ -608,14 +634,11 @@ namespace Silicups.GUI
         {
             Solution.Add(project);
             listBoxSolution.Items.Add(project);
-            if(CurrentProject == null)
-            {
-                listBoxSolution.SelectedIndex = listBoxSolution.Items.Count - 1;
-                CurrentProject = (Project)listBoxSolution.SelectedItem;
-                radioButtonTimeseries.Checked = true;
-                SetDataSource(SeriesTypeEnum.Timed);
-                RefreshCurrentProject();
-            }
+            listBoxSolution.SelectedIndex = listBoxSolution.Items.Count - 1;
+            CurrentProject = (Project)listBoxSolution.SelectedItem;
+            radioButtonTimeseries.Checked = true;
+            SetDataSource(SeriesTypeEnum.Timed);
+            RefreshCurrentProject();
         }
 
         private void ToggleControls(IEnumerable<Control> controls, bool enabled)
@@ -671,6 +694,17 @@ namespace Silicups.GUI
             { listBoxObs.Items.Add(metadata, metadata.Enabled); }
 
             UpdateDataSource();
+        }
+
+        private void RemoveSetFromProject(IDataSetMetadata metadata)
+        {
+            if (CurrentProject == null)
+            { return; }
+
+            if (!CurrentProject.RemoveSet(metadata))
+            { return; }
+
+            RefreshCurrentProject();
         }
 
         // menu

@@ -124,6 +124,14 @@ namespace Silicups.Core
             BoundingBox.Union(pointSet.BoundingBox);
         }
 
+        public void RemoveSet(DataPointSet pointSet)
+        {
+            list.Remove(pointSet);
+            BoundingBox = BoundingBox.CloneEmpty();
+            foreach (DataPointSet set in list)
+            { BoundingBox.Union(set.BoundingBox); }
+        }
+
         public IEnumerable<IDataSet> Series
         {
             get

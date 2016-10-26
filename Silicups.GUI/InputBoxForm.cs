@@ -24,6 +24,8 @@ namespace Silicups.GUI
         private void buttonOK_Click(object sender, EventArgs e)
         {
             PromptValue = textBox.Text;
+            if (String.IsNullOrWhiteSpace(PromptValue))
+            { PromptValue = null; }
         }
     }
 }

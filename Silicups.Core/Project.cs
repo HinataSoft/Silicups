@@ -136,6 +136,7 @@ namespace Silicups.Core
                 DataSeries.AddSet(set);
                 set.Metadata.OffsetY = setNode.FindAttribute("offsetY").AsDouble(0);
                 set.Metadata.Enabled = setNode.FindAttribute("enabled").AsBoolean(true);
+                set.Metadata.Caption = setNode.FindAttribute("caption").AsString(null);
             }
             XmlNode settingsNode = root.FindOneNode("Settings");
             if (settingsNode != null)
@@ -170,6 +171,8 @@ namespace Silicups.Core
                 setNode.AppendXmlAttribute("source", "file");
                 setNode.AppendXmlAttribute("offsetY", set.Metadata.OffsetY);
                 setNode.AppendXmlAttribute("enabled", set.Metadata.Enabled);
+                if (!String.IsNullOrEmpty(set.Metadata.Caption))
+                { setNode.AppendXmlAttribute("caption", set.Metadata.Caption); }
             }
 
             {
@@ -225,7 +228,26 @@ namespace Silicups.Core
             }
             if (String.IsNullOrEmpty(set.Metadata.Caption) && !Double.IsInfinity(set.BoundingBox.Left))
             {
+                DateTime date = JD.JDToDateTime(set.BoundingBox.Left);
+                set.Metadata.Caption = date.ToString("yyyy'-'MM'-'dd");
             }
+        }
+
+        public bool RemoveSet(IDataSetMetadata metadata)
+        {
+            IDataSet setToRemove = null;
+            foreach(IDataSet set in DataSeries.Series)
+            {
+                if (set.Metadata == metadata)
+                { setToRemove = set; break; }
+            }
+            if (setToRemove != null)
+            {
+                DataSeries.RemoveSet((DataPointSet)setToRemove);
+                Refresh();
+                return true;
+            }
+            return false;
         }
     }
 
