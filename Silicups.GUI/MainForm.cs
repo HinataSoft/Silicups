@@ -255,8 +255,18 @@ namespace Silicups.GUI
             if (IsInitializing)
             { return; }
 
-            CurrentProject = (Project)listBoxSolution.SelectedItem;
-            RefreshCurrentProject();
+            try
+            {
+                IsInitializing = true;
+                CurrentProject = (Project)listBoxSolution.SelectedItem;
+                trackBarP.Value = 0;
+                trackBarOffset.Value = 0;
+                RefreshCurrentProject();
+            }
+            finally
+            {
+                IsInitializing = false;
+            }
         }
 
         void listBoxSolution_KeyDown(object sender, KeyEventArgs e)
@@ -301,38 +311,48 @@ namespace Silicups.GUI
             if (IsInitializing)
             { return; }
 
-            SelectedMetadata = null;
-            IDataSetMetadata selectedMetadata = null;
-            int selectedIndex = listBoxObs.SelectedIndex;
-            for (int i = 0; i < listBoxObs.Items.Count; i++)
+            try
             {
-                var metadata = (IDataSetMetadata)listBoxObs.Items[i];
-                if(i == selectedIndex)
+                IsInitializing = true;
+                SelectedMetadata = null;
+                IDataSetMetadata selectedMetadata = null;
+                int selectedIndex = listBoxObs.SelectedIndex;
+                for (int i = 0; i < listBoxObs.Items.Count; i++)
                 {
-                    metadata.Hightlighted = true;
-                    selectedMetadata = metadata;
+                    var metadata = (IDataSetMetadata)listBoxObs.Items[i];
+                    if (i == selectedIndex)
+                    {
+                        metadata.Hightlighted = true;
+                        selectedMetadata = metadata;
+                    }
+                    else
+                    {
+                        metadata.Hightlighted = false;
+                    }
+                }
+                if (selectedMetadata != null)
+                {
+                    OriginalOffset = selectedMetadata.OffsetY;
+                    textBoxOffset.Text = MathEx.FormatDouble(selectedMetadata.OffsetY);
+                    textBoxOffset.Enabled = true;
+                    gliderOffset.Enabled = true;
                 }
                 else
                 {
-                    metadata.Hightlighted = false;
+                    OriginalOffset = null;
+                    textBoxOffset.Text = "";
+                    textBoxOffset.Enabled = false;
+                    gliderOffset.Enabled = false;
                 }
+                trackBarP.Value = 0;
+                trackBarOffset.Value = 0;
+                SelectedMetadata = selectedMetadata;
+                UpdateDataSource(true);
             }
-            if (selectedMetadata != null)
+            finally
             {
-                OriginalOffset = selectedMetadata.OffsetY;
-                textBoxOffset.Text = MathEx.FormatDouble(selectedMetadata.OffsetY);
-                textBoxOffset.Enabled = true;
-                gliderOffset.Enabled = true;
+                IsInitializing = false;
             }
-            else
-            {
-                OriginalOffset = null;
-                textBoxOffset.Text = "";
-                textBoxOffset.Enabled = false;
-                gliderOffset.Enabled = false;
-            }
-            SelectedMetadata = selectedMetadata;
-            UpdateDataSource(true);
         }
 
         void listBoxObs_KeyDown(object sender, KeyEventArgs e)
