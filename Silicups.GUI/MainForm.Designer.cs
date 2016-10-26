@@ -36,6 +36,8 @@
             this.listBoxObs = new System.Windows.Forms.CheckedListBox();
             this.graph = new Silicups.GUI.Graph(this.components);
             this.panelTools = new System.Windows.Forms.Panel();
+            this.buttonZeroOffset = new System.Windows.Forms.Button();
+            this.buttonZeroP = new System.Windows.Forms.Button();
             this.buttonSetOffset = new System.Windows.Forms.Button();
             this.buttonSetP = new System.Windows.Forms.Button();
             this.checkBoxStyle = new System.Windows.Forms.CheckBox();
@@ -154,6 +156,8 @@
             // 
             this.panelTools.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.panelTools.Controls.Add(this.buttonZeroOffset);
+            this.panelTools.Controls.Add(this.buttonZeroP);
             this.panelTools.Controls.Add(this.buttonSetOffset);
             this.panelTools.Controls.Add(this.buttonSetP);
             this.panelTools.Controls.Add(this.checkBoxStyle);
@@ -178,6 +182,24 @@
             this.panelTools.Name = "panelTools";
             this.panelTools.Size = new System.Drawing.Size(772, 97);
             this.panelTools.TabIndex = 0;
+            // 
+            // buttonZeroOffset
+            // 
+            this.buttonZeroOffset.Location = new System.Drawing.Point(326, 72);
+            this.buttonZeroOffset.Name = "buttonZeroOffset";
+            this.buttonZeroOffset.Size = new System.Drawing.Size(19, 23);
+            this.buttonZeroOffset.TabIndex = 21;
+            this.buttonZeroOffset.Text = "0";
+            this.buttonZeroOffset.UseVisualStyleBackColor = true;
+            // 
+            // buttonZeroP
+            // 
+            this.buttonZeroP.Location = new System.Drawing.Point(326, 3);
+            this.buttonZeroP.Name = "buttonZeroP";
+            this.buttonZeroP.Size = new System.Drawing.Size(19, 23);
+            this.buttonZeroP.TabIndex = 20;
+            this.buttonZeroP.Text = "0";
+            this.buttonZeroP.UseVisualStyleBackColor = true;
             // 
             // buttonSetOffset
             // 
@@ -542,6 +564,8 @@
         private System.Windows.Forms.Button buttonSetOffset;
         private System.Windows.Forms.Button buttonSetP;
         private System.Windows.Forms.CheckBox checkBoxStyle;
+        private System.Windows.Forms.Button buttonZeroOffset;
+        private System.Windows.Forms.Button buttonZeroP;
 
     }
 }
