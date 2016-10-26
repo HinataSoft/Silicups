@@ -20,6 +20,8 @@ namespace Silicups.GUI
             Phased,
         }
 
+        private static readonly string RegistryPath = @"SOFTWARE\HinataSoft\Silicups\MainForm";
+
         private List<Project> Solution = new List<Project>();
         private Project CurrentProject = null;
         private IDataSeries CurrentDataSeries = null;
@@ -33,6 +35,17 @@ namespace Silicups.GUI
         public MainForm()
         {
             InitializeComponent();
+
+            try
+            {
+                var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(RegistryPath);
+                if (key != null)
+                {
+                    checkBoxStyle.Checked = (key.GetValue("GliderStyle").ToString() == "1");
+                }
+            }
+            catch
+            { }
 
             radioButtonTimeseries.CheckedChanged += new EventHandler(radioButtonTimeseries_CheckedChanged);
             radioButtonPhased.CheckedChanged += new EventHandler(radioButtonPhased_CheckedChanged);
@@ -48,11 +61,41 @@ namespace Silicups.GUI
             gliderP.GliderValueConfirmed += new Glider.GliderEventHandler(gliderP_GliderValueConfirmed);
             gliderOffset.GliderValueChanged += new Glider.GliderEventHandler(gliderOffset_GliderValueChanged);
             gliderOffset.GliderValueConfirmed += new Glider.GliderEventHandler(gliderOffset_GliderValueConfirmed);
+            trackBarP.ValueChanged += new EventHandler(trackBarP_ValueChanged);
+            trackBarOffset.ValueChanged += new EventHandler(trackBarOffset_ValueChanged);
+            buttonSetOffset.Click += new EventHandler(buttonSetOffset_Click);
+            buttonSetP.Click += new EventHandler(buttonSetP_Click);
+
+            this.FormClosing += new FormClosingEventHandler(MainForm_FormClosing);
+
+            this.KeyPreview = true;
+            this.KeyDown += new KeyEventHandler(MainForm_KeyDown);
+
+            RefreshGliderStyle();
+            checkBoxStyle.CheckedChanged += new EventHandler(checkBoxStyle_CheckedChanged);
 
 #if DEBUG
             if (System.IO.File.Exists("autoload.xml"))
             { LoadSolution("autoload.xml"); }
 #endif
+        }
+
+        void MainForm_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Space)
+            {
+                gliderP.ConfirmPosition();
+                gliderOffset.ConfirmPosition();
+            }
+        }
+
+        void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            var key = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(RegistryPath);
+            if (key != null)
+            {
+                key.SetValue("GliderStyle", checkBoxStyle.Checked ? 1 : 0, Microsoft.Win32.RegistryValueKind.DWord);
+            }
         }
 
         // radio buttons
@@ -100,21 +143,50 @@ namespace Silicups.GUI
 
         void gliderP_GliderValueChanged(object sender, Glider.GliderEventArgs e)
         {
-            if (OriginalP == null)
-            { return; }
-            try
-            { textBoxP.Text = MathEx.FormatDouble(OriginalP.Value + e.GliderValue * MathEx.ParseDouble(textBoxPPM.Text));  }
-            catch { }
+            RefineGliderTarget(ref OriginalP, e.GliderValue, textBoxP, textBoxPPM);
         }
 
         void gliderP_GliderValueConfirmed(object sender, Glider.GliderEventArgs e)
         {
-            if (OriginalP == null)
+            SetGliderTarget(ref OriginalP, e.GliderValue, textBoxP, textBoxPPM);
+        }
+
+        bool trackBarP_SuppressEvent = false;
+        void trackBarP_ValueChanged(object sender, EventArgs e)
+        {
+            if (trackBarP_SuppressEvent) { return; }
+            RefineGliderTarget(ref OriginalP, trackBarP.NormalizedValue(), textBoxP, textBoxPPM);
+        }
+
+        void buttonSetP_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                trackBarP_SuppressEvent = false;
+                SetGliderTarget(ref OriginalP, trackBarP.NormalizedValue(), textBoxP, textBoxPPM);
+                trackBarP.Value = 0;
+            }
+            finally
+            { trackBarP_SuppressEvent = false; }
+        }
+
+        private static void RefineGliderTarget(ref double? target, double gliderValue, TextBox targetBox, TextBox amplitudeBox)
+        {
+            if (!target.HasValue)
+            { return; }
+            try
+            { targetBox.Text = MathEx.FormatDouble(target.Value + gliderValue * MathEx.ParseDouble(amplitudeBox.Text)); }
+            catch { }
+        }
+
+        private static void SetGliderTarget(ref double? target, double gliderValue, TextBox targetBox, TextBox amplitudeBox)
+        {
+            if (!target.HasValue)
             { return; }
             try
             {
-                OriginalP += e.GliderValue * MathEx.ParseDouble(textBoxPPM.Text);
-                textBoxP.Text = MathEx.FormatDouble(OriginalP.Value);
+                target += gliderValue * MathEx.ParseDouble(amplitudeBox.Text);
+                targetBox.Text = MathEx.FormatDouble(target.Value);
             }
             catch { }
         }
@@ -148,23 +220,31 @@ namespace Silicups.GUI
 
         void gliderOffset_GliderValueChanged(object sender, Glider.GliderEventArgs e)
         {
-            if (OriginalOffset == null)
-            { return; }
-            try
-            { textBoxOffset.Text = MathEx.FormatDouble(OriginalOffset.Value + e.GliderValue * MathEx.ParseDouble(textBoxOffsetPM.Text)); }
-            catch { }
+            RefineGliderTarget(ref OriginalOffset, e.GliderValue, textBoxOffset, textBoxOffsetPM);
         }
 
         void gliderOffset_GliderValueConfirmed(object sender, Glider.GliderEventArgs e)
         {
-            if (OriginalOffset == null)
-            { return; }
+            SetGliderTarget(ref OriginalOffset, e.GliderValue, textBoxOffset, textBoxOffsetPM);
+        }
+
+        bool trackBarOffset_SuppressEvent = false;
+        void trackBarOffset_ValueChanged(object sender, EventArgs e)
+        {
+            if (trackBarOffset_SuppressEvent) { return; }
+            RefineGliderTarget(ref OriginalOffset, trackBarOffset.NormalizedValue(), textBoxOffset, textBoxOffsetPM);
+        }
+
+        void buttonSetOffset_Click(object sender, EventArgs e)
+        {
             try
             {
-                OriginalOffset += e.GliderValue * MathEx.ParseDouble(textBoxOffsetPM.Text);
-                textBoxOffset.Text = MathEx.FormatDouble(OriginalOffset.Value);
+                trackBarOffset_SuppressEvent = true;
+                SetGliderTarget(ref OriginalOffset, trackBarOffset.NormalizedValue(), textBoxOffset, textBoxOffsetPM);
+                trackBarOffset.Value = 0;
             }
-            catch { }
+            finally
+            { trackBarOffset_SuppressEvent = false; }
         }
 
         // solution list box
@@ -252,6 +332,35 @@ namespace Silicups.GUI
             }
             SelectedMetadata = selectedMetadata;
             UpdateDataSource(true);
+        }
+
+        // glider style toggle
+
+        private void RefreshGliderStyle()
+        {
+            if (checkBoxStyle.Checked)
+            {
+                gliderP.Visible = false;
+                gliderOffset.Visible = false;
+                trackBarP.Visible = true;
+                trackBarOffset.Visible = true;
+                buttonSetP.Visible = true;
+                buttonSetOffset.Visible = true;
+            }
+            else
+            {
+                gliderP.Visible = true;
+                gliderOffset.Visible = true;
+                trackBarP.Visible = false;
+                trackBarOffset.Visible = false;
+                buttonSetP.Visible = false;
+                buttonSetOffset.Visible = false;
+            }
+        }
+
+        void checkBoxStyle_CheckedChanged(object sender, EventArgs e)
+        {
+            RefreshGliderStyle();
         }
 
         // data sources
@@ -647,6 +756,14 @@ namespace Silicups.GUI
         public new void RefreshItems()
         {
             base.RefreshItems();
+        }
+    }
+
+    public static class TrackBarExtensions
+    {
+        public static double NormalizedValue(this TrackBar trackBar)
+        {
+            return trackBar.Value * 1.0 / trackBar.Maximum;
         }
     }
 }

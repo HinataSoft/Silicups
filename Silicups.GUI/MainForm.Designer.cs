@@ -36,6 +36,11 @@
             this.listBoxObs = new System.Windows.Forms.CheckedListBox();
             this.graph = new Silicups.GUI.Graph(this.components);
             this.panelTools = new System.Windows.Forms.Panel();
+            this.buttonSetOffset = new System.Windows.Forms.Button();
+            this.buttonSetP = new System.Windows.Forms.Button();
+            this.checkBoxStyle = new System.Windows.Forms.CheckBox();
+            this.trackBarOffset = new System.Windows.Forms.TrackBar();
+            this.trackBarP = new System.Windows.Forms.TrackBar();
             this.label5 = new System.Windows.Forms.Label();
             this.textBoxOffsetPM = new System.Windows.Forms.TextBox();
             this.gliderOffset = new Silicups.GUI.Glider();
@@ -61,8 +66,8 @@
             this.addNewProjectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.loadFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.loadFilesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.statusStrip = new System.Windows.Forms.StatusStrip();
             this.exportToTxtToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.statusStrip = new System.Windows.Forms.StatusStrip();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerMain)).BeginInit();
             this.splitContainerMain.Panel1.SuspendLayout();
             this.splitContainerMain.Panel2.SuspendLayout();
@@ -72,6 +77,8 @@
             this.splitContainerLeft.Panel2.SuspendLayout();
             this.splitContainerLeft.SuspendLayout();
             this.panelTools.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.trackBarOffset)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.trackBarP)).BeginInit();
             this.menuStrip.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -147,6 +154,11 @@
             // 
             this.panelTools.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.panelTools.Controls.Add(this.buttonSetOffset);
+            this.panelTools.Controls.Add(this.buttonSetP);
+            this.panelTools.Controls.Add(this.checkBoxStyle);
+            this.panelTools.Controls.Add(this.trackBarOffset);
+            this.panelTools.Controls.Add(this.trackBarP);
             this.panelTools.Controls.Add(this.label5);
             this.panelTools.Controls.Add(this.textBoxOffsetPM);
             this.panelTools.Controls.Add(this.gliderOffset);
@@ -167,6 +179,61 @@
             this.panelTools.Size = new System.Drawing.Size(772, 97);
             this.panelTools.TabIndex = 0;
             // 
+            // buttonSetOffset
+            // 
+            this.buttonSetOffset.Location = new System.Drawing.Point(346, 72);
+            this.buttonSetOffset.Name = "buttonSetOffset";
+            this.buttonSetOffset.Size = new System.Drawing.Size(19, 23);
+            this.buttonSetOffset.TabIndex = 19;
+            this.buttonSetOffset.Text = "<";
+            this.buttonSetOffset.UseVisualStyleBackColor = true;
+            // 
+            // buttonSetP
+            // 
+            this.buttonSetP.Location = new System.Drawing.Point(346, 3);
+            this.buttonSetP.Name = "buttonSetP";
+            this.buttonSetP.Size = new System.Drawing.Size(19, 23);
+            this.buttonSetP.TabIndex = 18;
+            this.buttonSetP.Text = "<";
+            this.buttonSetP.UseVisualStyleBackColor = true;
+            // 
+            // checkBoxStyle
+            // 
+            this.checkBoxStyle.AutoSize = true;
+            this.checkBoxStyle.Checked = true;
+            this.checkBoxStyle.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.checkBoxStyle.Location = new System.Drawing.Point(305, 5);
+            this.checkBoxStyle.Name = "checkBoxStyle";
+            this.checkBoxStyle.Size = new System.Drawing.Size(15, 14);
+            this.checkBoxStyle.TabIndex = 17;
+            this.checkBoxStyle.UseVisualStyleBackColor = true;
+            // 
+            // trackBarOffset
+            // 
+            this.trackBarOffset.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.trackBarOffset.Location = new System.Drawing.Point(371, 49);
+            this.trackBarOffset.Maximum = 2048;
+            this.trackBarOffset.Minimum = -2048;
+            this.trackBarOffset.Name = "trackBarOffset";
+            this.trackBarOffset.Size = new System.Drawing.Size(392, 45);
+            this.trackBarOffset.TabIndex = 16;
+            this.trackBarOffset.TickFrequency = 64;
+            this.trackBarOffset.TickStyle = System.Windows.Forms.TickStyle.Both;
+            // 
+            // trackBarP
+            // 
+            this.trackBarP.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.trackBarP.Location = new System.Drawing.Point(371, 3);
+            this.trackBarP.Maximum = 2048;
+            this.trackBarP.Minimum = -2048;
+            this.trackBarP.Name = "trackBarP";
+            this.trackBarP.Size = new System.Drawing.Size(392, 45);
+            this.trackBarP.TabIndex = 15;
+            this.trackBarP.TickFrequency = 64;
+            this.trackBarP.TickStyle = System.Windows.Forms.TickStyle.Both;
+            // 
             // label5
             // 
             this.label5.AutoSize = true;
@@ -178,19 +245,22 @@
             // 
             // textBoxOffsetPM
             // 
-            this.textBoxOffsetPM.Location = new System.Drawing.Point(411, 52);
+            this.textBoxOffsetPM.Location = new System.Drawing.Point(305, 52);
             this.textBoxOffsetPM.Name = "textBoxOffsetPM";
             this.textBoxOffsetPM.Size = new System.Drawing.Size(60, 20);
             this.textBoxOffsetPM.TabIndex = 13;
             // 
             // gliderOffset
             // 
+            this.gliderOffset.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.gliderOffset.Cursor = System.Windows.Forms.Cursors.Cross;
             this.gliderOffset.Enabled = false;
-            this.gliderOffset.Location = new System.Drawing.Point(305, 52);
+            this.gliderOffset.Location = new System.Drawing.Point(371, 52);
             this.gliderOffset.Name = "gliderOffset";
-            this.gliderOffset.Size = new System.Drawing.Size(100, 20);
+            this.gliderOffset.Size = new System.Drawing.Size(392, 20);
             this.gliderOffset.TabIndex = 12;
+            this.gliderOffset.Visible = false;
             // 
             // label4
             // 
@@ -203,19 +273,22 @@
             // 
             // textBoxPPM
             // 
-            this.textBoxPPM.Location = new System.Drawing.Point(411, 26);
+            this.textBoxPPM.Location = new System.Drawing.Point(305, 26);
             this.textBoxPPM.Name = "textBoxPPM";
             this.textBoxPPM.Size = new System.Drawing.Size(60, 20);
             this.textBoxPPM.TabIndex = 10;
             // 
             // gliderP
             // 
+            this.gliderP.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.gliderP.Cursor = System.Windows.Forms.Cursors.Cross;
             this.gliderP.Enabled = false;
-            this.gliderP.Location = new System.Drawing.Point(305, 26);
+            this.gliderP.Location = new System.Drawing.Point(371, 26);
             this.gliderP.Name = "gliderP";
-            this.gliderP.Size = new System.Drawing.Size(100, 20);
+            this.gliderP.Size = new System.Drawing.Size(392, 20);
             this.gliderP.TabIndex = 9;
+            this.gliderP.Visible = false;
             // 
             // label3
             // 
@@ -359,29 +432,36 @@
             this.loadFilesToolStripMenuItem,
             this.exportToTxtToolStripMenuItem});
             this.projectToolStripMenuItem.Name = "projectToolStripMenuItem";
-            this.projectToolStripMenuItem.Size = new System.Drawing.Size(56, 20);
-            this.projectToolStripMenuItem.Text = "Project";
+            this.projectToolStripMenuItem.Size = new System.Drawing.Size(54, 20);
+            this.projectToolStripMenuItem.Text = "Object";
             // 
             // addNewProjectToolStripMenuItem
             // 
             this.addNewProjectToolStripMenuItem.Name = "addNewProjectToolStripMenuItem";
-            this.addNewProjectToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
-            this.addNewProjectToolStripMenuItem.Text = "Add New Project";
+            this.addNewProjectToolStripMenuItem.Size = new System.Drawing.Size(224, 22);
+            this.addNewProjectToolStripMenuItem.Text = "Add New Object To Solution";
             this.addNewProjectToolStripMenuItem.Click += new System.EventHandler(this.addNewProjectToolStripMenuItem_Click);
             // 
             // loadFileToolStripMenuItem
             // 
             this.loadFileToolStripMenuItem.Name = "loadFileToolStripMenuItem";
-            this.loadFileToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
+            this.loadFileToolStripMenuItem.Size = new System.Drawing.Size(224, 22);
             this.loadFileToolStripMenuItem.Text = "Add File[s]...";
             this.loadFileToolStripMenuItem.Click += new System.EventHandler(this.loadFileToolStripMenuItem_Click);
             // 
             // loadFilesToolStripMenuItem
             // 
             this.loadFilesToolStripMenuItem.Name = "loadFilesToolStripMenuItem";
-            this.loadFilesToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
+            this.loadFilesToolStripMenuItem.Size = new System.Drawing.Size(224, 22);
             this.loadFilesToolStripMenuItem.Text = "Add File Series...";
             this.loadFilesToolStripMenuItem.Click += new System.EventHandler(this.loadFilesToolStripMenuItem_Click);
+            // 
+            // exportToTxtToolStripMenuItem
+            // 
+            this.exportToTxtToolStripMenuItem.Name = "exportToTxtToolStripMenuItem";
+            this.exportToTxtToolStripMenuItem.Size = new System.Drawing.Size(224, 22);
+            this.exportToTxtToolStripMenuItem.Text = "Export To Txt...";
+            this.exportToTxtToolStripMenuItem.Click += new System.EventHandler(this.exportToTxtToolStripMenuItem_Click);
             // 
             // statusStrip
             // 
@@ -390,13 +470,6 @@
             this.statusStrip.Size = new System.Drawing.Size(1166, 22);
             this.statusStrip.TabIndex = 4;
             this.statusStrip.Text = "statusStrip1";
-            // 
-            // exportToTxtToolStripMenuItem
-            // 
-            this.exportToTxtToolStripMenuItem.Name = "exportToTxtToolStripMenuItem";
-            this.exportToTxtToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
-            this.exportToTxtToolStripMenuItem.Text = "Export To Txt...";
-            this.exportToTxtToolStripMenuItem.Click += new System.EventHandler(this.exportToTxtToolStripMenuItem_Click);
             // 
             // MainForm
             // 
@@ -420,6 +493,8 @@
             this.splitContainerLeft.ResumeLayout(false);
             this.panelTools.ResumeLayout(false);
             this.panelTools.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.trackBarOffset)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.trackBarP)).EndInit();
             this.menuStrip.ResumeLayout(false);
             this.menuStrip.PerformLayout();
             this.ResumeLayout(false);
@@ -462,6 +537,11 @@
         private System.Windows.Forms.ToolStripMenuItem projectToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem addNewProjectToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem exportToTxtToolStripMenuItem;
+        private System.Windows.Forms.TrackBar trackBarP;
+        private System.Windows.Forms.TrackBar trackBarOffset;
+        private System.Windows.Forms.Button buttonSetOffset;
+        private System.Windows.Forms.Button buttonSetP;
+        private System.Windows.Forms.CheckBox checkBoxStyle;
 
     }
 }

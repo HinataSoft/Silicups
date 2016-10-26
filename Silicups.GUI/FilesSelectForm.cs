@@ -70,11 +70,5 @@ namespace Silicups.GUI
             this.DialogResult = DialogResult.OK;
             this.Close();
         }
-
-        class FilterItem
-        {
-            public bool Include;
-            public string Contains;
-        }
     }
 }

@@ -25,6 +25,7 @@ namespace Silicups.GUI
         private Pen DiagonalCrossPen = Pens.DarkGray;
         private Pen DisabledPen = Pens.LightGray;
         private Point MiddlePoint = Point.Empty;
+        private Point LastLocation = Point.Empty;
 
         public double GliderValue { get; private set; }
         public event GliderEventHandler GliderValueChanged;
@@ -57,17 +58,30 @@ namespace Silicups.GUI
         void Glider_MouseLeave(object sender, EventArgs e)
         {
             OnGliderValueChanged(0);
+            LastLocation = Point.Empty;
         }
 
         void Glider_MouseMove(object sender, MouseEventArgs e)
         {
             OnGliderValueChanged(GetGliderValue(e.Location));
+            LastLocation = e.Location;
         }
 
         void Glider_MouseClick(object sender, MouseEventArgs e)
         {
-            OnGliderValueConfirmed(GetGliderValue(e.Location));
-            Cursor.Position = PointToScreen(MiddlePoint);
+            if ((e.Button & System.Windows.Forms.MouseButtons.Right) > 0)
+            {
+                OnGliderValueConfirmed(GetGliderValue(e.Location));
+                Cursor.Position = PointToScreen(MiddlePoint);
+                LastLocation = Point.Empty;
+            }
+        }
+
+        public void ConfirmPosition()
+        {
+            if (LastLocation.IsEmpty)
+            { return; }
+            OnGliderValueConfirmed(GetGliderValue(LastLocation));
         }
 
         void Glider_Paint(object sender, PaintEventArgs e)
