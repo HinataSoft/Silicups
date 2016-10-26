@@ -32,7 +32,7 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.splitContainerMain = new System.Windows.Forms.SplitContainer();
             this.splitContainerLeft = new System.Windows.Forms.SplitContainer();
-            this.listBoxSolution = new MyListBox();
+            this.listBoxSolution = new Silicups.GUI.MyListBox();
             this.listBoxObs = new System.Windows.Forms.CheckedListBox();
             this.graph = new Silicups.GUI.Graph(this.components);
             this.panelTools = new System.Windows.Forms.Panel();
@@ -56,13 +56,13 @@
             this.newSolutionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.loadSolutionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveSolutionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.addNewProjectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.projectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.addNewProjectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.loadFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.loadFilesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip = new System.Windows.Forms.StatusStrip();
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.exportToTxtToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerMain)).BeginInit();
             this.splitContainerMain.Panel1.SuspendLayout();
             this.splitContainerMain.Panel2.SuspendLayout();
@@ -147,7 +147,6 @@
             // 
             this.panelTools.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.panelTools.Controls.Add(this.textBox1);
             this.panelTools.Controls.Add(this.label5);
             this.panelTools.Controls.Add(this.textBoxOffsetPM);
             this.panelTools.Controls.Add(this.gliderOffset);
@@ -319,7 +318,6 @@
             this.newSolutionToolStripMenuItem,
             this.loadSolutionToolStripMenuItem,
             this.saveSolutionToolStripMenuItem,
-            this.addNewProjectToolStripMenuItem,
             this.exitToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
@@ -328,23 +326,41 @@
             // newSolutionToolStripMenuItem
             // 
             this.newSolutionToolStripMenuItem.Name = "newSolutionToolStripMenuItem";
-            this.newSolutionToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
+            this.newSolutionToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
             this.newSolutionToolStripMenuItem.Text = "New Solution";
             this.newSolutionToolStripMenuItem.Click += new System.EventHandler(this.newProjectToolStripMenuItem_Click);
             // 
             // loadSolutionToolStripMenuItem
             // 
             this.loadSolutionToolStripMenuItem.Name = "loadSolutionToolStripMenuItem";
-            this.loadSolutionToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
+            this.loadSolutionToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
             this.loadSolutionToolStripMenuItem.Text = "Load Solution...";
             this.loadSolutionToolStripMenuItem.Click += new System.EventHandler(this.loadSolutionToolStripMenuItem_Click);
             // 
             // saveSolutionToolStripMenuItem
             // 
             this.saveSolutionToolStripMenuItem.Name = "saveSolutionToolStripMenuItem";
-            this.saveSolutionToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
+            this.saveSolutionToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
             this.saveSolutionToolStripMenuItem.Text = "Save Solution...";
             this.saveSolutionToolStripMenuItem.Click += new System.EventHandler(this.saveSolutionToolStripMenuItem_Click);
+            // 
+            // exitToolStripMenuItem
+            // 
+            this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
+            this.exitToolStripMenuItem.Text = "Exit";
+            this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
+            // 
+            // projectToolStripMenuItem
+            // 
+            this.projectToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.addNewProjectToolStripMenuItem,
+            this.loadFileToolStripMenuItem,
+            this.loadFilesToolStripMenuItem,
+            this.exportToTxtToolStripMenuItem});
+            this.projectToolStripMenuItem.Name = "projectToolStripMenuItem";
+            this.projectToolStripMenuItem.Size = new System.Drawing.Size(56, 20);
+            this.projectToolStripMenuItem.Text = "Project";
             // 
             // addNewProjectToolStripMenuItem
             // 
@@ -353,33 +369,17 @@
             this.addNewProjectToolStripMenuItem.Text = "Add New Project";
             this.addNewProjectToolStripMenuItem.Click += new System.EventHandler(this.addNewProjectToolStripMenuItem_Click);
             // 
-            // exitToolStripMenuItem
-            // 
-            this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
-            this.exitToolStripMenuItem.Text = "Exit";
-            this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
-            // 
-            // projectToolStripMenuItem
-            // 
-            this.projectToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.loadFileToolStripMenuItem,
-            this.loadFilesToolStripMenuItem});
-            this.projectToolStripMenuItem.Name = "projectToolStripMenuItem";
-            this.projectToolStripMenuItem.Size = new System.Drawing.Size(56, 20);
-            this.projectToolStripMenuItem.Text = "Project";
-            // 
             // loadFileToolStripMenuItem
             // 
             this.loadFileToolStripMenuItem.Name = "loadFileToolStripMenuItem";
-            this.loadFileToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
+            this.loadFileToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
             this.loadFileToolStripMenuItem.Text = "Add File[s]...";
             this.loadFileToolStripMenuItem.Click += new System.EventHandler(this.loadFileToolStripMenuItem_Click);
             // 
             // loadFilesToolStripMenuItem
             // 
             this.loadFilesToolStripMenuItem.Name = "loadFilesToolStripMenuItem";
-            this.loadFilesToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
+            this.loadFilesToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
             this.loadFilesToolStripMenuItem.Text = "Add File Series...";
             this.loadFilesToolStripMenuItem.Click += new System.EventHandler(this.loadFilesToolStripMenuItem_Click);
             // 
@@ -391,12 +391,12 @@
             this.statusStrip.TabIndex = 4;
             this.statusStrip.Text = "statusStrip1";
             // 
-            // textBox1
+            // exportToTxtToolStripMenuItem
             // 
-            this.textBox1.Location = new System.Drawing.Point(597, 29);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(166, 20);
-            this.textBox1.TabIndex = 15;
+            this.exportToTxtToolStripMenuItem.Name = "exportToTxtToolStripMenuItem";
+            this.exportToTxtToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
+            this.exportToTxtToolStripMenuItem.Text = "Export To Txt...";
+            this.exportToTxtToolStripMenuItem.Click += new System.EventHandler(this.exportToTxtToolStripMenuItem_Click);
             // 
             // MainForm
             // 
@@ -461,7 +461,7 @@
         private MyListBox listBoxSolution;
         private System.Windows.Forms.ToolStripMenuItem projectToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem addNewProjectToolStripMenuItem;
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.ToolStripMenuItem exportToTxtToolStripMenuItem;
 
     }
 }

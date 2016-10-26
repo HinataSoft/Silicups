@@ -20,8 +20,11 @@ namespace Silicups.Core
 
         public string Id { get; internal set; }
         public string Caption { get; set; }
-        public string FilePattern { get; set; }
-        public string FileFilter { get; set; }
+
+        public string AbsoluteBasePath { get; internal set; }
+        public string RelativeBasePath { get; internal set; }
+        public string FilePattern { get; internal set; }
+        public string FileFilter { get; internal set; }
 
         public Project()
         {
@@ -94,7 +97,7 @@ namespace Silicups.Core
             foreach (string file in files)
             {
                 string absolutePath = new System.IO.FileInfo(file).FullName;
-                string relativePath = PathEx.MakeRelativePath(absolutePath, System.IO.Directory.GetCurrentDirectory());
+                string relativePath = PathEx.MakeRelativePathFromCurrentDir(absolutePath);
                 if (existingFiles.Contains(absolutePath) || existingFiles.Contains(relativePath))
                 { continue; }
                 var set = new DataPointSet(absolutePath, relativePath);
@@ -102,6 +105,15 @@ namespace Silicups.Core
                 DataSeries.AddSet(set);
             }
             Refresh();
+        }
+
+        public void AddDataFiles(string baseDirectory, string pattern, string filter)
+        {
+            this.AbsoluteBasePath = new System.IO.DirectoryInfo(baseDirectory).FullName + System.IO.Path.DirectorySeparatorChar;
+            this.RelativeBasePath = PathEx.MakeRelativePathFromCurrentDir(AbsoluteBasePath);
+            this.FilePattern = pattern;
+            this.FileFilter = filter;
+            AddDataFiles(PathEx.FindFiles(AbsoluteBasePath, pattern, filter));
         }
 
         public void LoadFromXml(XmlNode root)
@@ -112,10 +124,14 @@ namespace Silicups.Core
 
             foreach (XmlNode setNode in root.FindNodes("Set"))
             {
-                string absolutePath = setNode.FindOneNode("AbsolutePath").AsString();
-                string relativePath = setNode.FindOneNode("RelativePath").AsString();
+                string pathComposite = setNode.AsString();
+                string[] pathParts = pathComposite.Split('|');
+                if (pathParts.Length == 0)
+                { continue; }
+                string absolutePath = pathParts[0];
+                string relativePath = (pathParts.Length > 1) ? pathParts[1] : null;
                 var set = new DataPointSet(absolutePath, relativePath);
-                string path = System.IO.File.Exists(relativePath) ? relativePath : absolutePath;
+                string path = !String.IsNullOrEmpty(relativePath) && System.IO.File.Exists(relativePath) ? relativePath : absolutePath;
                 AppendMagFile(set, path);
                 DataSeries.AddSet(set);
                 set.Metadata.OffsetY = setNode.FindAttribute("offsetY").AsDouble(0);
@@ -150,18 +166,29 @@ namespace Silicups.Core
             foreach (IDataSet set in DataSeries.Series)
             {
                 XmlNode setNode = root.AppendXmlElement("Set");
-                XmlNode absolutePathNode = root.AppendXmlElement("AbsolutePath");
-                XmlNode relativePathNode = root.AppendXmlElement("RelativePath");
-                absolutePathNode.InnerText = set.Metadata.AbsolutePath;
-                relativePathNode.InnerText = set.Metadata.RelativePath;
+                setNode.InnerText = String.Format("{0}|{1}", set.Metadata.AbsolutePath, set.Metadata.RelativePath);
+                setNode.AppendXmlAttribute("source", "file");
                 setNode.AppendXmlAttribute("offsetY", set.Metadata.OffsetY);
                 setNode.AppendXmlAttribute("enabled", set.Metadata.Enabled);
             }
-            XmlNode settingsNode = root.AppendXmlElement("Settings");
-            if (!String.IsNullOrEmpty(Caption))
-            { settingsNode.AppendXmlAttribute("caption", Caption); }
-            settingsNode.AppendXmlAttribute("pAmplitude", PAmplitude);
-            settingsNode.AppendXmlAttribute("offsetAmplitude", OffsetAmplitude);
+
+            {
+                XmlNode settingsNode = root.AppendXmlElement("Settings");
+                if (!String.IsNullOrEmpty(Caption))
+                { settingsNode.AppendXmlAttribute("caption", Caption); }
+                settingsNode.AppendXmlAttribute("pAmplitude", PAmplitude);
+                settingsNode.AppendXmlAttribute("offsetAmplitude", OffsetAmplitude);
+            }
+
+            if (!String.IsNullOrEmpty(AbsoluteBasePath))
+            {
+                XmlNode sourceSettingsNode = root.AppendXmlElement("SourceSettings");
+                sourceSettingsNode.InnerText = String.Format("{0}|{1}", AbsoluteBasePath, RelativeBasePath);
+                sourceSettingsNode.AppendXmlAttribute("source", "file");
+                sourceSettingsNode.AppendXmlAttribute("filter", FileFilter);
+                sourceSettingsNode.AppendXmlAttribute("pattern", FilePattern);
+            }
+
         }
 
         private readonly static string MagFilePhasedTag = "Phased with elements ";
@@ -196,37 +223,6 @@ namespace Silicups.Core
                 catch
                 { }
             }
-        }
-    }
-
-    internal static class PathEx
-    {
-        /// <summary>
-        /// Creates a relative path from one file or folder to another.
-        /// http://stackoverflow.com/a/340454
-        /// </summary>
-        /// <param name="fromPath">Contains the directory that defines the start of the relative path.</param>
-        /// <param name="toPath">Contains the path that defines the endpoint of the relative path.</param>
-        /// <returns>The relative path from the start directory to the end path or <c>toPath</c> if the paths are not related.</returns>
-        public static String MakeRelativePath(String fromPath, String toPath)
-        {
-            if (String.IsNullOrEmpty(fromPath)) throw new ArgumentNullException("fromPath");
-            if (String.IsNullOrEmpty(toPath)) throw new ArgumentNullException("toPath");
-
-            Uri fromUri = new Uri(fromPath);
-            Uri toUri = new Uri(toPath);
-
-            if (fromUri.Scheme != toUri.Scheme) { return toPath; } // path can't be made relative.
-
-            Uri relativeUri = fromUri.MakeRelativeUri(toUri);
-            String relativePath = Uri.UnescapeDataString(relativeUri.ToString());
-
-            if (toUri.Scheme.Equals("file", StringComparison.InvariantCultureIgnoreCase))
-            {
-                relativePath = relativePath.Replace(System.IO.Path.AltDirectorySeparatorChar, System.IO.Path.DirectorySeparatorChar);
-            }
-
-            return relativePath;
         }
     }
 

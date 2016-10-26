@@ -79,7 +79,7 @@ namespace Silicups.GUI
 
         private void textBoxP_TextChanged(object sender, EventArgs e)
         {
-            if (IsInitializing)
+            if (IsInitializing || (CurrentProject == null))
             { return; }
 
             CurrentProject.SetM0AndPString(textBoxM0.Text, textBoxP.Text);
@@ -202,7 +202,6 @@ namespace Silicups.GUI
                 { RemoveProjectFromSolution(CurrentProject); }
             }
         }
-
 
         // observation list box
 
@@ -424,13 +423,54 @@ namespace Silicups.GUI
             {
                 IsInitializing = true;
                 if (CurrentProject == null)
-                { CurrentProject = new Core.Project(); }
+                { return; }
                 CurrentProject.AddDataFiles(filenames);
                 RefreshCurrentProject();
             }
             finally
             {
                 IsInitializing = false;
+            }
+        }
+
+        private void LoadFiles(string baseDirectory, string pattern, string filter)
+        {
+            try
+            {
+                IsInitializing = true;
+                if (CurrentProject == null)
+                { return; }
+                CurrentProject.AddDataFiles(baseDirectory, pattern, filter);
+                RefreshCurrentProject();
+            }
+            finally
+            {
+                IsInitializing = false;
+            }
+        }
+
+        private void SaveToTxt(string filename)
+        {
+            if (CurrentProject == null)
+            { return; }
+
+            using (var writer = new System.IO.StreamWriter(filename))
+            {
+                writer.WriteLine("Data for project {0} (Silicups)", CurrentProject.Caption ?? CurrentProject.Id);
+                writer.WriteLine("JD MAG ERR");
+                foreach (IDataSet set in CurrentProject.DataSeries.Series)
+                {
+                    if (!set.Metadata.Enabled)
+                    { continue; }
+                    foreach (DataPoint point in set.Set)
+                    {
+                        writer.WriteLine("{0} {1} {2}",
+                            MathEx.FormatDouble(point.X),
+                            MathEx.FormatDouble(point.Y + set.Metadata.OffsetY),
+                            MathEx.FormatDouble(point.Yerr)
+                        );
+                    }
+                }
             }
         }
 
@@ -500,10 +540,14 @@ namespace Silicups.GUI
             {
                 OriginalP = null;
                 ToggleControls(controls, false);
+                loadFileToolStripMenuItem.Enabled = false;
+                loadFilesToolStripMenuItem.Enabled = false;
                 graph.SetDataSource(null);
                 return;
             }
             ToggleControls(controls, true);
+            loadFileToolStripMenuItem.Enabled = true;
+            loadFilesToolStripMenuItem.Enabled = true;
 
             OriginalP = CurrentProject.P;
             textBoxM0.Text = MathEx.FormatDouble(CurrentProject.M0);
@@ -579,10 +623,21 @@ namespace Silicups.GUI
                 if (dialogResult == DialogResult.OK)
                 {
                     try
-                    { LoadFiles(fd.FileNames); }
+                    { LoadFiles(fd.SelectedDirectory, fd.SelectedPattern, fd.SelectedFilter); }
                     catch (Exception ex)
                     { MessageBox.Show(ex.Message, "Exception", MessageBoxButtons.OK, MessageBoxIcon.Error); }
                 }
+            }
+        }
+
+        private void exportToTxtToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using (var fd = new SaveFileDialog())
+            {
+                fd.Filter = "Text Files (.txt)|*.txt|All Files (*.*)|*.*";
+                DialogResult dialogResult = fd.ShowDialog();
+                if (dialogResult == DialogResult.OK)
+                { SaveToTxt(fd.FileName); }
             }
         }
     }
