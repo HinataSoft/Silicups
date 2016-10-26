@@ -626,8 +626,8 @@ namespace Silicups.GUI
 
             using (var writer = new System.IO.StreamWriter(filename))
             {
-                writer.WriteLine("Data for project {0} (Silicups)", CurrentProject.Caption ?? CurrentProject.Id);
-                writer.WriteLine("JD MAG ERR");
+                //writer.WriteLine("Data for project {0} (Silicups)", CurrentProject.Caption ?? CurrentProject.Id);
+                //writer.WriteLine("JD MAG ERR");
                 foreach (IDataSet set in CurrentProject.DataSeries.Series)
                 {
                     if (!set.Metadata.Enabled)
