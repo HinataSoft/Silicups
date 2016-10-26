@@ -223,6 +223,9 @@ namespace Silicups.Core
                 catch
                 { }
             }
+            if (String.IsNullOrEmpty(set.Metadata.Caption) && !Double.IsInfinity(set.BoundingBox.Left))
+            {
+            }
         }
     }
 

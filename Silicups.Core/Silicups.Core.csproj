@@ -43,6 +43,7 @@
   <ItemGroup>
     <Compile Include="BoundingBox.cs" />
     <Compile Include="Data.cs" />
+    <Compile Include="JD.cs" />
     <Compile Include="MathEx.cs" />
     <Compile Include="PathEx.cs" />
     <Compile Include="Project.cs" />
