@@ -628,7 +628,7 @@ namespace Silicups.GUI
             {
                 //writer.WriteLine("Data for project {0} (Silicups)", CurrentProject.Caption ?? CurrentProject.Id);
                 //writer.WriteLine("JD MAG ERR");
-                foreach (IDataSet set in CurrentProject.DataSeries.Series)
+                foreach (IDataSet set in CurrentProject.TimeSeries.Series)
                 {
                     if (!set.Metadata.Enabled)
                     { continue; }
@@ -636,7 +636,7 @@ namespace Silicups.GUI
                     {
                         writer.WriteLine("{0} {1} {2}",
                             MathEx.FormatDouble(point.X),
-                            MathEx.FormatDouble(point.Y + set.Metadata.OffsetY),
+                            MathEx.FormatDouble(point.Y),
                             MathEx.FormatDouble(point.Yerr)
                         );
                     }
