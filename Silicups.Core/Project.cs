@@ -128,11 +128,24 @@ namespace Silicups.Core
                 string[] pathParts = pathComposite.Split('|');
                 if (pathParts.Length == 0)
                 { continue; }
-                string absolutePath = pathParts[0];
-                string relativePath = (pathParts.Length > 1) ? pathParts[1] : null;
+                string absolutePath = null;
+                string relativePath = null;
+                if (setNode.FindOneNode("AbsolutePath") != null)
+                {
+                    absolutePath = setNode.GetOneNode("AbsolutePath").AsString();
+                    relativePath = setNode.GetOneNode("RelativePath").AsString();
+                }
+                else
+                {
+                    // TOFIX: Obsolete
+                    absolutePath = pathParts[0];
+                    relativePath = (pathParts.Length > 1) ? pathParts[1] : null;
+                }
                 var set = new DataPointSet(absolutePath, relativePath);
                 string path = !String.IsNullOrEmpty(relativePath) && System.IO.File.Exists(relativePath) ? relativePath : absolutePath;
                 AppendMagFile(set, path);
+                foreach (XmlNode xmarkNode in setNode.FindNodes("XMark"))
+                { set.AddXMark(xmarkNode.AsDouble()); }
                 DataSeries.AddSet(set);
                 set.Metadata.OffsetY = setNode.FindAttribute("offsetY").AsDouble(0);
                 set.Metadata.Enabled = setNode.FindAttribute("enabled").AsBoolean(true);

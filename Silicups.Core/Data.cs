@@ -20,6 +20,7 @@ namespace Silicups.Core
         BoundingBox BoundingBox { get; }
         IDataSetMetadata Metadata { get; }
         IEnumerable<DataPoint> Set { get; }
+        IEnumerable<DataMark> XMarks { get; }
     }
 
     public interface IDataSeries
@@ -63,6 +64,16 @@ namespace Silicups.Core
         }
     }
 
+    public struct DataMark
+    {
+        public double N;
+
+        public DataMark(double n)
+        {
+            this.N = n;
+        }
+    }
+
     public class DataPointSet : IDataSet
     {
         public BoundingBox BoundingBox { get; private set; }
@@ -70,6 +81,7 @@ namespace Silicups.Core
         public IDataSetMetadata Metadata { get; internal set; }
 
         private List<DataPoint> list = new List<DataPoint>();
+        private List<DataMark> xmarks = new List<DataMark>();
 
         public DataPointSet(IDataSet templateSet)
         {
@@ -101,9 +113,24 @@ namespace Silicups.Core
             Add(new DataPoint(x, y, yerr));
         }
 
+        public void AddXMark(DataMark m)
+        {
+            xmarks.Add(m);
+        }
+
+        public void AddXMark(double x)
+        {
+            xmarks.Add(new DataMark(x));
+        }
+
         public IEnumerable<DataPoint> Set
         {
             get { return list; }
+        }
+
+        public IEnumerable<DataMark> XMarks
+        {
+            get { return xmarks; }
         }
     }
 
@@ -203,9 +230,14 @@ namespace Silicups.Core
             {
                 if (!originalSet.Metadata.Enabled)
                 { continue; }
+
                 var set = new DataPointSet(originalSet);
                 foreach (DataPoint p in originalSet.Set)
+
                 { set.Add(p.X, p.Y - originalSet.Metadata.OffsetY, p.Yerr); }
+                foreach (DataMark m in originalSet.XMarks)
+                { set.AddXMark(m); }
+
                 Add(set);
             }
         }
@@ -232,6 +264,9 @@ namespace Silicups.Core
 
                 foreach (DataPoint p in originalSet.Set)
                 { set.Add(p.X + xOffset, p.Y - originalSet.Metadata.OffsetY, p.Yerr); }
+
+                foreach (DataMark m in originalSet.XMarks)
+                { set.AddXMark(m.N + xOffset); }
 
                 Add(set);
                 x += originalSet.BoundingBox.Width * 1.1;
@@ -268,17 +303,26 @@ namespace Silicups.Core
                 var set = new DataPointSet(originalSet);
                 foreach (DataPoint p in originalSet.Set)
                 {
-                    double phased = (p.X - M0) / P;
-                    double phase = phased - Math.Floor(phased);
+                    double phase = GetPhased(p.X);
                     set.Add(phase, p.Y - originalSet.Metadata.OffsetY, p.Yerr);
                     set.Add(phase - 1, p.Y - originalSet.Metadata.OffsetY, p.Yerr);
                 }
+
+                foreach (DataMark m in originalSet.XMarks)
+                { set.AddXMark(GetPhased(m.N)); }
+
                 Add(set);
                 BoundingBox.Union(set.BoundingBox);
             }
 
             BoundingBox.Left = -1;
             BoundingBox.Right = 1;
+        }
+
+        private double GetPhased(double x)
+        {
+            double phased = (x - M0) / P;
+            return phased - Math.Floor(phased);
         }
     }
 }
