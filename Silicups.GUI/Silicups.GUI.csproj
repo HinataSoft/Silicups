@@ -63,6 +63,12 @@
     <Compile Include="Graph.Designer.cs">
       <DependentUpon>Graph.cs</DependentUpon>
     </Compile>
+    <Compile Include="ImportVarAstroCzForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ImportVarAstroCzForm.Designer.cs">
+      <DependentUpon>ImportVarAstroCzForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="InputBoxForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -75,6 +81,12 @@
     <Compile Include="MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="MinimaForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MinimaForm.Designer.cs">
+      <DependentUpon>MinimaForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="FilesSelectForm.resx">
@@ -86,11 +98,17 @@
     <EmbeddedResource Include="Graph.resx">
       <DependentUpon>Graph.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="ImportVarAstroCzForm.resx">
+      <DependentUpon>ImportVarAstroCzForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="InputBoxForm.resx">
       <DependentUpon>InputBoxForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MinimaForm.resx">
+      <DependentUpon>MinimaForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -117,6 +135,10 @@
     <ProjectReference Include="..\Silicups.Core\Silicups.Core.csproj">
       <Project>{6D4F9A7A-444B-4D68-8F77-D482D4FF599E}</Project>
       <Name>Silicups.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Silicups.Util\Silicups.Util.csproj">
+      <Project>{C024D979-F3A6-4F69-8CB7-11B1EC18F3F7}</Project>
+      <Name>Silicups.Util</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

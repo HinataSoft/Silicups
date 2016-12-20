@@ -261,6 +261,30 @@ namespace System.Xml
             return AsBoolean(node);
         }
 
+        public static T AsEnum<T>(this XmlNode node)
+        {
+            return (T)Enum.Parse(typeof(T), AsString(node), true);
+        }
+
+        public static T AsEnum<T>(this XmlNode node, T defaultValue)
+        {
+            if (node == null)
+            { return defaultValue; }
+            return (T)Enum.Parse(typeof(T), AsString(node), true);
+        }
+
+        public static int AsEnumInt<T>(this XmlNode node)
+        {
+            return (int)Enum.Parse(typeof(T), AsString(node), true);
+        }
+
+        public static int AsEnumInt<T>(this XmlNode node, int defaultValue)
+        {
+            if (node == null)
+            { return defaultValue; }
+            return (int)Enum.Parse(typeof(T), AsString(node), true);
+        }
+
         /// <summary>
         /// Finds all children XML nodes with given name
         /// </summary>

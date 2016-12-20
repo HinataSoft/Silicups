@@ -5,14 +5,13 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{6D4F9A7A-444B-4D68-8F77-D482D4FF599E}</ProjectGuid>
+    <ProjectGuid>{C024D979-F3A6-4F69-8CB7-11B1EC18F3F7}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Silicups.Core</RootNamespace>
-    <AssemblyName>Silicups.Core</AssemblyName>
+    <RootNamespace>Silicups.Util</RootNamespace>
+    <AssemblyName>Silicups.Util</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -41,15 +40,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BoundingBox.cs" />
-    <Compile Include="Data.cs" />
-    <Compile Include="FormatEx.cs" />
-    <Compile Include="JD.cs" />
-    <Compile Include="MathEx.cs" />
-    <Compile Include="PathEx.cs" />
-    <Compile Include="Project.cs" />
+    <Compile Include="HelCor.cs" />
+    <Compile Include="VarAstroCzImporter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="XmlHelper.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Silicups.Core\Silicups.Core.csproj">
+      <Project>{6D4F9A7A-444B-4D68-8F77-D482D4FF599E}</Project>
+      <Name>Silicups.Core</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

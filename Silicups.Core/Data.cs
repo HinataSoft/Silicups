@@ -66,10 +66,18 @@ namespace Silicups.Core
 
     public struct DataMark
     {
+        public int Type;
         public double N;
 
-        public DataMark(double n)
+        public DataMark(DataMark m)
         {
+            this.Type = m.Type;
+            this.N = m.N;
+        }
+
+        public DataMark(int type, double n)
+        {
+            this.Type = type;
             this.N = n;
         }
     }
@@ -118,9 +126,9 @@ namespace Silicups.Core
             xmarks.Add(m);
         }
 
-        public void AddXMark(double x)
+        public void AddXMark(int type, double x)
         {
-            xmarks.Add(new DataMark(x));
+            xmarks.Add(new DataMark(type, x));
         }
 
         public IEnumerable<DataPoint> Set
@@ -216,10 +224,32 @@ namespace Silicups.Core
         public bool IsEmpty { get { return List.Count == 0; } }
     }
 
-    public class TimeSeries : DerivedSeries, IRefreshableDataSeries
+    public interface IPeriodDataProvider
     {
-        public TimeSeries(DataPointSeries dataSeries)
+        bool CanProvidePeriodData { get; }
+        double GetPhased(double time);
+        IEnumerable<double> GetFullPhasesBetween(double t1, double t2);
+    }
+
+    public class DerivedSeriesWithPeriodProvider : DerivedSeries
+    {
+        protected IPeriodDataProvider PeriodDataProvider { get; private set; }
+
+        public DerivedSeriesWithPeriodProvider(DataPointSeries dataSeries, IPeriodDataProvider periodDataProvider)
             : base(dataSeries)
+        {
+            this.PeriodDataProvider = periodDataProvider;
+        }
+
+        protected void InsertPhaseMarks()
+        {
+        }
+    }
+
+    public class TimeSeries : DerivedSeriesWithPeriodProvider, IRefreshableDataSeries
+    {
+        public TimeSeries(DataPointSeries dataSeries, IPeriodDataProvider periodDataProvider)
+            : base(dataSeries, periodDataProvider)
         {
         }
 
@@ -232,21 +262,23 @@ namespace Silicups.Core
                 { continue; }
 
                 var set = new DataPointSet(originalSet);
-                foreach (DataPoint p in originalSet.Set)
 
+                foreach (DataPoint p in originalSet.Set)
                 { set.Add(p.X, p.Y - originalSet.Metadata.OffsetY, p.Yerr); }
+
                 foreach (DataMark m in originalSet.XMarks)
                 { set.AddXMark(m); }
 
+                InsertPhaseMarks();
                 Add(set);
             }
         }
     }
 
-    public class CompressedSeries : DerivedSeries, IRefreshableDataSeries
+    public class CompressedSeries : DerivedSeriesWithPeriodProvider, IRefreshableDataSeries
     {
-        public CompressedSeries(DataPointSeries dataSeries)
-            : base(dataSeries)
+        public CompressedSeries(DataPointSeries dataSeries, IPeriodDataProvider periodDataProvider)
+            : base(dataSeries, periodDataProvider)
         {
         }
 
@@ -266,30 +298,26 @@ namespace Silicups.Core
                 { set.Add(p.X + xOffset, p.Y - originalSet.Metadata.OffsetY, p.Yerr); }
 
                 foreach (DataMark m in originalSet.XMarks)
-                { set.AddXMark(m.N + xOffset); }
+                { set.AddXMark(m.Type, m.N + xOffset); }
 
+                InsertPhaseMarks();
                 Add(set);
                 x += originalSet.BoundingBox.Width * 1.1;
             }
         }
     }
 
-    public class PhasedSeries : DerivedSeries, IRefreshableDataSeries
+    public class PhasedSeries : DerivedSeriesWithPeriodProvider, IRefreshableDataSeries
     {
-        public double M0 { get; set; }
-        public double P { get; set; }
-
-        public PhasedSeries(DataPointSeries dataSeries)
-            : base(dataSeries)
+        public PhasedSeries(DataPointSeries dataSeries, IPeriodDataProvider periodDataProvider)
+            : base(dataSeries, periodDataProvider)
         {
-            this.M0 = 0;
-            this.P = 0;
         }
 
         public void Refresh()
         {
             Clean();
-            if (P == 0)
+            if (!PeriodDataProvider.CanProvidePeriodData)
             {
                 BoundingBox = new BoundingBox(-1, 0, 1, 1);
                 return;
@@ -303,26 +331,25 @@ namespace Silicups.Core
                 var set = new DataPointSet(originalSet);
                 foreach (DataPoint p in originalSet.Set)
                 {
-                    double phase = GetPhased(p.X);
+                    double phase = PeriodDataProvider.GetPhased(p.X);
                     set.Add(phase, p.Y - originalSet.Metadata.OffsetY, p.Yerr);
                     set.Add(phase - 1, p.Y - originalSet.Metadata.OffsetY, p.Yerr);
                 }
 
                 foreach (DataMark m in originalSet.XMarks)
-                { set.AddXMark(GetPhased(m.N)); }
+                {
+                    double phase = PeriodDataProvider.GetPhased(m.N);
+                    set.AddXMark(m.Type, phase);
+                    set.AddXMark(m.Type, phase - 1);
+                }
 
+                InsertPhaseMarks();
                 Add(set);
                 BoundingBox.Union(set.BoundingBox);
             }
 
             BoundingBox.Left = -1;
             BoundingBox.Right = 1;
-        }
-
-        private double GetPhased(double x)
-        {
-            double phased = (x - M0) / P;
-            return phased - Math.Floor(phased);
         }
     }
 }

@@ -270,7 +270,7 @@ namespace Silicups.GUI
                         float x = (float)(((m.N - ViewBB.Left) / ViewBB.Width) * graphWidth);
                         if ((x < markSize2) || (x > graphWidth - markSize2))
                         { continue; }
-                        g.DrawLine(XMark, graphLeft + x, graphTop, graphLeft + x, graphHeight);
+                        g.DrawLine(XMark, graphLeft + x, graphTop, graphLeft + x, graphBottom);
                     }
                 } 
                 foreach (IDataSet set in DataSource.Series)

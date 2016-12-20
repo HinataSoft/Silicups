@@ -139,7 +139,7 @@ namespace Silicups.GUI
             { return; }
 
             try
-            { CurrentProject.PAmplitude = MathEx.ParseDouble(textBoxPPM.Text); }
+            { CurrentProject.PAmplitude = FormatEx.ParseDouble(textBoxPPM.Text); }
             catch
             { }
         }
@@ -183,7 +183,7 @@ namespace Silicups.GUI
             if (!target.HasValue)
             { return; }
             try
-            { targetBox.Text = MathEx.FormatDouble(target.Value + gliderValue * MathEx.ParseDouble(amplitudeBox.Text)); }
+            { targetBox.Text = FormatEx.FormatDouble(target.Value + gliderValue * FormatEx.ParseDouble(amplitudeBox.Text)); }
             catch { }
         }
 
@@ -193,8 +193,8 @@ namespace Silicups.GUI
             { return; }
             try
             {
-                target += gliderValue * MathEx.ParseDouble(amplitudeBox.Text);
-                targetBox.Text = MathEx.FormatDouble(target.Value);
+                target += gliderValue * FormatEx.ParseDouble(amplitudeBox.Text);
+                targetBox.Text = FormatEx.FormatDouble(target.Value);
             }
             catch { }
         }
@@ -208,7 +208,7 @@ namespace Silicups.GUI
 
             try
             {
-                SelectedMetadata.OffsetY = MathEx.ParseDouble(textBoxOffset.Text);
+                SelectedMetadata.OffsetY = FormatEx.ParseDouble(textBoxOffset.Text);
                 RefreshDataSource();
             }
             catch
@@ -221,7 +221,7 @@ namespace Silicups.GUI
             { return; }
 
             try
-            { CurrentProject.OffsetAmplitude = MathEx.ParseDouble(textBoxOffsetPM.Text); }
+            { CurrentProject.OffsetAmplitude = FormatEx.ParseDouble(textBoxOffsetPM.Text); }
             catch
             { }
         }
@@ -345,7 +345,7 @@ namespace Silicups.GUI
                 if (selectedMetadata != null)
                 {
                     OriginalOffset = selectedMetadata.OffsetY;
-                    textBoxOffset.Text = MathEx.FormatDouble(selectedMetadata.OffsetY);
+                    textBoxOffset.Text = FormatEx.FormatDouble(selectedMetadata.OffsetY);
                     textBoxOffset.Enabled = true;
                     gliderOffset.Enabled = true;
                 }
@@ -468,7 +468,7 @@ namespace Silicups.GUI
             try
             {
                 IsInitializing = true;
-                RenewSolution(new Project[] { new Project() } );
+                RenewSolution(new Project[] { new Project(System.IO.Directory.GetCurrentDirectory()) } );
             }
             finally
             {
@@ -481,7 +481,7 @@ namespace Silicups.GUI
             try
             {
                 IsInitializing = true;
-                AddProjectToSolution(new Project());
+                AddProjectToSolution(new Project(System.IO.Directory.GetCurrentDirectory()));
             }
             finally
             {
@@ -577,7 +577,7 @@ namespace Silicups.GUI
             {
                 solutionNode.AppendXmlElement("Project").AppendXmlAttribute("id", project.Id);
                 XmlNode projectNode = projectsNode.AppendXmlElement("Project");
-                project.SaveToXml(projectNode);
+                project.SaveToXml(path, projectNode);
             }
             doc.Save(path);
         }
@@ -635,9 +635,9 @@ namespace Silicups.GUI
                     foreach (DataPoint point in set.Set)
                     {
                         writer.WriteLine("{0} {1} {2}",
-                            MathEx.FormatDouble(point.X),
-                            MathEx.FormatDouble(point.Y),
-                            MathEx.FormatDouble(point.Yerr)
+                            FormatEx.FormatDouble(point.X),
+                            FormatEx.FormatDouble(point.Y),
+                            FormatEx.FormatDouble(point.Yerr)
                         );
                     }
                 }
@@ -647,10 +647,15 @@ namespace Silicups.GUI
         private void RenewSolution(IEnumerable<Project> projects)
         {
             Solution.Clear();
+            Solution.AddRange(projects);
+            RenewSolution();
+        }
+
+        private void RenewSolution()
+        {
             listBoxSolution.Items.Clear();
             CurrentProject = null;
 
-            Solution.AddRange(projects);
             if (Solution.Count > 0)
             {
                 foreach (Project project in Solution)
@@ -717,10 +722,10 @@ namespace Silicups.GUI
             loadFilesToolStripMenuItem.Enabled = true;
 
             OriginalP = CurrentProject.P;
-            textBoxM0.Text = MathEx.FormatDouble(CurrentProject.M0);
-            textBoxP.Text = MathEx.FormatDouble(CurrentProject.P);
-            textBoxPPM.Text = MathEx.FormatDouble(CurrentProject.PAmplitude);
-            textBoxOffsetPM.Text = MathEx.FormatDouble(CurrentProject.OffsetAmplitude);
+            textBoxM0.Text = FormatEx.FormatDouble(CurrentProject.M0);
+            textBoxP.Text = FormatEx.FormatDouble(CurrentProject.P);
+            textBoxPPM.Text = FormatEx.FormatDouble(CurrentProject.PAmplitude);
+            textBoxOffsetPM.Text = FormatEx.FormatDouble(CurrentProject.OffsetAmplitude);
 
             gliderP.Enabled = CurrentProject.P.HasValue && CurrentProject.PAmplitude.HasValue;
             gliderOffset.Enabled = false;
@@ -817,6 +822,20 @@ namespace Silicups.GUI
                 if (dialogResult == DialogResult.OK)
                 { SaveToTxt(fd.FileName); }
             }
+        }
+
+        private void buttonMinima_Click(object sender, EventArgs e)
+        {
+            //
+        }
+
+        private void importFromVarastroczToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var importVarAstroCzForm = new ImportVarAstroCzForm();
+            importVarAstroCzForm.ShowDialog();
+            if (importVarAstroCzForm.Project != null)
+            { Solution.Add(importVarAstroCzForm.Project); }
+            RenewSolution();
         }
     }
 

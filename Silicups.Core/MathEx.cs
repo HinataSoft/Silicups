@@ -17,21 +17,6 @@ namespace Silicups.Core
             return Math.Min(Math.Max(min, value), max);
         }
 
-        public static double ParseDouble(string s)
-        {
-            return Double.Parse(s.Replace(',', '.'), System.Globalization.CultureInfo.InvariantCulture);
-        }
-
-        public static string FormatDouble(double d)
-        {
-            return d.ToString(System.Globalization.CultureInfo.InvariantCulture);
-        }
-
-        public static string FormatDouble(double? d)
-        {
-            return d.HasValue ? FormatDouble(d.Value) : null;
-        }
-
         public static double GetLower125Base(double d)
         {
             var bases = new Bases125(d);

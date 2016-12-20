@@ -36,6 +36,7 @@
             this.listBoxObs = new System.Windows.Forms.CheckedListBox();
             this.graph = new Silicups.GUI.Graph(this.components);
             this.panelTools = new System.Windows.Forms.Panel();
+            this.buttonMinima = new System.Windows.Forms.Button();
             this.buttonZeroOffset = new System.Windows.Forms.Button();
             this.buttonZeroP = new System.Windows.Forms.Button();
             this.buttonSetOffset = new System.Windows.Forms.Button();
@@ -70,6 +71,7 @@
             this.loadFilesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exportToTxtToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip = new System.Windows.Forms.StatusStrip();
+            this.importFromVarastroczToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerMain)).BeginInit();
             this.splitContainerMain.Panel1.SuspendLayout();
             this.splitContainerMain.Panel2.SuspendLayout();
@@ -156,6 +158,7 @@
             // 
             this.panelTools.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.panelTools.Controls.Add(this.buttonMinima);
             this.panelTools.Controls.Add(this.buttonZeroOffset);
             this.panelTools.Controls.Add(this.buttonZeroP);
             this.panelTools.Controls.Add(this.buttonSetOffset);
@@ -182,6 +185,16 @@
             this.panelTools.Name = "panelTools";
             this.panelTools.Size = new System.Drawing.Size(772, 97);
             this.panelTools.TabIndex = 0;
+            // 
+            // buttonMinima
+            // 
+            this.buttonMinima.Location = new System.Drawing.Point(38, 49);
+            this.buttonMinima.Name = "buttonMinima";
+            this.buttonMinima.Size = new System.Drawing.Size(51, 23);
+            this.buttonMinima.TabIndex = 22;
+            this.buttonMinima.Text = "Minima";
+            this.buttonMinima.UseVisualStyleBackColor = true;
+            this.buttonMinima.Click += new System.EventHandler(this.buttonMinima_Click);
             // 
             // buttonZeroOffset
             // 
@@ -452,6 +465,7 @@
             this.addNewProjectToolStripMenuItem,
             this.loadFileToolStripMenuItem,
             this.loadFilesToolStripMenuItem,
+            this.importFromVarastroczToolStripMenuItem,
             this.exportToTxtToolStripMenuItem});
             this.projectToolStripMenuItem.Name = "projectToolStripMenuItem";
             this.projectToolStripMenuItem.Size = new System.Drawing.Size(54, 20);
@@ -492,6 +506,13 @@
             this.statusStrip.Size = new System.Drawing.Size(1166, 22);
             this.statusStrip.TabIndex = 4;
             this.statusStrip.Text = "statusStrip1";
+            // 
+            // importFromVarastroczToolStripMenuItem
+            // 
+            this.importFromVarastroczToolStripMenuItem.Name = "importFromVarastroczToolStripMenuItem";
+            this.importFromVarastroczToolStripMenuItem.Size = new System.Drawing.Size(224, 22);
+            this.importFromVarastroczToolStripMenuItem.Text = "Import from var.astro.cz...";
+            this.importFromVarastroczToolStripMenuItem.Click += new System.EventHandler(this.importFromVarastroczToolStripMenuItem_Click);
             // 
             // MainForm
             // 
@@ -566,6 +587,8 @@
         private System.Windows.Forms.CheckBox checkBoxStyle;
         private System.Windows.Forms.Button buttonZeroOffset;
         private System.Windows.Forms.Button buttonZeroP;
+        private System.Windows.Forms.Button buttonMinima;
+        private System.Windows.Forms.ToolStripMenuItem importFromVarastroczToolStripMenuItem;
 
     }
 }

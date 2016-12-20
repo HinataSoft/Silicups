@@ -5,8 +5,30 @@ using System.Xml;
 
 namespace Silicups.Core
 {
-    public class Project
+    public class Project : IPeriodDataProvider
     {
+        public enum XMarkTypeEnum
+        {
+            AnyMinimum = 0,
+            PrimaryMinimum = 1,
+            SecondaryMinimum = 2,
+            FlexPoint1 = 3,
+            FlexPoint2 = 4,
+            CalculatedPrimaryMinimum = 10,
+            CalculatedSecondaryMinimum = 11,
+        }
+
+        public static Dictionary<int, string> XMarkTypeColors = new Dictionary<int, string>()
+        {
+            { (int)XMarkTypeEnum.AnyMinimum, "Black" },
+            { (int)XMarkTypeEnum.PrimaryMinimum, "Red" },
+            { (int)XMarkTypeEnum.SecondaryMinimum, "Red" },
+            { (int)XMarkTypeEnum.FlexPoint1, "Green" },
+            { (int)XMarkTypeEnum.FlexPoint2, "Green" },
+            { (int)XMarkTypeEnum.CalculatedPrimaryMinimum, "Blue" },
+            { (int)XMarkTypeEnum.CalculatedSecondaryMinimum, "Blue" },
+        };
+
         public DataPointSeries DataSeries { get; private set; }
         public TimeSeries TimeSeries { get; private set; }
         public CompressedSeries CompressedSeries { get; private set; }
@@ -22,16 +44,15 @@ namespace Silicups.Core
         public string Caption { get; set; }
 
         public string AbsoluteBasePath { get; internal set; }
-        public string RelativeBasePath { get; internal set; }
         public string FilePattern { get; internal set; }
         public string FileFilter { get; internal set; }
 
         public Project()
         {
             this.DataSeries = new DataPointSeries();
-            this.TimeSeries = new TimeSeries(this.DataSeries);
-            this.CompressedSeries = new CompressedSeries(this.DataSeries);
-            this.PhasedSeries = new PhasedSeries(this.DataSeries);
+            this.TimeSeries = new TimeSeries(this.DataSeries, this);
+            this.CompressedSeries = new CompressedSeries(this.DataSeries, this);
+            this.PhasedSeries = new PhasedSeries(this.DataSeries, this);
             this.M0 = null;
             this.P = null;
             this.OffsetAmplitude = null;
@@ -78,17 +99,35 @@ namespace Silicups.Core
 
         internal void RefreshM0AndP()
         {
-            if (M0.HasValue && P.HasValue)
-            {
-                PhasedSeries.M0 = M0.Value;
-                PhasedSeries.P = P.Value;
-            }
-            else
-            {
-                PhasedSeries.M0 = 0;
-                PhasedSeries.P = 0;
-            }
+            TimeSeries.Refresh();
+            CompressedSeries.Refresh();
             PhasedSeries.Refresh();
+        }
+
+        public bool CanProvidePeriodData
+        {
+            get { return P.HasValue && M0.HasValue && (P.Value != 0); }
+        }
+
+        public double GetPhased(double time)
+        {
+            double phased = (time - M0.Value) / P.Value;
+            return phased - Math.Floor(phased);
+        }
+
+        public IEnumerable<double> GetFullPhasesBetween(double t1, double t2)
+        {
+            yield break;
+        }
+
+        public DataPointSet AddDataFile(string file)
+        {
+            string absolutePath = new System.IO.FileInfo(file).FullName;
+            string relativePath = System.IO.Path.GetFileName(absolutePath);
+            var set = new DataPointSet(absolutePath, relativePath);
+            AppendMagFile(set, file);
+            DataSeries.AddSet(set);
+            return set;
         }
 
         public void AddDataFiles(IEnumerable<string> files)
@@ -97,12 +136,10 @@ namespace Silicups.Core
             foreach (string file in files)
             {
                 string absolutePath = new System.IO.FileInfo(file).FullName;
-                string relativePath = PathEx.MakeRelativePathFromCurrentDir(absolutePath);
+                string relativePath = System.IO.Path.GetFileName(absolutePath);
                 if (existingFiles.Contains(absolutePath) || existingFiles.Contains(relativePath))
                 { continue; }
-                var set = new DataPointSet(absolutePath, relativePath);
-                AppendMagFile(set, file);
-                DataSeries.AddSet(set);
+                AddDataFile(file);
             }
             Refresh();
         }
@@ -110,7 +147,6 @@ namespace Silicups.Core
         public void AddDataFiles(string baseDirectory, string pattern, string filter)
         {
             this.AbsoluteBasePath = new System.IO.DirectoryInfo(baseDirectory).FullName + System.IO.Path.DirectorySeparatorChar;
-            this.RelativeBasePath = PathEx.MakeRelativePathFromCurrentDir(AbsoluteBasePath);
             this.FilePattern = pattern;
             this.FileFilter = filter;
             AddDataFiles(PathEx.FindFiles(AbsoluteBasePath, pattern, filter));
@@ -124,10 +160,6 @@ namespace Silicups.Core
 
             foreach (XmlNode setNode in root.FindNodes("Set"))
             {
-                string pathComposite = setNode.AsString();
-                string[] pathParts = pathComposite.Split('|');
-                if (pathParts.Length == 0)
-                { continue; }
                 string absolutePath = null;
                 string relativePath = null;
                 if (setNode.FindOneNode("AbsolutePath") != null)
@@ -138,6 +170,10 @@ namespace Silicups.Core
                 else
                 {
                     // TOFIX: Obsolete
+                    string pathComposite = setNode.AsString();
+                    string[] pathParts = pathComposite.Split('|');
+                    if (pathParts.Length == 0)
+                    { continue; }
                     absolutePath = pathParts[0];
                     relativePath = (pathParts.Length > 1) ? pathParts[1] : null;
                 }
@@ -145,7 +181,7 @@ namespace Silicups.Core
                 string path = !String.IsNullOrEmpty(relativePath) && System.IO.File.Exists(relativePath) ? relativePath : absolutePath;
                 AppendMagFile(set, path);
                 foreach (XmlNode xmarkNode in setNode.FindNodes("XMark"))
-                { set.AddXMark(xmarkNode.AsDouble()); }
+                { set.AddXMark(FormatEx.ParseEnumToInt<XMarkTypeEnum>(xmarkNode.FindAttribute("type").AsString("AnyMinimum")), xmarkNode.AsDouble()); }
                 DataSeries.AddSet(set);
                 set.Metadata.OffsetY = setNode.FindAttribute("offsetY").AsDouble(0);
                 set.Metadata.Enabled = setNode.FindAttribute("enabled").AsBoolean(true);
@@ -172,20 +208,29 @@ namespace Silicups.Core
             return existingFiles;
         }
 
-        public void SaveToXml(XmlNode root)
+        public void SaveToXml(string solutionPath, XmlNode root)
         {
+            solutionPath = System.IO.Path.GetDirectoryName(solutionPath) + System.IO.Path.DirectorySeparatorChar;
             root.AppendXmlAttribute("id", Id);
             root.AppendXmlAttribute("m0", M0);
             root.AppendXmlAttribute("p", P);
             foreach (IDataSet set in DataSeries.Series)
             {
+                string relativePath = PathEx.MakeRelativePathFromOtherPath(set.Metadata.AbsolutePath, solutionPath);
+
                 XmlNode setNode = root.AppendXmlElement("Set");
-                setNode.InnerText = String.Format("{0}|{1}", set.Metadata.AbsolutePath, set.Metadata.RelativePath);
+                setNode.AppendXmlElement("AbsolutePath", set.Metadata.AbsolutePath);
+                setNode.AppendXmlElement("RelativePath", relativePath);
                 setNode.AppendXmlAttribute("source", "file");
                 setNode.AppendXmlAttribute("offsetY", set.Metadata.OffsetY);
                 setNode.AppendXmlAttribute("enabled", set.Metadata.Enabled);
                 if (!String.IsNullOrEmpty(set.Metadata.Caption))
                 { setNode.AppendXmlAttribute("caption", set.Metadata.Caption); }
+                foreach (DataMark m in set.XMarks)
+                {
+                    XmlNode xmarkNode = setNode.AppendXmlElement("XMark", FormatEx.FormatDouble(m.N));
+                    xmarkNode.AppendXmlAttribute("type", ((XMarkTypeEnum)m.Type).ToString());
+                }
             }
 
             {
@@ -198,8 +243,10 @@ namespace Silicups.Core
 
             if (!String.IsNullOrEmpty(AbsoluteBasePath))
             {
+                string relativeBasePath = PathEx.MakeRelativePathFromOtherPath(AbsoluteBasePath, solutionPath);
+
                 XmlNode sourceSettingsNode = root.AppendXmlElement("SourceSettings");
-                sourceSettingsNode.InnerText = String.Format("{0}|{1}", AbsoluteBasePath, RelativeBasePath);
+                sourceSettingsNode.InnerText = String.Format("{0}|{1}", AbsoluteBasePath, relativeBasePath);
                 sourceSettingsNode.AppendXmlAttribute("source", "file");
                 sourceSettingsNode.AppendXmlAttribute("filter", FileFilter);
                 sourceSettingsNode.AppendXmlAttribute("pattern", FilePattern);
@@ -217,9 +264,9 @@ namespace Silicups.Core
                     if (s.StartsWith("24"))
                     {
                         string[] parts = s.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                        var x = MathEx.ParseDouble(parts[0]);
-                        var y = MathEx.ParseDouble(parts[1]);
-                        var yerr = MathEx.ParseDouble(parts[2]);
+                        var x = FormatEx.ParseDouble(parts[0]);
+                        var y = FormatEx.ParseDouble(parts[1]);
+                        var yerr = FormatEx.ParseDouble(parts[2]);
                         if (y > 50)
                         { continue; }
 
@@ -231,8 +278,8 @@ namespace Silicups.Core
                         if (i > 0)
                         {
                             string[] parts = s.Substring(i + MagFilePhasedTag.Length).Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                            M0 = MathEx.ParseDouble(parts[0]);
-                            P = MathEx.ParseDouble(parts[2]);
+                            M0 = FormatEx.ParseDouble(parts[0]);
+                            P = FormatEx.ParseDouble(parts[2]);
                         }
                     }
                 }
@@ -276,8 +323,8 @@ namespace Silicups.Core
         {
             try
             {
-                project.M0 = MathEx.ParseDouble(m0);
-                project.P = MathEx.ParseDouble(p);
+                project.M0 = FormatEx.ParseDouble(m0);
+                project.P = FormatEx.ParseDouble(p);
             }
             catch
             {

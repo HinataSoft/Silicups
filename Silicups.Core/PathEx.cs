@@ -83,9 +83,9 @@ namespace Silicups.Core
             return relativePath;
         }
 
-        public static String MakeRelativePathFromCurrentDir(String path)
+        public static String MakeRelativePathFromOtherPath(String absolutePath, String otherAbsolutePath)
         {
-            return MakeRelativePath(System.IO.Directory.GetCurrentDirectory() + System.IO.Path.DirectorySeparatorChar, path);
+            return MakeRelativePath(System.IO.Path.GetDirectoryName(otherAbsolutePath) + System.IO.Path.DirectorySeparatorChar, absolutePath);
         }
     }
 }
