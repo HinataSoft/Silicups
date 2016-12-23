@@ -15,7 +15,7 @@ namespace Silicups.Util
         private static Regex rowRegex = new Regex(@"<tr\svalign='top'><td>[0-9].*?tr>", RegexOptions.CultureInvariant | RegexOptions.IgnoreCase | RegexOptions.Singleline);
         private static Regex fileRegex = new Regex("'obslog/([^']*?.txt)'", RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
         private static Regex minimaRegex = new Regex("Tmin([GH])JD[ ]*=[ ]*([0-9]+[,.][0-9]+)", RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
-        private static Regex offsetRegex = new Regex("name='shift_[0-9]*' value='([0-9.]*)'", RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
+        private static Regex offsetRegex = new Regex("name='shift_[0-9]*' value='([0-9.-]*)'", RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
 
         public static Project Import(Action<string> log, string url, string directory)
         {
@@ -74,7 +74,7 @@ namespace Silicups.Util
                     DataPointSet set = project.AddDataFile(filename);
                     double offset;
                     if (!String.IsNullOrEmpty(offsetString) && Double.TryParse(offsetString, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out offset))
-                    { set.Metadata.OffsetY = offset; }
+                    { set.Metadata.OffsetY = -offset; }
 
                     // minima
                     {
@@ -129,7 +129,7 @@ namespace Silicups.Util
 
             }
 
-            if (String.IsNullOrEmpty(name))
+            if (!String.IsNullOrEmpty(name))
             { project.Caption = name; }
             project.Refresh();
             project.SetM0AndPString(m0, per);

@@ -12,6 +12,7 @@ namespace Silicups.GUI
     {
         private static readonly string RegistryPath = @"SOFTWARE\HinataSoft\Silicups\FileSelectDialog";
 
+        private bool InitedFromRegistry { get; set; }
         public string SelectedDirectory { get; private set; }
         public string SelectedPattern { get; private set; }
         public string SelectedFilter { get; private set; }
@@ -32,6 +33,19 @@ namespace Silicups.GUI
             }
             catch
             { }
+
+            this.InitedFromRegistry = true;
+        }
+
+        public FilesSelectForm(string directory, string pattern, string filter)
+        {
+            InitializeComponent();
+
+            textBoxDirectory.Text = directory;
+            textBoxPattern.Text = pattern;
+            textBoxFilter.Text = filter;
+
+            this.InitedFromRegistry = false;
         }
 
         private void buttonChoose_Click(object sender, EventArgs e)
@@ -56,12 +70,15 @@ namespace Silicups.GUI
 
             try
             {
-                var key = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(RegistryPath);
-                if (key != null)
+                if (InitedFromRegistry)
                 {
-                    key.SetValue("Directory", textBoxDirectory.Text);
-                    key.SetValue("Pattern", textBoxPattern.Text);
-                    key.SetValue("Filter", textBoxFilter.Text);
+                    var key = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(RegistryPath);
+                    if (key != null)
+                    {
+                        key.SetValue("Directory", textBoxDirectory.Text);
+                        key.SetValue("Pattern", textBoxPattern.Text);
+                        key.SetValue("Filter", textBoxFilter.Text);
+                    }
                 }
             }
             catch
