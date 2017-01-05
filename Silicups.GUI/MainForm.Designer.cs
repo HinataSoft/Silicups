@@ -63,15 +63,16 @@
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.newSolutionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.loadSolutionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.saveSolutionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.saveSolutionAsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.projectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.addNewProjectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.loadFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.loadFilesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.importFromVarastroczToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exportToTxtToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip = new System.Windows.Forms.StatusStrip();
-            this.importFromVarastroczToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.saveSolutionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerMain)).BeginInit();
             this.splitContainerMain.Panel1.SuspendLayout();
             this.splitContainerMain.Panel2.SuspendLayout();
@@ -426,6 +427,7 @@
             this.newSolutionToolStripMenuItem,
             this.loadSolutionToolStripMenuItem,
             this.saveSolutionToolStripMenuItem,
+            this.saveSolutionAsToolStripMenuItem,
             this.exitToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
@@ -434,28 +436,28 @@
             // newSolutionToolStripMenuItem
             // 
             this.newSolutionToolStripMenuItem.Name = "newSolutionToolStripMenuItem";
-            this.newSolutionToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
+            this.newSolutionToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
             this.newSolutionToolStripMenuItem.Text = "New Solution";
             this.newSolutionToolStripMenuItem.Click += new System.EventHandler(this.newProjectToolStripMenuItem_Click);
             // 
             // loadSolutionToolStripMenuItem
             // 
             this.loadSolutionToolStripMenuItem.Name = "loadSolutionToolStripMenuItem";
-            this.loadSolutionToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
+            this.loadSolutionToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
             this.loadSolutionToolStripMenuItem.Text = "Load Solution...";
             this.loadSolutionToolStripMenuItem.Click += new System.EventHandler(this.loadSolutionToolStripMenuItem_Click);
             // 
-            // saveSolutionToolStripMenuItem
+            // saveSolutionAsToolStripMenuItem
             // 
-            this.saveSolutionToolStripMenuItem.Name = "saveSolutionToolStripMenuItem";
-            this.saveSolutionToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
-            this.saveSolutionToolStripMenuItem.Text = "Save Solution...";
-            this.saveSolutionToolStripMenuItem.Click += new System.EventHandler(this.saveSolutionToolStripMenuItem_Click);
+            this.saveSolutionAsToolStripMenuItem.Name = "saveSolutionAsToolStripMenuItem";
+            this.saveSolutionAsToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
+            this.saveSolutionAsToolStripMenuItem.Text = "Save Solution As...";
+            this.saveSolutionAsToolStripMenuItem.Click += new System.EventHandler(this.saveSolutionAsToolStripMenuItem_Click);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
@@ -492,6 +494,13 @@
             this.loadFilesToolStripMenuItem.Text = "Add File Series...";
             this.loadFilesToolStripMenuItem.Click += new System.EventHandler(this.loadFilesToolStripMenuItem_Click);
             // 
+            // importFromVarastroczToolStripMenuItem
+            // 
+            this.importFromVarastroczToolStripMenuItem.Name = "importFromVarastroczToolStripMenuItem";
+            this.importFromVarastroczToolStripMenuItem.Size = new System.Drawing.Size(224, 22);
+            this.importFromVarastroczToolStripMenuItem.Text = "Import from var.astro.cz...";
+            this.importFromVarastroczToolStripMenuItem.Click += new System.EventHandler(this.importFromVarastroczToolStripMenuItem_Click);
+            // 
             // exportToTxtToolStripMenuItem
             // 
             this.exportToTxtToolStripMenuItem.Name = "exportToTxtToolStripMenuItem";
@@ -507,12 +516,12 @@
             this.statusStrip.TabIndex = 4;
             this.statusStrip.Text = "statusStrip1";
             // 
-            // importFromVarastroczToolStripMenuItem
+            // saveSolutionToolStripMenuItem
             // 
-            this.importFromVarastroczToolStripMenuItem.Name = "importFromVarastroczToolStripMenuItem";
-            this.importFromVarastroczToolStripMenuItem.Size = new System.Drawing.Size(224, 22);
-            this.importFromVarastroczToolStripMenuItem.Text = "Import from var.astro.cz...";
-            this.importFromVarastroczToolStripMenuItem.Click += new System.EventHandler(this.importFromVarastroczToolStripMenuItem_Click);
+            this.saveSolutionToolStripMenuItem.Name = "saveSolutionToolStripMenuItem";
+            this.saveSolutionToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
+            this.saveSolutionToolStripMenuItem.Text = "Save Solution";
+            this.saveSolutionToolStripMenuItem.Click += new System.EventHandler(this.saveSolutionToolStripMenuItem_Click);
             // 
             // MainForm
             // 
@@ -574,7 +583,7 @@
         private Glider gliderP;
         private System.Windows.Forms.ToolStripMenuItem newSolutionToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem loadSolutionToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem saveSolutionToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem saveSolutionAsToolStripMenuItem;
         private System.Windows.Forms.SplitContainer splitContainerLeft;
         private MyListBox listBoxSolution;
         private System.Windows.Forms.ToolStripMenuItem projectToolStripMenuItem;
@@ -589,6 +598,7 @@
         private System.Windows.Forms.Button buttonZeroP;
         private System.Windows.Forms.Button buttonMinima;
         private System.Windows.Forms.ToolStripMenuItem importFromVarastroczToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem saveSolutionToolStripMenuItem;
 
     }
 }

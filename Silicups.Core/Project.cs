@@ -210,13 +210,17 @@ namespace Silicups.Core
 
         public void SaveToXml(string solutionPath, XmlNode root)
         {
-            solutionPath = System.IO.Path.GetDirectoryName(solutionPath) + System.IO.Path.DirectorySeparatorChar;
+            solutionPath = System.IO.Path.GetDirectoryName(System.IO.Path.GetFullPath(solutionPath)) + System.IO.Path.DirectorySeparatorChar;
             root.AppendXmlAttribute("id", Id);
             root.AppendXmlAttribute("m0", M0);
             root.AppendXmlAttribute("p", P);
             foreach (IDataSet set in DataSeries.Series)
             {
-                string relativePath = PathEx.MakeRelativePathFromOtherPath(set.Metadata.AbsolutePath, solutionPath);
+                string relativePath;
+                try
+                { relativePath = PathEx.MakeRelativePathFromOtherPath(set.Metadata.AbsolutePath, solutionPath); }
+                catch
+                { relativePath = ""; }
 
                 XmlNode setNode = root.AppendXmlElement("Set");
                 setNode.AppendXmlElement("AbsolutePath", set.Metadata.AbsolutePath);

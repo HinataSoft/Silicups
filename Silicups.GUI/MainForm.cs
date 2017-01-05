@@ -28,6 +28,8 @@ namespace Silicups.GUI
         private SeriesTypeEnum CurrentDataSeriesType = SeriesTypeEnum.Timed;
         private IDataSetMetadata SelectedMetadata = null;
         private bool IsInitializing = false;
+        private bool IsDirty = false;
+        private string CurrentSolutionFile = null;
 
         private double? OriginalP = null;
         private double? OriginalOffset = null;
@@ -35,6 +37,7 @@ namespace Silicups.GUI
         public MainForm()
         {
             InitializeComponent();
+            ResetTitle();
 
             try
             {
@@ -94,6 +97,12 @@ namespace Silicups.GUI
 
         void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
+            if (!ClosingConfirmed())
+            {
+                e.Cancel = true;
+                return;
+            }
+
             var key = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(RegistryPath);
             if (key != null)
             {
@@ -129,6 +138,7 @@ namespace Silicups.GUI
             { return; }
 
             CurrentProject.SetM0AndPString(textBoxM0.Text, textBoxP.Text);
+            SetDirty();
             if (radioButtonPhased.Checked)
             { SetDataSource(SeriesTypeEnum.Phased, true); }
         }
@@ -187,7 +197,7 @@ namespace Silicups.GUI
             catch { }
         }
 
-        private static void SetGliderTarget(ref double? target, double gliderValue, TextBox targetBox, TextBox amplitudeBox)
+        private void SetGliderTarget(ref double? target, double gliderValue, TextBox targetBox, TextBox amplitudeBox)
         {
             if (!target.HasValue)
             { return; }
@@ -195,6 +205,7 @@ namespace Silicups.GUI
             {
                 target += gliderValue * FormatEx.ParseDouble(amplitudeBox.Text);
                 targetBox.Text = FormatEx.FormatDouble(target.Value);
+                SetDirty();
             }
             catch { }
         }
@@ -210,6 +221,7 @@ namespace Silicups.GUI
             {
                 SelectedMetadata.OffsetY = FormatEx.ParseDouble(textBoxOffset.Text);
                 RefreshDataSource();
+                SetDirty();
             }
             catch
             { }
@@ -294,6 +306,7 @@ namespace Silicups.GUI
                     {
                         CurrentProject.Caption = form.PromptValue;
                         listBoxSolution.RefreshItems();
+                        SetDirty();
                     }
                 }
             }
@@ -302,7 +315,7 @@ namespace Silicups.GUI
             {
                 DialogResult result = MessageBox.Show("Really delete the object from the solution?", "Confirmation", MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
                 if(result == DialogResult.OK)
-                { RemoveProjectFromSolution(CurrentProject); }
+                { RemoveProjectFromSolution(CurrentProject); SetDirty(); }
             }
         }
 
@@ -316,6 +329,7 @@ namespace Silicups.GUI
             var metadata = (IDataSetMetadata)listBoxObs.Items[e.Index];
             metadata.Enabled = (e.NewValue == CheckState.Checked);
             RefreshDataSource();
+            SetDirty();
         }
 
         void listBoxObs_SelectedIndexChanged(object sender, EventArgs e)
@@ -379,6 +393,7 @@ namespace Silicups.GUI
                     {
                         SelectedMetadata.Caption = form.PromptValue;
                         listBoxObs.Refresh();
+                        SetDirty();
                     }
                 }
             }
@@ -387,7 +402,7 @@ namespace Silicups.GUI
             {
                 DialogResult result = MessageBox.Show("Really delete the set from the project?", "Confirmation", MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
                 if (result == DialogResult.OK)
-                { RemoveSetFromProject(SelectedMetadata); }
+                { RemoveSetFromProject(SelectedMetadata); SetDirty(); }
             }
         }
 
@@ -461,6 +476,52 @@ namespace Silicups.GUI
             SetDataSource(CurrentDataSeriesType, doUpdate);
         }
 
+        // title
+
+        private void RefreshTitle()
+        {
+            string dirtyFlag = IsDirty ? "*" : "";
+            if (!String.IsNullOrEmpty(CurrentSolutionFile))
+            { this.Text = String.Format("{1}{0} - Silicups", dirtyFlag, CurrentSolutionFile); }
+            else
+            { this.Text = String.Format("Silicups{0}", dirtyFlag); }
+        }
+
+        private void SetDirty()
+        {
+            IsDirty = true;
+            RefreshTitle();
+        }
+
+        private void SetTitle(string currentSolutionFile)
+        {
+            CurrentSolutionFile = currentSolutionFile;
+            IsDirty = false;
+            RefreshTitle();
+        }
+
+        private void ResetTitle()
+        {
+            SetTitle(null);
+        }
+
+        private bool ClosingConfirmed()
+        {
+            if (!IsDirty)
+            { return true; }
+
+            switch(MessageBox.Show("Save changes to the solution file?", "Confirmation", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question))
+            {
+                case DialogResult.Yes:
+                    return SaveSolutionWithDialogResult() == System.Windows.Forms.DialogResult.OK;
+                case DialogResult.No:
+                    return true;
+                case DialogResult.Cancel:
+                default:
+                    return false;
+            }
+        }
+
         // files
 
         private void NewSolution()
@@ -468,7 +529,8 @@ namespace Silicups.GUI
             try
             {
                 IsInitializing = true;
-                RenewSolution(new Project[] { new Project(System.IO.Directory.GetCurrentDirectory()) } );
+                RenewSolution(new Project[] { new Project() } );
+                ResetTitle();
             }
             finally
             {
@@ -481,7 +543,8 @@ namespace Silicups.GUI
             try
             {
                 IsInitializing = true;
-                AddProjectToSolution(new Project(System.IO.Directory.GetCurrentDirectory()));
+                AddProjectToSolution(new Project());
+                SetDirty();
             }
             finally
             {
@@ -507,6 +570,7 @@ namespace Silicups.GUI
                     CurrentProject = (Project)listBoxSolution.SelectedItem;
                 }
                 RefreshCurrentProject();
+                SetDirty();
             }
             finally
             {
@@ -556,6 +620,7 @@ namespace Silicups.GUI
                 }
 
                 RenewSolution(solution);
+                SetTitle(path);
             }
             catch (Exception e)
             {
@@ -580,6 +645,7 @@ namespace Silicups.GUI
                 project.SaveToXml(path, projectNode);
             }
             doc.Save(path);
+            SetTitle(path);
         }
 
         private void LoadFile(string filename)
@@ -745,6 +811,7 @@ namespace Silicups.GUI
             { return; }
 
             RefreshCurrentProject();
+            SetDirty();
         }
 
         // menu
@@ -765,15 +832,48 @@ namespace Silicups.GUI
             }
         }
 
-        private void saveSolutionToolStripMenuItem_Click(object sender, EventArgs e)
+        private DialogResult SaveSolutionWithDialogResult(string path)
+        {
+            try
+            {
+                SaveSolution(path);
+                return DialogResult.OK;
+            }
+            catch (Exception e)
+            {
+                if (MessageBox.Show(e.Message, "Exception", MessageBoxButtons.RetryCancel, MessageBoxIcon.Error) == DialogResult.Retry)
+                { SaveSolutionWithDialogResult(path); }
+                return DialogResult.Cancel;
+            }
+        }
+
+        private DialogResult SaveSolutionWithDialogResult()
+        {
+            if (!String.IsNullOrEmpty(CurrentSolutionFile))
+            { return SaveSolutionWithDialogResult(CurrentSolutionFile); }
+            else
+            { return SaveSolutionAsWithDialogResult(); }
+        }
+
+        private DialogResult SaveSolutionAsWithDialogResult()
         {
             using (var fd = new SaveFileDialog())
             {
                 fd.Filter = "XML Files (.xml)|*.xml|All Files (*.*)|*.*";
                 DialogResult dialogResult = fd.ShowDialog();
                 if (dialogResult == DialogResult.OK)
-                { SaveSolution(fd.FileName); }
+                { return SaveSolutionWithDialogResult(fd.FileName); }
+                return DialogResult.Cancel;
             }
+        }
+
+        private void saveSolutionToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+        }
+
+        private void saveSolutionAsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SaveSolutionAsWithDialogResult();
         }
 
         private void addNewProjectToolStripMenuItem_Click(object sender, EventArgs e)
@@ -783,7 +883,8 @@ namespace Silicups.GUI
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Application.Exit();
+            if (ClosingConfirmed())
+            { Application.Exit(); }
         }
 
         private void loadFileToolStripMenuItem_Click(object sender, EventArgs e)
