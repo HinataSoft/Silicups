@@ -130,6 +130,18 @@ namespace Silicups.Core
             return set;
         }
 
+        public void RemoveDataFile(string file)
+        {
+            DataPointSet setToRemove = null;
+            foreach (DataPointSet set in DataSeries.Series)
+            {
+                if (set.Metadata.AbsolutePath == file)
+                { setToRemove = set; break; }
+            }
+            if (setToRemove != null)
+            { DataSeries.RemoveSet(setToRemove); }
+        }
+
         public void AddDataFiles(IEnumerable<string> files)
         {
             var existingFiles = MakePathHashSet();
@@ -144,12 +156,11 @@ namespace Silicups.Core
             Refresh();
         }
 
-        public void AddDataFiles(string baseDirectory, string pattern, string filter)
+        public void SetFileSource(string baseDirectory, string pattern, string filter)
         {
             this.AbsoluteBasePath = new System.IO.DirectoryInfo(baseDirectory).FullName + System.IO.Path.DirectorySeparatorChar;
             this.FilePattern = pattern;
             this.FileFilter = filter;
-            AddDataFiles(PathEx.FindFiles(AbsoluteBasePath, pattern, filter));
         }
 
         public void LoadFromXml(XmlNode root)
@@ -169,7 +180,7 @@ namespace Silicups.Core
                 }
                 else
                 {
-                    // TOFIX: Obsolete
+                    // TOFIX: Obsolete, for backward compability
                     string pathComposite = setNode.AsString();
                     string[] pathParts = pathComposite.Split('|');
                     if (pathParts.Length == 0)
@@ -179,21 +190,61 @@ namespace Silicups.Core
                 }
                 var set = new DataPointSet(absolutePath, relativePath);
                 string path = !String.IsNullOrEmpty(relativePath) && System.IO.File.Exists(relativePath) ? relativePath : absolutePath;
-                AppendMagFile(set, path);
                 foreach (XmlNode xmarkNode in setNode.FindNodes("XMark"))
                 { set.AddXMark(FormatEx.ParseEnumToInt<XMarkTypeEnum>(xmarkNode.FindAttribute("type").AsString("AnyMinimum")), xmarkNode.AsDouble()); }
-                DataSeries.AddSet(set);
                 set.Metadata.OffsetY = setNode.FindAttribute("offsetY").AsDouble(0);
                 set.Metadata.Enabled = setNode.FindAttribute("enabled").AsBoolean(true);
                 set.Metadata.Caption = setNode.FindAttribute("caption").AsString(null);
+                AppendMagFile(set, path);
+                DataSeries.AddSet(set);
             }
-            XmlNode settingsNode = root.FindOneNode("Settings");
-            if (settingsNode != null)
+
             {
-                Caption = settingsNode.FindAttribute("caption").AsString(null);
-                PAmplitude = settingsNode.FindAttribute("pAmplitude").AsNullableDouble();
-                OffsetAmplitude = settingsNode.FindAttribute("offsetAmplitude").AsNullableDouble();
+                XmlNode settingsNode = root.FindOneNode("Settings");
+                if (settingsNode != null)
+                {
+                    Caption = settingsNode.FindAttribute("caption").AsString(null);
+                    PAmplitude = settingsNode.FindAttribute("pAmplitude").AsNullableDouble();
+                    OffsetAmplitude = settingsNode.FindAttribute("offsetAmplitude").AsNullableDouble();
+                }
             }
+
+            {
+                XmlNode sourceSettingsNode = root.FindOneNode("SourceSettings");
+                if (sourceSettingsNode != null)
+                {
+                    AbsoluteBasePath = sourceSettingsNode.FindOneNode("AbsolutePath").AsString("");
+                    string relativePath = sourceSettingsNode.FindOneNode("RelativePath").AsString("");
+                    FileFilter = sourceSettingsNode.FindOneNode("Filter").AsString("");
+                    FilePattern = sourceSettingsNode.FindOneNode("Pattern").AsString("");
+
+                    // TOFIX: Obsolete, for backward compability
+                    if (String.IsNullOrEmpty(AbsoluteBasePath))
+                    {
+                        string path = sourceSettingsNode.InnerText;
+                        if(!String.IsNullOrWhiteSpace(path))
+                        {
+                            string[] parts = path.Split('|');
+                            if (parts.Length > 0)
+                            { AbsoluteBasePath = parts[0]; }
+                            if (parts.Length > 1)
+                            { relativePath = parts[1]; }
+                        }
+                    }
+                    if (String.IsNullOrWhiteSpace(FileFilter))
+                    { FileFilter = sourceSettingsNode.FindAttribute("filter").AsString(""); }
+                    if (String.IsNullOrWhiteSpace(FilePattern))
+                    { FilePattern = sourceSettingsNode.FindAttribute("pattern").AsString(""); }
+                    
+                    // fixing absolute path using relative path if absolute does not exist
+                    if (!System.IO.Directory.Exists(AbsoluteBasePath) &&
+                        System.IO.Directory.Exists(relativePath))
+                    {
+                        AbsoluteBasePath = System.IO.Path.GetFullPath(relativePath);
+                    }
+                }
+            }
+
             Refresh();
         }
 
@@ -247,15 +298,19 @@ namespace Silicups.Core
 
             if (!String.IsNullOrEmpty(AbsoluteBasePath))
             {
-                string relativeBasePath = PathEx.MakeRelativePathFromOtherPath(AbsoluteBasePath, solutionPath);
+                string relativePath;
+                try
+                { relativePath = PathEx.MakeRelativePathFromOtherPath(AbsoluteBasePath, solutionPath); }
+                catch
+                { relativePath = ""; }
 
                 XmlNode sourceSettingsNode = root.AppendXmlElement("SourceSettings");
-                sourceSettingsNode.InnerText = String.Format("{0}|{1}", AbsoluteBasePath, relativeBasePath);
                 sourceSettingsNode.AppendXmlAttribute("source", "file");
-                sourceSettingsNode.AppendXmlAttribute("filter", FileFilter);
-                sourceSettingsNode.AppendXmlAttribute("pattern", FilePattern);
+                sourceSettingsNode.AppendXmlElement("AbsolutePath", AbsoluteBasePath);
+                sourceSettingsNode.AppendXmlElement("RelativePath", relativePath);
+                sourceSettingsNode.AppendXmlElement("Filter", FileFilter);
+                sourceSettingsNode.AppendXmlElement("Pattern", FilePattern);
             }
-
         }
 
         private readonly static string MagFilePhasedTag = "Phased with elements ";
@@ -276,7 +331,7 @@ namespace Silicups.Core
 
                         set.Add(x, y, yerr);
                     }
-                    else
+                    else if(!P.HasValue && !M0.HasValue)
                     {
                         int i = s.IndexOf(MagFilePhasedTag);
                         if (i > 0)
@@ -290,7 +345,7 @@ namespace Silicups.Core
                 catch
                 { }
             }
-            if (String.IsNullOrEmpty(set.Metadata.Caption) && !Double.IsInfinity(set.BoundingBox.Left))
+            if (String.IsNullOrEmpty(set.Metadata.Caption) && !set.BoundingBox.IsEmpty)
             {
                 DateTime date = JD.JDToDateTime(set.BoundingBox.Left);
                 set.Metadata.Caption = date.ToString("yyyy'-'MM'-'dd");

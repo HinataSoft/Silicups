@@ -37,20 +37,23 @@ namespace Silicups.Core
             }
 
             var files = new List<string>();
-            foreach (string filename in System.IO.Directory.GetFiles(baseDirectory, pattern, System.IO.SearchOption.AllDirectories))
+            foreach (string patternItem in pattern.Split('|'))
             {
-                bool filtered = false;
-                foreach (FilterItem filterItem in filters)
+                foreach (string filename in System.IO.Directory.GetFiles(baseDirectory, patternItem, System.IO.SearchOption.AllDirectories))
                 {
-                    if (filterItem.Include && !filename.Contains(filterItem.Contains))
-                    { filtered = true; break; }
-                    if (!filterItem.Include && filename.Contains(filterItem.Contains))
-                    { filtered = true; break; }
-                }
-                if (filtered)
-                { continue; }
+                    bool filtered = false;
+                    foreach (FilterItem filterItem in filters)
+                    {
+                        if (filterItem.Include && !filename.Contains(filterItem.Contains))
+                        { filtered = true; break; }
+                        if (!filterItem.Include && filename.Contains(filterItem.Contains))
+                        { filtered = true; break; }
+                    }
+                    if (filtered)
+                    { continue; }
 
-                files.Add(filename);
+                    files.Add(filename.Replace(@"\\", @"\"));
+                }
             }
             return files.ToArray();
         }

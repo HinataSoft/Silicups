@@ -48,6 +48,14 @@ namespace Silicups.GUI
             this.InitedFromRegistry = false;
         }
 
+        public static FilesSelectForm CreateFilesSelectForm(Silicups.Core.Project project)
+        {
+            if ((project != null) && !String.IsNullOrWhiteSpace(project.AbsoluteBasePath))
+            { return new FilesSelectForm(project.AbsoluteBasePath, project.FilePattern, project.FileFilter); }
+            else
+            { return new FilesSelectForm(); }
+        }
+
         private void buttonChoose_Click(object sender, EventArgs e)
         {
             using (var fd = new OpenFileDialog())
@@ -64,6 +72,8 @@ namespace Silicups.GUI
 
         private void buttonOK_Click(object sender, EventArgs e)
         {
+            buttonOK.DialogResult = System.Windows.Forms.DialogResult.OK;
+
             this.SelectedDirectory = textBoxDirectory.Text;
             this.SelectedPattern = textBoxPattern.Text;
             this.SelectedFilter = textBoxFilter.Text;

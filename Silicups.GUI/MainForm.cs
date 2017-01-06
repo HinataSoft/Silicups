@@ -300,15 +300,7 @@ namespace Silicups.GUI
 
             if (e.KeyCode == Keys.F2)
             {
-                using (var form = new InputBoxForm("Object name:", CurrentProject.Caption))
-                {
-                    if (form.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-                    {
-                        CurrentProject.Caption = form.PromptValue;
-                        listBoxSolution.RefreshItems();
-                        SetDirty();
-                    }
-                }
+                RenameProject();
             }
 
             if (e.KeyCode == Keys.Delete)
@@ -316,6 +308,22 @@ namespace Silicups.GUI
                 DialogResult result = MessageBox.Show("Really delete the object from the solution?", "Confirmation", MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
                 if(result == DialogResult.OK)
                 { RemoveProjectFromSolution(CurrentProject); SetDirty(); }
+            }
+        }
+
+        private void RenameProject()
+        {
+            if (IsInitializing || (CurrentProject == null))
+            { return; }
+
+            using (var form = new InputBoxForm("Object name:", CurrentProject.Caption))
+            {
+                if (form.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                {
+                    CurrentProject.Caption = form.PromptValue;
+                    listBoxSolution.RefreshItems();
+                    SetDirty();
+                }
             }
         }
 
@@ -676,8 +684,28 @@ namespace Silicups.GUI
                 IsInitializing = true;
                 if (CurrentProject == null)
                 { return; }
-                CurrentProject.AddDataFiles(baseDirectory, pattern, filter);
+
+                var files = new List<string>(PathEx.FindFiles(baseDirectory, pattern, filter));
+
+                var fileListForm = new FileListForm(files, CurrentProject);
+                if (fileListForm.ShowDialog() != System.Windows.Forms.DialogResult.OK)
+                { return; }
+
+                foreach (FileListForm.FileAction action in fileListForm.GetChangeActions())
+                {
+                    switch (action.Action)
+                    {
+                        case FileListForm.ActionEnum.Add: CurrentProject.AddDataFile(action.Path); break;
+                        case FileListForm.ActionEnum.Remove: CurrentProject.RemoveDataFile(action.Path); break;
+                    }
+                }
+
+                CurrentProject.SetFileSource(baseDirectory, pattern, filter);
                 RefreshCurrentProject();
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show("Exception when scanning for files: " + e.Message, "Exception", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
@@ -869,6 +897,7 @@ namespace Silicups.GUI
 
         private void saveSolutionToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            SaveSolutionWithDialogResult();
         }
 
         private void saveSolutionAsToolStripMenuItem_Click(object sender, EventArgs e)
@@ -887,6 +916,11 @@ namespace Silicups.GUI
             { Application.Exit(); }
         }
 
+        private void renameObjectToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            RenameProject();
+        }
+
         private void loadFileToolStripMenuItem_Click(object sender, EventArgs e)
         {
             using (var fd = new OpenFileDialog())
@@ -901,7 +935,7 @@ namespace Silicups.GUI
 
         private void loadFilesToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            using (var fd = new FilesSelectForm())
+            using (var fd = FilesSelectForm.CreateFilesSelectForm(CurrentProject))
             {
                 DialogResult dialogResult = fd.ShowDialog();
                 if (dialogResult == DialogResult.OK)

@@ -108,7 +108,7 @@ namespace System.Xml
             XmlDocument xmlDoc = (node is XmlDocument) ? (XmlDocument)node : node.OwnerDocument;
             XmlElement elem = xmlDoc.CreateElement(name);
             node.AppendChild(elem);
-            if (value != null)
+            if (!String.IsNullOrEmpty(value))
             { elem.InnerText = value; }
             return elem;
         }
