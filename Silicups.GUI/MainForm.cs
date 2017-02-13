@@ -458,7 +458,7 @@ namespace Silicups.GUI
                 {
                     case SeriesTypeEnum.Timed: dataSeries = CurrentProject.TimeSeries; break;
                     case SeriesTypeEnum.Compressed: dataSeries = CurrentProject.CompressedSeries; break;
-                    case SeriesTypeEnum.Phased: dataSeries = CurrentProject.PhasedSeries; break;
+                    case SeriesTypeEnum.Phased: dataSeries = CurrentProject.PhasedSeriesOrDefault; break;
                 }
             }
             CurrentDataSeriesType = dataSeriesType;
