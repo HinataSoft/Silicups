@@ -32,7 +32,8 @@ namespace Silicups.Core
         public DataPointSeries DataSeries { get; private set; }
         public TimeSeries TimeSeries { get; private set; }
         public CompressedSeries CompressedSeries { get; private set; }
-        public PhasedSeries PhasedSeries { get; private set; }
+        private PhasedSeries PhasedSeries { get; set; }
+        public PhasedSeries PhasedSeriesOrDefault { get { return CanProvidePeriodData ? PhasedSeries : null; } }
 
         public double? M0 { get; internal set; }
         public double? P { get; internal set; }
