@@ -92,6 +92,22 @@ namespace Silicups.GUI
             {
                 gliderP.ConfirmPosition();
                 gliderOffset.ConfirmPosition();
+                return;
+            }
+            if ((e.KeyCode == Keys.A) || (e.KeyCode == Keys.Q))
+            {
+                if ((CurrentProject != null) && (listBoxObs.Items.Count > 0))
+                {
+                    if (listBoxObs.SelectedIndex < 0)
+                    {
+                        listBoxObs.SelectedIndex = 0;
+                        return;
+                    }
+                    if ((e.KeyCode == Keys.A) && (listBoxObs.SelectedIndex + 1 < listBoxObs.Items.Count))
+                    { listBoxObs.SelectedIndex++; }
+                    if ((e.KeyCode == Keys.Q) && (listBoxObs.SelectedIndex > 0))
+                    { listBoxObs.SelectedIndex--; }
+                }
             }
         }
 
