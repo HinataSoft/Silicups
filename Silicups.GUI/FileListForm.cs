@@ -63,10 +63,7 @@ namespace Silicups.GUI
                     else
                     { continue; }
                 }
-                if (actionType != ActionEnum.Keep)
-                {
-                    result.Add(new FileAction { Action = actionType, Path = action.Path });
-                }
+                result.Add(new FileAction { Action = actionType, Path = action.Path });
             }
             return result;
         }
@@ -100,7 +97,7 @@ namespace Silicups.GUI
 
         private void buttonOK_Click(object sender, EventArgs e)
         {
-            buttonOK.DialogResult = System.Windows.Forms.DialogResult.OK;
+            this.DialogResult = System.Windows.Forms.DialogResult.OK;
         }
     }
 }

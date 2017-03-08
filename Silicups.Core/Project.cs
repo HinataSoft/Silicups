@@ -143,6 +143,18 @@ namespace Silicups.Core
             { DataSeries.RemoveSet(setToRemove); }
         }
 
+        public void RefreshDataFile(string file)
+        {
+            foreach (DataPointSet set in DataSeries.Series)
+            {
+                if (set.Metadata.AbsolutePath == file)
+                {
+                    set.Clear();
+                    AppendMagFile(set, file);
+                }
+            }
+        }
+
         public void AddDataFiles(IEnumerable<string> files)
         {
             var existingFiles = MakePathHashSet();

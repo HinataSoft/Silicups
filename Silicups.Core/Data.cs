@@ -121,6 +121,11 @@ namespace Silicups.Core
             Add(new DataPoint(x, y, yerr));
         }
 
+        public void Clear()
+        {
+            list.Clear();
+        }
+
         public void AddXMark(DataMark m)
         {
             xmarks.Add(m);

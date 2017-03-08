@@ -704,12 +704,14 @@ namespace Silicups.GUI
                     switch (action.Action)
                     {
                         case FileListForm.ActionEnum.Add: CurrentProject.AddDataFile(action.Path); break;
+                        case FileListForm.ActionEnum.Keep: CurrentProject.RefreshDataFile(action.Path); break;
                         case FileListForm.ActionEnum.Remove: CurrentProject.RemoveDataFile(action.Path); break;
                     }
                 }
 
                 CurrentProject.SetFileSource(baseDirectory, pattern, filter);
                 RefreshCurrentProject();
+                RefreshDataSource();
             }
             catch (Exception e)
             {
@@ -835,7 +837,7 @@ namespace Silicups.GUI
             foreach (IDataSetMetadata metadata in CurrentProject.GetMetadata())
             { listBoxObs.Items.Add(metadata, metadata.Enabled); }
 
-            UpdateDataSource();
+            UpdateDataSource(true);
         }
 
         private void RemoveSetFromProject(IDataSetMetadata metadata)
