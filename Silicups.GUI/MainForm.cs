@@ -8,6 +8,7 @@ using System.Windows.Forms;
 using System.Xml;
 
 using Silicups.Core;
+using Silicups.Util;
 
 namespace Silicups.GUI
 {
@@ -39,16 +40,9 @@ namespace Silicups.GUI
             InitializeComponent();
             ResetTitle();
 
-            try
-            {
-                var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(RegistryPath);
-                if (key != null)
-                {
-                    checkBoxStyle.Checked = (key.GetValue("GliderStyle").ToString() == "1");
-                }
-            }
-            catch
-            { }
+            RegistryHelper.TryGetFromRegistry(RegistryPath,
+                new RegistryHelper.GetRegistryStringAction("GliderStyle", (s) => { checkBoxStyle.Checked = (s == "1"); } )
+            );
 
             radioButtonTimeseries.CheckedChanged += new EventHandler(radioButtonTimeseries_CheckedChanged);
             radioButtonPhased.CheckedChanged += new EventHandler(radioButtonPhased_CheckedChanged);
@@ -119,11 +113,9 @@ namespace Silicups.GUI
                 return;
             }
 
-            var key = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(RegistryPath);
-            if (key != null)
-            {
-                key.SetValue("GliderStyle", checkBoxStyle.Checked ? 1 : 0, Microsoft.Win32.RegistryValueKind.DWord);
-            }
+            RegistryHelper.TrySetToRegistry(RegistryPath,
+                new RegistryHelper.SetRegistryAction("GliderStyle", checkBoxStyle.Checked ? 1 : 0)
+             );
         }
 
         // radio buttons
@@ -870,9 +862,13 @@ namespace Silicups.GUI
             using(var fd = new OpenFileDialog())
             {
                 fd.Filter = "XML Files (.xml)|*.xml|All Files (*.*)|*.*";
+                RegistryHelper.TryGetFromRegistry(RegistryPath, new RegistryHelper.GetRegistryStringAction("LoadSolutionPath", (s) => { fd.InitialDirectory = s; } ));
                 DialogResult dialogResult = fd.ShowDialog();
                 if (dialogResult == DialogResult.OK)
-                { LoadSolution(fd.FileName); }
+                {
+                    RegistryHelper.TrySetToRegistry(RegistryPath, new RegistryHelper.SetRegistryAction("LoadSolutionPath", System.IO.Path.GetDirectoryName(fd.FileName)));
+                    LoadSolution(fd.FileName);
+                }
             }
         }
 
@@ -904,9 +900,13 @@ namespace Silicups.GUI
             using (var fd = new SaveFileDialog())
             {
                 fd.Filter = "XML Files (.xml)|*.xml|All Files (*.*)|*.*";
+                RegistryHelper.TryGetFromRegistry(RegistryPath, new RegistryHelper.GetRegistryStringAction("SaveSolutionPath", (s) => { fd.InitialDirectory = s; } ));
                 DialogResult dialogResult = fd.ShowDialog();
                 if (dialogResult == DialogResult.OK)
-                { return SaveSolutionWithDialogResult(fd.FileName); }
+                {
+                    RegistryHelper.TrySetToRegistry(RegistryPath, new RegistryHelper.SetRegistryAction("SaveSolutionPath", System.IO.Path.GetDirectoryName(fd.FileName))); 
+                    return SaveSolutionWithDialogResult(fd.FileName);
+                }
                 return DialogResult.Cancel;
             }
         }
@@ -943,9 +943,13 @@ namespace Silicups.GUI
             {
                 fd.Filter = "Text Files (.txt)|*.txt|All Files (*.*)|*.*";
                 fd.Multiselect = true;
+                RegistryHelper.TryGetFromRegistry(RegistryPath, new RegistryHelper.GetRegistryStringAction("LoadFilePath", (s) => { fd.InitialDirectory = s; }));
                 DialogResult dialogResult = fd.ShowDialog();
-                if (dialogResult == DialogResult.OK)
-                { LoadFiles(fd.FileNames); }
+                if ((dialogResult == DialogResult.OK) && (fd.FileNames.Length > 0))
+                {
+                    RegistryHelper.TrySetToRegistry(RegistryPath, new RegistryHelper.SetRegistryAction("LoadFilePath", System.IO.Path.GetDirectoryName(fd.FileNames[0])));
+                    LoadFiles(fd.FileNames);
+                }
             }
         }
 
@@ -969,9 +973,13 @@ namespace Silicups.GUI
             using (var fd = new SaveFileDialog())
             {
                 fd.Filter = "Text Files (.txt)|*.txt|All Files (*.*)|*.*";
+                RegistryHelper.TryGetFromRegistry(RegistryPath, new RegistryHelper.GetRegistryStringAction("ExportToTxtPath", (s) => { fd.InitialDirectory = s; }));
                 DialogResult dialogResult = fd.ShowDialog();
                 if (dialogResult == DialogResult.OK)
-                { SaveToTxt(fd.FileName); }
+                {
+                    RegistryHelper.TrySetToRegistry(RegistryPath, new RegistryHelper.SetRegistryAction("ExportToTxtPath", System.IO.Path.GetDirectoryName(fd.FileName)));
+                    SaveToTxt(fd.FileName);
+                }
             }
         }
 
