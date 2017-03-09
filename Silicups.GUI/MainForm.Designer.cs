@@ -32,7 +32,9 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.splitContainerMain = new System.Windows.Forms.SplitContainer();
             this.splitContainerLeft = new System.Windows.Forms.SplitContainer();
+            this.listBoxSolution = new Silicups.GUI.MyListBox();
             this.listBoxObs = new System.Windows.Forms.CheckedListBox();
+            this.graph = new Silicups.GUI.Graph(this.components);
             this.panelTools = new System.Windows.Forms.Panel();
             this.buttonMinima = new System.Windows.Forms.Button();
             this.buttonZeroOffset = new System.Windows.Forms.Button();
@@ -44,8 +46,10 @@
             this.trackBarP = new System.Windows.Forms.TrackBar();
             this.label5 = new System.Windows.Forms.Label();
             this.textBoxOffsetPM = new System.Windows.Forms.TextBox();
+            this.gliderOffset = new Silicups.GUI.Glider();
             this.label4 = new System.Windows.Forms.Label();
             this.textBoxPPM = new System.Windows.Forms.TextBox();
+            this.gliderP = new Silicups.GUI.Glider();
             this.label3 = new System.Windows.Forms.Label();
             this.textBoxOffset = new System.Windows.Forms.TextBox();
             this.radioButtonCompressed = new System.Windows.Forms.RadioButton();
@@ -64,16 +68,12 @@
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.projectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.addNewProjectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.renameObjectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.loadFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.loadFilesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.importFromVarastroczToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exportToTxtToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip = new System.Windows.Forms.StatusStrip();
-            this.listBoxSolution = new Silicups.GUI.MyListBox();
-            this.graph = new Silicups.GUI.Graph(this.components);
-            this.gliderOffset = new Silicups.GUI.Glider();
-            this.gliderP = new Silicups.GUI.Glider();
-            this.renameObjectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerMain)).BeginInit();
             this.splitContainerMain.Panel1.SuspendLayout();
             this.splitContainerMain.Panel2.SuspendLayout();
@@ -125,6 +125,16 @@
             this.splitContainerLeft.SplitterDistance = 144;
             this.splitContainerLeft.TabIndex = 1;
             // 
+            // listBoxSolution
+            // 
+            this.listBoxSolution.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.listBoxSolution.FormattingEnabled = true;
+            this.listBoxSolution.IntegralHeight = false;
+            this.listBoxSolution.Location = new System.Drawing.Point(0, 0);
+            this.listBoxSolution.Name = "listBoxSolution";
+            this.listBoxSolution.Size = new System.Drawing.Size(144, 474);
+            this.listBoxSolution.TabIndex = 0;
+            // 
             // listBoxObs
             // 
             this.listBoxObs.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -134,6 +144,17 @@
             this.listBoxObs.Name = "listBoxObs";
             this.listBoxObs.Size = new System.Drawing.Size(237, 474);
             this.listBoxObs.TabIndex = 0;
+            // 
+            // graph
+            // 
+            this.graph.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.graph.BackColor = System.Drawing.Color.White;
+            this.graph.Location = new System.Drawing.Point(2, 0);
+            this.graph.Name = "graph";
+            this.graph.Size = new System.Drawing.Size(772, 368);
+            this.graph.TabIndex = 1;
             // 
             // panelTools
             // 
@@ -266,6 +287,18 @@
             this.textBoxOffsetPM.Size = new System.Drawing.Size(60, 20);
             this.textBoxOffsetPM.TabIndex = 13;
             // 
+            // gliderOffset
+            // 
+            this.gliderOffset.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.gliderOffset.Cursor = System.Windows.Forms.Cursors.Cross;
+            this.gliderOffset.Enabled = false;
+            this.gliderOffset.Location = new System.Drawing.Point(371, 52);
+            this.gliderOffset.Name = "gliderOffset";
+            this.gliderOffset.Size = new System.Drawing.Size(392, 20);
+            this.gliderOffset.TabIndex = 12;
+            this.gliderOffset.Visible = false;
+            // 
             // label4
             // 
             this.label4.AutoSize = true;
@@ -281,6 +314,18 @@
             this.textBoxPPM.Name = "textBoxPPM";
             this.textBoxPPM.Size = new System.Drawing.Size(60, 20);
             this.textBoxPPM.TabIndex = 10;
+            // 
+            // gliderP
+            // 
+            this.gliderP.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.gliderP.Cursor = System.Windows.Forms.Cursors.Cross;
+            this.gliderP.Enabled = false;
+            this.gliderP.Location = new System.Drawing.Point(371, 26);
+            this.gliderP.Name = "gliderP";
+            this.gliderP.Size = new System.Drawing.Size(392, 20);
+            this.gliderP.TabIndex = 9;
+            this.gliderP.Visible = false;
             // 
             // label3
             // 
@@ -441,14 +486,23 @@
             // addNewProjectToolStripMenuItem
             // 
             this.addNewProjectToolStripMenuItem.Name = "addNewProjectToolStripMenuItem";
-            this.addNewProjectToolStripMenuItem.Size = new System.Drawing.Size(224, 22);
+            this.addNewProjectToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.I)));
+            this.addNewProjectToolStripMenuItem.Size = new System.Drawing.Size(261, 22);
             this.addNewProjectToolStripMenuItem.Text = "Add New Object To Solution";
             this.addNewProjectToolStripMenuItem.Click += new System.EventHandler(this.addNewProjectToolStripMenuItem_Click);
+            // 
+            // renameObjectToolStripMenuItem
+            // 
+            this.renameObjectToolStripMenuItem.Name = "renameObjectToolStripMenuItem";
+            this.renameObjectToolStripMenuItem.ShortcutKeyDisplayString = "F2";
+            this.renameObjectToolStripMenuItem.Size = new System.Drawing.Size(261, 22);
+            this.renameObjectToolStripMenuItem.Text = "Rename Object...";
+            this.renameObjectToolStripMenuItem.Click += new System.EventHandler(this.renameObjectToolStripMenuItem_Click);
             // 
             // loadFileToolStripMenuItem
             // 
             this.loadFileToolStripMenuItem.Name = "loadFileToolStripMenuItem";
-            this.loadFileToolStripMenuItem.Size = new System.Drawing.Size(224, 22);
+            this.loadFileToolStripMenuItem.Size = new System.Drawing.Size(261, 22);
             this.loadFileToolStripMenuItem.Text = "Add File[s]...";
             this.loadFileToolStripMenuItem.Click += new System.EventHandler(this.loadFileToolStripMenuItem_Click);
             // 
@@ -456,21 +510,22 @@
             // 
             this.loadFilesToolStripMenuItem.Name = "loadFilesToolStripMenuItem";
             this.loadFilesToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.R)));
-            this.loadFilesToolStripMenuItem.Size = new System.Drawing.Size(224, 22);
+            this.loadFilesToolStripMenuItem.Size = new System.Drawing.Size(261, 22);
             this.loadFilesToolStripMenuItem.Text = "(Re)Scan File Series...";
             this.loadFilesToolStripMenuItem.Click += new System.EventHandler(this.loadFilesToolStripMenuItem_Click);
             // 
             // importFromVarastroczToolStripMenuItem
             // 
             this.importFromVarastroczToolStripMenuItem.Name = "importFromVarastroczToolStripMenuItem";
-            this.importFromVarastroczToolStripMenuItem.Size = new System.Drawing.Size(224, 22);
+            this.importFromVarastroczToolStripMenuItem.Size = new System.Drawing.Size(261, 22);
             this.importFromVarastroczToolStripMenuItem.Text = "Import from var.astro.cz...";
             this.importFromVarastroczToolStripMenuItem.Click += new System.EventHandler(this.importFromVarastroczToolStripMenuItem_Click);
             // 
             // exportToTxtToolStripMenuItem
             // 
             this.exportToTxtToolStripMenuItem.Name = "exportToTxtToolStripMenuItem";
-            this.exportToTxtToolStripMenuItem.Size = new System.Drawing.Size(224, 22);
+            this.exportToTxtToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.E)));
+            this.exportToTxtToolStripMenuItem.Size = new System.Drawing.Size(261, 22);
             this.exportToTxtToolStripMenuItem.Text = "Export To Txt...";
             this.exportToTxtToolStripMenuItem.Click += new System.EventHandler(this.exportToTxtToolStripMenuItem_Click);
             // 
@@ -481,58 +536,6 @@
             this.statusStrip.Size = new System.Drawing.Size(1166, 22);
             this.statusStrip.TabIndex = 4;
             this.statusStrip.Text = "statusStrip1";
-            // 
-            // listBoxSolution
-            // 
-            this.listBoxSolution.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.listBoxSolution.FormattingEnabled = true;
-            this.listBoxSolution.IntegralHeight = false;
-            this.listBoxSolution.Location = new System.Drawing.Point(0, 0);
-            this.listBoxSolution.Name = "listBoxSolution";
-            this.listBoxSolution.Size = new System.Drawing.Size(144, 474);
-            this.listBoxSolution.TabIndex = 0;
-            // 
-            // graph
-            // 
-            this.graph.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.graph.BackColor = System.Drawing.Color.White;
-            this.graph.Location = new System.Drawing.Point(2, 0);
-            this.graph.Name = "graph";
-            this.graph.Size = new System.Drawing.Size(772, 368);
-            this.graph.TabIndex = 1;
-            // 
-            // gliderOffset
-            // 
-            this.gliderOffset.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.gliderOffset.Cursor = System.Windows.Forms.Cursors.Cross;
-            this.gliderOffset.Enabled = false;
-            this.gliderOffset.Location = new System.Drawing.Point(371, 52);
-            this.gliderOffset.Name = "gliderOffset";
-            this.gliderOffset.Size = new System.Drawing.Size(392, 20);
-            this.gliderOffset.TabIndex = 12;
-            this.gliderOffset.Visible = false;
-            // 
-            // gliderP
-            // 
-            this.gliderP.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.gliderP.Cursor = System.Windows.Forms.Cursors.Cross;
-            this.gliderP.Enabled = false;
-            this.gliderP.Location = new System.Drawing.Point(371, 26);
-            this.gliderP.Name = "gliderP";
-            this.gliderP.Size = new System.Drawing.Size(392, 20);
-            this.gliderP.TabIndex = 9;
-            this.gliderP.Visible = false;
-            // 
-            // renameObjectToolStripMenuItem
-            // 
-            this.renameObjectToolStripMenuItem.Name = "renameObjectToolStripMenuItem";
-            this.renameObjectToolStripMenuItem.Size = new System.Drawing.Size(224, 22);
-            this.renameObjectToolStripMenuItem.Text = "Rename Object...";
-            this.renameObjectToolStripMenuItem.Click += new System.EventHandler(this.renameObjectToolStripMenuItem_Click);
             // 
             // MainForm
             // 

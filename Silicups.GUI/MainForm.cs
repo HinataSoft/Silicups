@@ -86,9 +86,10 @@ namespace Silicups.GUI
             {
                 gliderP.ConfirmPosition();
                 gliderOffset.ConfirmPosition();
+                e.Handled = true;
                 return;
             }
-            if ((e.KeyCode == Keys.A) || (e.KeyCode == Keys.Q))
+            if (!e.Control && ((e.KeyCode == Keys.A) || (e.KeyCode == Keys.Q)))
             {
                 if ((CurrentProject != null) && (listBoxObs.Items.Count > 0))
                 {
@@ -101,6 +102,8 @@ namespace Silicups.GUI
                     { listBoxObs.SelectedIndex++; }
                     if ((e.KeyCode == Keys.Q) && (listBoxObs.SelectedIndex > 0))
                     { listBoxObs.SelectedIndex--; }
+                    e.Handled = true;
+                    return;
                 }
             }
         }
@@ -324,14 +327,17 @@ namespace Silicups.GUI
             if (IsInitializing || (CurrentProject == null))
             { return; }
 
-            using (var form = new InputBoxForm("Object name:", CurrentProject.Caption))
+            RenameProject(CurrentProject);
+            listBoxSolution.RefreshItems();
+            SetDirty();
+        }
+
+        private void RenameProject(Project project)
+        {
+            using (var form = new InputBoxForm("Object name:", project.Caption))
             {
                 if (form.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-                {
-                    CurrentProject.Caption = form.PromptValue;
-                    listBoxSolution.RefreshItems();
-                    SetDirty();
-                }
+                { project.Caption = form.PromptValue; }
             }
         }
 
@@ -559,7 +565,9 @@ namespace Silicups.GUI
             try
             {
                 IsInitializing = true;
-                AddProjectToSolution(new Project());
+                var newProject = new Project();
+                RenameProject(newProject);
+                AddProjectToSolution(newProject);
                 SetDirty();
             }
             finally
