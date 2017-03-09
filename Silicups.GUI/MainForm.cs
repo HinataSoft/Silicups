@@ -703,9 +703,9 @@ namespace Silicups.GUI
                 {
                     switch (action.Action)
                     {
-                        case FileListForm.ActionEnum.Add: CurrentProject.AddDataFile(action.Path); break;
+                        case FileListForm.ActionEnum.Add: CurrentProject.AddDataFile(action.Path); SetDirty(); break;
                         case FileListForm.ActionEnum.Keep: CurrentProject.RefreshDataFile(action.Path); break;
-                        case FileListForm.ActionEnum.Remove: CurrentProject.RemoveDataFile(action.Path); break;
+                        case FileListForm.ActionEnum.Remove: CurrentProject.RemoveDataFile(action.Path); SetDirty(); break;
                     }
                 }
 
