@@ -32,6 +32,7 @@
             this.buttonAdd = new System.Windows.Forms.Button();
             this.buttonOK = new System.Windows.Forms.Button();
             this.buttonCancel = new System.Windows.Forms.Button();
+            this.buttonEstimator = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // textBoxMinima
@@ -42,14 +43,14 @@
             this.textBoxMinima.Location = new System.Drawing.Point(12, 12);
             this.textBoxMinima.Multiline = true;
             this.textBoxMinima.Name = "textBoxMinima";
-            this.textBoxMinima.Size = new System.Drawing.Size(260, 212);
+            this.textBoxMinima.Size = new System.Drawing.Size(411, 273);
             this.textBoxMinima.TabIndex = 0;
             // 
             // buttonAdd
             // 
             this.buttonAdd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.buttonAdd.Enabled = false;
-            this.buttonAdd.Location = new System.Drawing.Point(12, 230);
+            this.buttonAdd.Location = new System.Drawing.Point(12, 291);
             this.buttonAdd.Name = "buttonAdd";
             this.buttonAdd.Size = new System.Drawing.Size(85, 23);
             this.buttonAdd.TabIndex = 10;
@@ -60,7 +61,7 @@
             // buttonOK
             // 
             this.buttonOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonOK.Location = new System.Drawing.Point(116, 230);
+            this.buttonOK.Location = new System.Drawing.Point(267, 291);
             this.buttonOK.Name = "buttonOK";
             this.buttonOK.Size = new System.Drawing.Size(75, 23);
             this.buttonOK.TabIndex = 1;
@@ -72,12 +73,22 @@
             // 
             this.buttonCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.buttonCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.buttonCancel.Location = new System.Drawing.Point(197, 230);
+            this.buttonCancel.Location = new System.Drawing.Point(348, 291);
             this.buttonCancel.Name = "buttonCancel";
             this.buttonCancel.Size = new System.Drawing.Size(75, 23);
             this.buttonCancel.TabIndex = 2;
             this.buttonCancel.Text = "Cancel";
             this.buttonCancel.UseVisualStyleBackColor = true;
+            // 
+            // buttonEstimator
+            // 
+            this.buttonEstimator.Location = new System.Drawing.Point(103, 291);
+            this.buttonEstimator.Name = "buttonEstimator";
+            this.buttonEstimator.Size = new System.Drawing.Size(105, 23);
+            this.buttonEstimator.TabIndex = 11;
+            this.buttonEstimator.Text = "format for Estimator";
+            this.buttonEstimator.UseVisualStyleBackColor = true;
+            this.buttonEstimator.Click += new System.EventHandler(this.buttonEstimator_Click);
             // 
             // MinimaForm
             // 
@@ -85,7 +96,8 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.buttonCancel;
-            this.ClientSize = new System.Drawing.Size(284, 265);
+            this.ClientSize = new System.Drawing.Size(435, 326);
+            this.Controls.Add(this.buttonEstimator);
             this.Controls.Add(this.buttonCancel);
             this.Controls.Add(this.buttonOK);
             this.Controls.Add(this.buttonAdd);
@@ -103,5 +115,6 @@
         private System.Windows.Forms.Button buttonAdd;
         private System.Windows.Forms.Button buttonOK;
         private System.Windows.Forms.Button buttonCancel;
+        private System.Windows.Forms.Button buttonEstimator;
     }
 }

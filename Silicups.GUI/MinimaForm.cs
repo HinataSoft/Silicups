@@ -13,9 +13,13 @@ namespace Silicups.GUI
 {
     public partial class MinimaForm : Form
     {
-        public MinimaForm()
+        Project CurrentProject;
+
+        public MinimaForm(Project project)
         {
             InitializeComponent();
+            this.CurrentProject = project;
+            LoadMinimaFromProject(CurrentProject);
         }
 
         public void LoadMinimaFromProject(Project project)
@@ -35,6 +39,11 @@ namespace Silicups.GUI
                 }
             }
             textBoxMinima.Text = sb.ToString();
+        }
+
+        public void SetMinimaToProject()
+        {
+            SetMinimaToProject(CurrentProject);
         }
 
         public void SetMinimaToProject(Project project)
@@ -60,6 +69,20 @@ namespace Silicups.GUI
                     {
                         type = Project.XMarkTypeEnum.SecondaryMinimum;
                         minString = minString.Substring(0, minString.Length - 1);
+                    }
+                    if (minString.EndsWith("(p)"))
+                    {
+                        type = Project.XMarkTypeEnum.PrimaryMinimum;
+                        minString = minString.Substring(0, minString.Length - 3);
+                    }
+                    if (minString.EndsWith("(s)"))
+                    {
+                        type = Project.XMarkTypeEnum.SecondaryMinimum;
+                        minString = minString.Substring(0, minString.Length - 3);
+                    }
+                    if (minString.StartsWith("TminHJD="))
+                    {
+                        minString = minString.Substring("TminHJD=".Length);
                     }
 
                     double min = FormatEx.ParseDouble(minString.Trim());
@@ -99,6 +122,27 @@ namespace Silicups.GUI
         private void buttonOK_Click(object sender, EventArgs e)
         {
             this.DialogResult = DialogResult.OK;
+        }
+
+        private void buttonEstimator_Click(object sender, EventArgs e)
+        {
+            SetMinimaToProject(CurrentProject);
+            var sb = new StringBuilder();
+            foreach (IDataSet set in CurrentProject.DataSeries.Series)
+            {
+                foreach (DataMark mark in set.XMarks)
+                {
+                    sb.Append("TminHJD=");
+                    sb.Append(FormatEx.FormatDouble(mark.N));
+                    switch (mark.Type)
+                    {
+                        case (int)Project.XMarkTypeEnum.PrimaryMinimum: sb.Append(" (p)"); break;
+                        case (int)Project.XMarkTypeEnum.SecondaryMinimum: sb.Append(" (s)"); break;
+                    }
+                    sb.AppendLine();
+                }
+            }
+            textBoxMinima.Text = sb.ToString();
         }
     }
 }
