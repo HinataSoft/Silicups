@@ -76,7 +76,7 @@ namespace Silicups.Core
         public Project(XmlNode root)
             : this()
         {
-            LoadFromXml(root);
+            LoadFromXml(root, null);
         }
 
         public override string ToString()
@@ -176,7 +176,7 @@ namespace Silicups.Core
             this.FileFilter = filter;
         }
 
-        public void LoadFromXml(XmlNode root)
+        public void LoadFromXml(XmlNode root, List<Exception> exceptions)
         {
             Id = root.FindAttribute("id").AsString();
             M0 = root.FindAttribute("m0").AsNullableDouble();
@@ -184,32 +184,40 @@ namespace Silicups.Core
 
             foreach (XmlNode setNode in root.FindNodes("Set"))
             {
-                string absolutePath = null;
-                string relativePath = null;
-                if (setNode.FindOneNode("AbsolutePath") != null)
+                try
                 {
-                    absolutePath = setNode.GetOneNode("AbsolutePath").AsString();
-                    relativePath = setNode.GetOneNode("RelativePath").AsString();
+                    string absolutePath = null;
+                    string relativePath = null;
+                    if (setNode.FindOneNode("AbsolutePath") != null)
+                    {
+                        absolutePath = setNode.GetOneNode("AbsolutePath").AsString();
+                        relativePath = setNode.GetOneNode("RelativePath").AsString();
+                    }
+                    else
+                    {
+                        // TOFIX: Obsolete, for backward compability
+                        string pathComposite = setNode.AsString();
+                        string[] pathParts = pathComposite.Split('|');
+                        if (pathParts.Length == 0)
+                        { continue; }
+                        absolutePath = pathParts[0];
+                        relativePath = (pathParts.Length > 1) ? pathParts[1] : null;
+                    }
+                    var set = new DataPointSet(absolutePath, relativePath);
+                    string path = !String.IsNullOrEmpty(relativePath) && System.IO.File.Exists(relativePath) ? relativePath : absolutePath;
+                    foreach (XmlNode xmarkNode in setNode.FindNodes("XMark"))
+                    { set.AddXMark(FormatEx.ParseEnumToInt<XMarkTypeEnum>(xmarkNode.FindAttribute("type").AsString("AnyMinimum")), xmarkNode.AsDouble()); }
+                    set.Metadata.OffsetY = setNode.FindAttribute("offsetY").AsDouble(0);
+                    set.Metadata.Enabled = setNode.FindAttribute("enabled").AsBoolean(true);
+                    set.Metadata.Caption = setNode.FindAttribute("caption").AsString(null);
+                    AppendMagFile(set, path);
+                    DataSeries.AddSet(set);
                 }
-                else
+                catch (Exception e)
                 {
-                    // TOFIX: Obsolete, for backward compability
-                    string pathComposite = setNode.AsString();
-                    string[] pathParts = pathComposite.Split('|');
-                    if (pathParts.Length == 0)
-                    { continue; }
-                    absolutePath = pathParts[0];
-                    relativePath = (pathParts.Length > 1) ? pathParts[1] : null;
+                    if (exceptions != null)
+                    { exceptions.Add(e); }
                 }
-                var set = new DataPointSet(absolutePath, relativePath);
-                string path = !String.IsNullOrEmpty(relativePath) && System.IO.File.Exists(relativePath) ? relativePath : absolutePath;
-                foreach (XmlNode xmarkNode in setNode.FindNodes("XMark"))
-                { set.AddXMark(FormatEx.ParseEnumToInt<XMarkTypeEnum>(xmarkNode.FindAttribute("type").AsString("AnyMinimum")), xmarkNode.AsDouble()); }
-                set.Metadata.OffsetY = setNode.FindAttribute("offsetY").AsDouble(0);
-                set.Metadata.Enabled = setNode.FindAttribute("enabled").AsBoolean(true);
-                set.Metadata.Caption = setNode.FindAttribute("caption").AsString(null);
-                AppendMagFile(set, path);
-                DataSeries.AddSet(set);
             }
 
             {

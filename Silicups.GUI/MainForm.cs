@@ -515,10 +515,10 @@ namespace Silicups.GUI
             RefreshTitle();
         }
 
-        private void SetTitle(string currentSolutionFile)
+        private void SetTitle(string currentSolutionFile, bool isDirty = false)
         {
             CurrentSolutionFile = currentSolutionFile;
-            IsDirty = false;
+            IsDirty = isDirty;
             RefreshTitle();
         }
 
@@ -613,11 +613,12 @@ namespace Silicups.GUI
 
                 var projects = new Dictionary<string, Project>();
                 var projectsUsed = new HashSet<string>();
+                var projectLoadExceptions = new List<Exception>();
                 foreach (XmlNode projectNode in rootNode.FindNodes("Projects").FindNodes("Project"))
                 {
                     string id = projectNode.GetAttribute("id").AsString();
                     Project project = new Core.Project();
-                    project.LoadFromXml(projectNode);
+                    project.LoadFromXml(projectNode, projectLoadExceptions);
                     projects.Add(id, project);
                 }
 
@@ -626,6 +627,23 @@ namespace Silicups.GUI
                     string id = projectNode.GetAttribute("id").AsString();
                     solution.Add(projects[id]);
                     projectsUsed.Add(id);
+                }
+
+                bool isDirty = false;
+                if (projectLoadExceptions.Count > 0)
+                {
+                    var sb = new StringBuilder();
+                    sb.Append("The project has been loaded only partially").AppendLine();
+                    if (projectLoadExceptions.Count > 1)
+                    { sb.Append("There was an exception while loading the project:").AppendLine(); }
+                    else
+                    { sb.Append("There were ").Append(projectLoadExceptions.Count).Append(" exceptions while loading the project:").AppendLine(); }
+                    foreach (Exception e in projectLoadExceptions)
+                    { sb.Append(" - ").AppendLine(e.Message); }
+
+                    MessageBox.Show(sb.ToString(), "The project has been loaded only partially", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                    isDirty = true;
                 }
 
                 int projectsNotUsed = 0;
@@ -644,7 +662,7 @@ namespace Silicups.GUI
                 }
 
                 RenewSolution(solution);
-                SetTitle(path);
+                SetTitle(path, isDirty);
             }
             catch (Exception e)
             {
