@@ -51,10 +51,10 @@
             this.textBoxPPM = new System.Windows.Forms.TextBox();
             this.gliderP = new Silicups.GUI.Glider();
             this.label3 = new System.Windows.Forms.Label();
-            this.textBoxOffset = new System.Windows.Forms.TextBox();
+            this.textBoxOffset = new Silicups.GUI.MyTextBox();
             this.radioButtonCompressed = new System.Windows.Forms.RadioButton();
             this.label2 = new System.Windows.Forms.Label();
-            this.textBoxP = new System.Windows.Forms.TextBox();
+            this.textBoxP = new Silicups.GUI.MyTextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.textBoxM0 = new System.Windows.Forms.TextBox();
             this.radioButtonPhased = new System.Windows.Forms.RadioButton();
@@ -343,6 +343,7 @@
             this.textBoxOffset.Name = "textBoxOffset";
             this.textBoxOffset.Size = new System.Drawing.Size(100, 20);
             this.textBoxOffset.TabIndex = 7;
+            this.textBoxOffset.KeyUp += new System.Windows.Forms.KeyEventHandler(this.textBoxOffset_KeyUp);
             // 
             // radioButtonCompressed
             // 
@@ -371,6 +372,7 @@
             this.textBoxP.Size = new System.Drawing.Size(100, 20);
             this.textBoxP.TabIndex = 4;
             this.textBoxP.TextChanged += new System.EventHandler(this.textBoxP_TextChanged);
+            this.textBoxP.KeyUp += new System.Windows.Forms.KeyEventHandler(this.textBoxP_KeyUp);
             // 
             // label1
             // 
@@ -580,7 +582,7 @@
         private System.Windows.Forms.RadioButton radioButtonPhased;
         private System.Windows.Forms.RadioButton radioButtonTimeseries;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.TextBox textBoxP;
+        private MyTextBox textBoxP;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox textBoxM0;
         private System.Windows.Forms.ToolStripMenuItem loadFileToolStripMenuItem;
@@ -588,7 +590,7 @@
         private System.Windows.Forms.CheckedListBox listBoxObs;
         private System.Windows.Forms.RadioButton radioButtonCompressed;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.TextBox textBoxOffset;
+        private MyTextBox textBoxOffset;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.TextBox textBoxOffsetPM;
         private Glider gliderOffset;

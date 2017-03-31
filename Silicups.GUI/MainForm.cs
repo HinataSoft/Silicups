@@ -55,6 +55,8 @@ namespace Silicups.GUI
             textBoxOffset.TextChanged += new EventHandler(textBoxOffset_TextChanged);
             textBoxPPM.TextChanged += new EventHandler(textBoxPPM_TextChanged);
             textBoxOffsetPM.TextChanged += new EventHandler(textBoxOffsetPM_TextChanged);
+            textBoxP.AfterPaste += new Action(textBoxP_AfterPaste);
+            textBoxOffset.AfterPaste += new Action(textBoxOffset_AfterPaste);
             gliderP.GliderValueChanged += new Glider.GliderEventHandler(gliderP_GliderValueChanged);
             gliderP.GliderValueConfirmed += new Glider.GliderEventHandler(gliderP_GliderValueConfirmed);
             gliderOffset.GliderValueChanged += new Glider.GliderEventHandler(gliderOffset_GliderValueChanged);
@@ -154,6 +156,36 @@ namespace Silicups.GUI
             { SetDataSource(SeriesTypeEnum.Phased, true); }
         }
 
+        private void textBoxP_KeyUp(object sender, KeyEventArgs e)
+        {
+            textBoxP_HandleDirectChange();
+        }
+
+        void textBoxP_AfterPaste()
+        {
+            textBoxP_HandleDirectChange();
+        }
+
+        void textBoxP_HandleDirectChange()
+        {
+            if (IsInitializing || trackBarP_SuppressEvent)
+            { return; }
+
+            try
+            {
+                OriginalP = FormatEx.ParseDouble(textBoxP.Text);
+                trackBarP_SuppressEvent = true;
+                trackBarP.Value = 0;
+            }
+            catch
+            {
+            }
+            finally
+            {
+                trackBarP_SuppressEvent = false;
+            }
+        }
+
         void textBoxPPM_TextChanged(object sender, EventArgs e)
         {
             if (IsInitializing || (CurrentProject == null))
@@ -236,6 +268,36 @@ namespace Silicups.GUI
             }
             catch
             { }
+        }
+
+        private void textBoxOffset_KeyUp(object sender, KeyEventArgs e)
+        {
+            textBoxOffset_HandleDirectChange();
+        }
+
+        void textBoxOffset_AfterPaste()
+        {
+            textBoxOffset_HandleDirectChange();
+        }
+
+        void textBoxOffset_HandleDirectChange()
+        {
+            if (IsInitializing || trackBarOffset_SuppressEvent)
+            { return; }
+
+            try
+            {
+                OriginalOffset = FormatEx.ParseDouble(textBoxOffset.Text);
+                trackBarOffset_SuppressEvent = true;
+                trackBarOffset.Value = 0;
+            }
+            catch
+            {
+            }
+            finally
+            {
+                trackBarOffset_SuppressEvent = false;
+            }
         }
 
         void textBoxOffsetPM_TextChanged(object sender, EventArgs e)
@@ -1031,6 +1093,24 @@ namespace Silicups.GUI
         public new void RefreshItems()
         {
             base.RefreshItems();
+        }
+    }
+
+    public class MyTextBox : TextBox
+    {
+        public event Action AfterPaste;
+
+        protected override void WndProc(ref Message m)
+        {
+            base.WndProc(ref m);
+            switch (m.Msg)
+            {
+                case 0x302: //WM_PASTE
+                    Action afterPaste = AfterPaste;
+                    if (afterPaste != null)
+                    { afterPaste(); }
+                    break;
+            }
         }
     }
 
