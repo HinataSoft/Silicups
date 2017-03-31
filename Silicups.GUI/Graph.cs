@@ -40,7 +40,9 @@ namespace Silicups.GUI
         public Pen GraphBorder = Pens.Black;
         public Pen DataPointError = Pens.Gray;
         public Pen CoordMark = Pens.LightGray;
-        public Pen XMark = Pens.Blue;
+        public Pen XMark = Pens.Gray;
+        public Pen XMarkPrim = Pens.Blue;
+        public Pen XMarkSec = Pens.Red;
 
         public Brush DataPointBrush = Brushes.Black;
         public Brush DataPointHighlightedBrush = Brushes.Red;
@@ -270,7 +272,10 @@ namespace Silicups.GUI
                         float x = (float)(((m.N - ViewBB.Left) / ViewBB.Width) * graphWidth);
                         if ((x < markSize2) || (x > graphWidth - markSize2))
                         { continue; }
-                        g.DrawLine(XMark, graphLeft + x, graphTop, graphLeft + x, graphBottom);
+                        Pen pen = XMark;
+                        if (m.Type == 1) { pen = XMarkPrim; }
+                        if (m.Type == 2) { pen = XMarkSec; }
+                        g.DrawLine(pen, graphLeft + x, graphTop, graphLeft + x, graphBottom);
                     }
                 } 
                 foreach (IDataSet set in DataSource.Series)

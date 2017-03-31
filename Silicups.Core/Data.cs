@@ -136,6 +136,11 @@ namespace Silicups.Core
             xmarks.Add(new DataMark(type, x));
         }
 
+        public void ClearXMarks()
+        {
+            xmarks.Clear();
+        }
+
         public IEnumerable<DataPoint> Set
         {
             get { return list; }

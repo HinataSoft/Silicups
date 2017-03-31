@@ -21,12 +21,12 @@ namespace Silicups.Core
         public static Dictionary<int, string> XMarkTypeColors = new Dictionary<int, string>()
         {
             { (int)XMarkTypeEnum.AnyMinimum, "Black" },
-            { (int)XMarkTypeEnum.PrimaryMinimum, "Red" },
+            { (int)XMarkTypeEnum.PrimaryMinimum, "Blue" },
             { (int)XMarkTypeEnum.SecondaryMinimum, "Red" },
             { (int)XMarkTypeEnum.FlexPoint1, "Green" },
             { (int)XMarkTypeEnum.FlexPoint2, "Green" },
             { (int)XMarkTypeEnum.CalculatedPrimaryMinimum, "Blue" },
-            { (int)XMarkTypeEnum.CalculatedSecondaryMinimum, "Blue" },
+            { (int)XMarkTypeEnum.CalculatedSecondaryMinimum, "Red" },
         };
 
         public DataPointSeries DataSeries { get; private set; }

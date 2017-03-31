@@ -1075,7 +1075,17 @@ namespace Silicups.GUI
 
         private void buttonMinima_Click(object sender, EventArgs e)
         {
-            //
+            if (CurrentProject == null)
+            { return; }
+
+            var minimaForm = new MinimaForm();
+            minimaForm.LoadMinimaFromProject(CurrentProject);
+            if (minimaForm.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                minimaForm.SetMinimaToProject(CurrentProject);
+                SetDirty();
+                RefreshDataSource(true);
+            }
         }
 
         private void importFromVarastroczToolStripMenuItem_Click(object sender, EventArgs e)
