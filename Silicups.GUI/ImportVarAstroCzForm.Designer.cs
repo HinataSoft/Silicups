@@ -144,6 +144,7 @@
             this.Controls.Add(this.textBoxDirectory);
             this.Controls.Add(this.textBoxURL);
             this.Name = "ImportVarAstroCzForm";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Import from var.astro.cz";
             this.ResumeLayout(false);
             this.PerformLayout();

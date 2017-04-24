@@ -103,6 +103,7 @@
             this.Controls.Add(this.buttonAdd);
             this.Controls.Add(this.textBoxMinima);
             this.Name = "MinimaForm";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "MinimaForm";
             this.ResumeLayout(false);
             this.PerformLayout();

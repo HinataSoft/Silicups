@@ -87,7 +87,7 @@
             this.Controls.Add(this.label);
             this.Controls.Add(this.textBox);
             this.Name = "InputBoxForm";
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "InputBox";
             this.ResumeLayout(false);
             this.PerformLayout();
