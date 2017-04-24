@@ -343,7 +343,7 @@ namespace Silicups.Core
                 {
                     if (s.StartsWith("24"))
                     {
-                        string[] parts = s.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                        string[] parts = s.Split(new char[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
                         var x = FormatEx.ParseDouble(parts[0]);
                         var y = FormatEx.ParseDouble(parts[1]);
                         var yerr = FormatEx.ParseDouble(parts[2]);
