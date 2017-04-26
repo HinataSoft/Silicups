@@ -74,6 +74,7 @@
             this.importFromVarastroczToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exportToTxtToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip = new System.Windows.Forms.StatusStrip();
+            this.minimaPredictionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerMain)).BeginInit();
             this.splitContainerMain.Panel1.SuspendLayout();
             this.splitContainerMain.Panel2.SuspendLayout();
@@ -480,7 +481,8 @@
             this.loadFileToolStripMenuItem,
             this.loadFilesToolStripMenuItem,
             this.importFromVarastroczToolStripMenuItem,
-            this.exportToTxtToolStripMenuItem});
+            this.exportToTxtToolStripMenuItem,
+            this.minimaPredictionsToolStripMenuItem});
             this.projectToolStripMenuItem.Name = "projectToolStripMenuItem";
             this.projectToolStripMenuItem.Size = new System.Drawing.Size(54, 20);
             this.projectToolStripMenuItem.Text = "Object";
@@ -538,6 +540,13 @@
             this.statusStrip.Size = new System.Drawing.Size(1166, 22);
             this.statusStrip.TabIndex = 4;
             this.statusStrip.Text = "statusStrip1";
+            // 
+            // minimaPredictionsToolStripMenuItem
+            // 
+            this.minimaPredictionsToolStripMenuItem.Name = "minimaPredictionsToolStripMenuItem";
+            this.minimaPredictionsToolStripMenuItem.Size = new System.Drawing.Size(261, 22);
+            this.minimaPredictionsToolStripMenuItem.Text = "Minima Predictions...";
+            this.minimaPredictionsToolStripMenuItem.Click += new System.EventHandler(this.minimaPredictionsToolStripMenuItem_Click);
             // 
             // MainForm
             // 
@@ -616,6 +625,7 @@
         private System.Windows.Forms.ToolStripMenuItem importFromVarastroczToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem saveSolutionToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem renameObjectToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem minimaPredictionsToolStripMenuItem;
 
     }
 }

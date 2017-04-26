@@ -23,7 +23,18 @@ namespace Silicups.Core
             int month = e - 1; if (month > 12) { month -= 12; }
             int year = (month <= 2) ? c - 4715 : c - 4716;
 
-            return new DateTime(year, month, day, 0, 0, 0, DateTimeKind.Utc);
+            return new DateTime(year, month, day, 0, 0, 0, DateTimeKind.Utc).AddTicks((long)((q - z) * TimeSpan.TicksPerDay));
+        }
+
+        // http://stackoverflow.com/a/26676794
+        public static double DateTimeToJD(DateTime dateTime)
+        {
+            DateTime origin = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+            TimeSpan diff = dateTime.ToUniversalTime() - origin;
+            double unixTime = Math.Floor(diff.TotalSeconds);
+            double julianDate = (unixTime / 86400) + 2440587.5;
+
+            return julianDate;
         }
     }
 }

@@ -93,6 +93,12 @@
     <Compile Include="MinimaForm.Designer.cs">
       <DependentUpon>MinimaForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="MinimaPredictionsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MinimaPredictionsForm.Designer.cs">
+      <DependentUpon>MinimaPredictionsForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="FileListForm.resx">
@@ -118,6 +124,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="MinimaForm.resx">
       <DependentUpon>MinimaForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MinimaPredictionsForm.resx">
+      <DependentUpon>MinimaPredictionsForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

@@ -1095,6 +1095,20 @@ namespace Silicups.GUI
             { Solution.Add(importVarAstroCzForm.Project); }
             RenewSolution();
         }
+
+        private void minimaPredictionsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (CurrentProject == null)
+            { return; }
+
+            if (!CurrentProject.M0.HasValue || !CurrentProject.P.HasValue || (CurrentProject.P.Value <= 0))
+            {
+                MessageBox.Show("Epoch (M0 and P) not given, cannot show predictions", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            new MinimaPredictionsForm(CurrentProject).ShowDialog();
+        }
     }
 
     public class MyListBox : ListBox
