@@ -1109,6 +1109,16 @@ namespace Silicups.GUI
 
             new MinimaPredictionsForm(CurrentProject).ShowDialog();
         }
+
+        private void sortObservationsByDateToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (CurrentProject == null)
+            { return; }
+
+            CurrentProject.SortByDate();
+            RefreshCurrentProject();
+            SetDirty();
+        }
     }
 
     public class MyListBox : ListBox

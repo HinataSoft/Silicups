@@ -105,6 +105,11 @@ namespace Silicups.Core
             PhasedSeries.Refresh();
         }
 
+        public void SortByDate()
+        {
+            DataSeries.SortByDate();
+        }
+
         public bool CanProvidePeriodData
         {
             get { return P.HasValue && M0.HasValue && (P.Value != 0); }

@@ -194,6 +194,11 @@ namespace Silicups.Core
             }
         }
 
+        public void SortByDate()
+        {
+            list.Sort((a, b) => a.BoundingBox.Left.CompareTo(b.BoundingBox.Left));
+        }
+
         public bool IsEmpty { get { return list.Count == 0; } }
     }
 
