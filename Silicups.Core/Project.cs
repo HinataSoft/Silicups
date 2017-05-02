@@ -73,10 +73,10 @@ namespace Silicups.Core
             AddDataFiles(files);
         }
 
-        public Project(XmlNode root)
+        public Project(string workingDir, XmlNode root)
             : this()
         {
-            LoadFromXml(root, null);
+            LoadFromXml(workingDir, root, null);
         }
 
         public override string ToString()
@@ -176,8 +176,10 @@ namespace Silicups.Core
             this.FileFilter = filter;
         }
 
-        public void LoadFromXml(XmlNode root, List<Exception> exceptions)
+        public void LoadFromXml(string workingDir, XmlNode root, List<Exception> exceptions)
         {
+            workingDir = PathEx.GetFullAbsolutePath(workingDir);
+
             Id = root.FindAttribute("id").AsString();
             M0 = root.FindAttribute("m0").AsNullableDouble();
             P = root.FindAttribute("p").AsNullableDouble();
@@ -186,31 +188,17 @@ namespace Silicups.Core
             {
                 try
                 {
-                    string absolutePath = null;
-                    string relativePath = null;
-                    if (setNode.FindOneNode("AbsolutePath") != null)
-                    {
-                        absolutePath = setNode.GetOneNode("AbsolutePath").AsString();
-                        relativePath = setNode.GetOneNode("RelativePath").AsString();
-                    }
-                    else
-                    {
-                        // TOFIX: Obsolete, for backward compability
-                        string pathComposite = setNode.AsString();
-                        string[] pathParts = pathComposite.Split('|');
-                        if (pathParts.Length == 0)
-                        { continue; }
-                        absolutePath = pathParts[0];
-                        relativePath = (pathParts.Length > 1) ? pathParts[1] : null;
-                    }
+                    string absolutePath = setNode.GetOneNode("AbsolutePath").AsString();
+                    string relativePath = setNode.GetOneNode("RelativePath").AsString();
+                    absolutePath = PathEx.GetBestAbsolutePath(workingDir, absolutePath, relativePath);
+
                     var set = new DataPointSet(absolutePath, relativePath);
-                    string path = !String.IsNullOrEmpty(relativePath) && System.IO.File.Exists(relativePath) ? relativePath : absolutePath;
                     foreach (XmlNode xmarkNode in setNode.FindNodes("XMark"))
                     { set.AddXMark(FormatEx.ParseEnumToInt<XMarkTypeEnum>(xmarkNode.FindAttribute("type").AsString("AnyMinimum")), xmarkNode.AsDouble()); }
                     set.Metadata.OffsetY = setNode.FindAttribute("offsetY").AsDouble(0);
                     set.Metadata.Enabled = setNode.FindAttribute("enabled").AsBoolean(true);
                     set.Metadata.Caption = setNode.FindAttribute("caption").AsString(null);
-                    AppendMagFile(set, path);
+                    AppendMagFile(set, absolutePath);
                     DataSeries.AddSet(set);
                 }
                 catch (Exception e)
@@ -235,34 +223,17 @@ namespace Silicups.Core
                 if (sourceSettingsNode != null)
                 {
                     AbsoluteBasePath = sourceSettingsNode.FindOneNode("AbsolutePath").AsString("");
-                    string relativePath = sourceSettingsNode.FindOneNode("RelativePath").AsString("");
+                    string relativeBasePath = sourceSettingsNode.FindOneNode("RelativePath").AsString("");
+                    // fixing absolute path using relative path if absolute does not exist
+                    AbsoluteBasePath = PathEx.GetBestAbsolutePath(workingDir, AbsoluteBasePath, relativeBasePath);
+
                     FileFilter = sourceSettingsNode.FindOneNode("Filter").AsString("");
                     FilePattern = sourceSettingsNode.FindOneNode("Pattern").AsString("");
 
-                    // TOFIX: Obsolete, for backward compability
-                    if (String.IsNullOrEmpty(AbsoluteBasePath))
-                    {
-                        string path = sourceSettingsNode.InnerText;
-                        if(!String.IsNullOrWhiteSpace(path))
-                        {
-                            string[] parts = path.Split('|');
-                            if (parts.Length > 0)
-                            { AbsoluteBasePath = parts[0]; }
-                            if (parts.Length > 1)
-                            { relativePath = parts[1]; }
-                        }
-                    }
                     if (String.IsNullOrWhiteSpace(FileFilter))
                     { FileFilter = sourceSettingsNode.FindAttribute("filter").AsString(""); }
                     if (String.IsNullOrWhiteSpace(FilePattern))
                     { FilePattern = sourceSettingsNode.FindAttribute("pattern").AsString(""); }
-                    
-                    // fixing absolute path using relative path if absolute does not exist
-                    if (!System.IO.Directory.Exists(AbsoluteBasePath) &&
-                        System.IO.Directory.Exists(relativePath))
-                    {
-                        AbsoluteBasePath = System.IO.Path.GetFullPath(relativePath);
-                    }
                 }
             }
 
@@ -280,9 +251,9 @@ namespace Silicups.Core
             return existingFiles;
         }
 
-        public void SaveToXml(string solutionPath, XmlNode root)
+        public void SaveToXml(string workingDir, XmlNode root)
         {
-            solutionPath = System.IO.Path.GetDirectoryName(System.IO.Path.GetFullPath(solutionPath)) + System.IO.Path.DirectorySeparatorChar;
+            workingDir = PathEx.GetFullAbsolutePath(workingDir);
             root.AppendXmlAttribute("id", Id);
             root.AppendXmlAttribute("m0", M0);
             root.AppendXmlAttribute("p", P);
@@ -290,7 +261,7 @@ namespace Silicups.Core
             {
                 string relativePath;
                 try
-                { relativePath = PathEx.MakeRelativePathFromOtherPath(set.Metadata.AbsolutePath, solutionPath); }
+                { relativePath = PathEx.MakeRelativePathFromOtherPath(set.Metadata.AbsolutePath, workingDir); }
                 catch
                 { relativePath = ""; }
 
@@ -321,7 +292,7 @@ namespace Silicups.Core
             {
                 string relativePath;
                 try
-                { relativePath = PathEx.MakeRelativePathFromOtherPath(AbsoluteBasePath, solutionPath); }
+                { relativePath = PathEx.MakeRelativePathFromOtherPath(AbsoluteBasePath, workingDir); }
                 catch
                 { relativePath = ""; }
 

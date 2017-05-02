@@ -680,7 +680,7 @@ namespace Silicups.GUI
                 {
                     string id = projectNode.GetAttribute("id").AsString();
                     Project project = new Core.Project();
-                    project.LoadFromXml(projectNode, projectLoadExceptions);
+                    project.LoadFromXml(path, projectNode, projectLoadExceptions);
                     projects.Add(id, project);
                 }
 

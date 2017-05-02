@@ -39,7 +39,7 @@ namespace Silicups.Core
             var files = new List<string>();
             foreach (string patternItem in pattern.Split('|'))
             {
-                foreach (string filename in System.IO.Directory.GetFiles(baseDirectory, patternItem, System.IO.SearchOption.AllDirectories))
+                foreach (string filename in Directory.GetFiles(baseDirectory, patternItem, SearchOption.AllDirectories))
                 {
                     bool filtered = false;
                     foreach (FilterItem filterItem in filters)
@@ -65,7 +65,7 @@ namespace Silicups.Core
         /// <param name="fromPath">Contains the directory that defines the start of the relative path.</param>
         /// <param name="toPath">Contains the path that defines the endpoint of the relative path.</param>
         /// <returns>The relative path from the start directory to the end path or <c>toPath</c> if the paths are not related.</returns>
-        public static String MakeRelativePath(String fromPath, String toPath)
+        public static string MakeRelativePath(string fromPath, string toPath)
         {
             if (String.IsNullOrEmpty(fromPath)) throw new ArgumentNullException("fromPath");
             if (String.IsNullOrEmpty(toPath)) throw new ArgumentNullException("toPath");
@@ -76,19 +76,39 @@ namespace Silicups.Core
             if (fromUri.Scheme != toUri.Scheme) { return toPath; } // path can't be made relative.
 
             Uri relativeUri = fromUri.MakeRelativeUri(toUri);
-            String relativePath = Uri.UnescapeDataString(relativeUri.ToString());
+            string relativePath = Uri.UnescapeDataString(relativeUri.ToString());
 
             if (toUri.Scheme.Equals("file", StringComparison.InvariantCultureIgnoreCase))
             {
-                relativePath = relativePath.Replace(System.IO.Path.AltDirectorySeparatorChar, System.IO.Path.DirectorySeparatorChar);
+                relativePath = relativePath.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
             }
 
             return relativePath;
         }
 
-        public static String MakeRelativePathFromOtherPath(String absolutePath, String otherAbsolutePath)
+        public static string MakeRelativePathFromOtherPath(string absolutePath, string otherAbsolutePath)
         {
-            return MakeRelativePath(System.IO.Path.GetDirectoryName(otherAbsolutePath) + System.IO.Path.DirectorySeparatorChar, absolutePath);
+            return MakeRelativePath(Path.GetDirectoryName(otherAbsolutePath) + Path.DirectorySeparatorChar, absolutePath);
+        }
+
+        public static string GetBestAbsolutePath(string workingDirectory, string absolutePath, string relativePath)
+        {
+            if (File.Exists(absolutePath) || Directory.Exists(absolutePath))
+            { return absolutePath; }
+
+            if (!String.IsNullOrEmpty(relativePath))
+            {
+                string otherAbsolutePath = Path.GetFullPath(Path.Combine(workingDirectory, relativePath));
+                if (File.Exists(otherAbsolutePath) || Directory.Exists(otherAbsolutePath))
+                { return otherAbsolutePath; }
+            }
+
+            return absolutePath;
+        }
+
+        public static string GetFullAbsolutePath(string path)
+        {
+            return System.IO.Path.GetDirectoryName(System.IO.Path.GetFullPath(path)) + System.IO.Path.DirectorySeparatorChar;
         }
     }
 }
