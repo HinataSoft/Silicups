@@ -71,11 +71,12 @@
             this.renameObjectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.loadFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.loadFilesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.sortObservationsByDateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.importFromVarastroczToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exportToTxtToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.minimaPredictionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip = new System.Windows.Forms.StatusStrip();
-            this.sortObservationsByDateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerMain)).BeginInit();
             this.splitContainerMain.Panel1.SuspendLayout();
             this.splitContainerMain.Panel2.SuspendLayout();
@@ -88,6 +89,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.trackBarOffset)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarP)).BeginInit();
             this.menuStrip.SuspendLayout();
+            this.statusStrip.SuspendLayout();
             this.SuspendLayout();
             // 
             // splitContainerMain
@@ -520,6 +522,13 @@
             this.loadFilesToolStripMenuItem.Text = "(Re)Scan File Series...";
             this.loadFilesToolStripMenuItem.Click += new System.EventHandler(this.loadFilesToolStripMenuItem_Click);
             // 
+            // sortObservationsByDateToolStripMenuItem
+            // 
+            this.sortObservationsByDateToolStripMenuItem.Name = "sortObservationsByDateToolStripMenuItem";
+            this.sortObservationsByDateToolStripMenuItem.Size = new System.Drawing.Size(261, 22);
+            this.sortObservationsByDateToolStripMenuItem.Text = "Sort Observations By Date";
+            this.sortObservationsByDateToolStripMenuItem.Click += new System.EventHandler(this.sortObservationsByDateToolStripMenuItem_Click);
+            // 
             // importFromVarastroczToolStripMenuItem
             // 
             this.importFromVarastroczToolStripMenuItem.Name = "importFromVarastroczToolStripMenuItem";
@@ -544,18 +553,19 @@
             // 
             // statusStrip
             // 
+            this.statusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripStatusLabel1});
             this.statusStrip.Location = new System.Drawing.Point(0, 504);
             this.statusStrip.Name = "statusStrip";
             this.statusStrip.Size = new System.Drawing.Size(1166, 22);
             this.statusStrip.TabIndex = 4;
             this.statusStrip.Text = "statusStrip1";
             // 
-            // sortObservationsByDateToolStripMenuItem
+            // toolStripStatusLabel1
             // 
-            this.sortObservationsByDateToolStripMenuItem.Name = "sortObservationsByDateToolStripMenuItem";
-            this.sortObservationsByDateToolStripMenuItem.Size = new System.Drawing.Size(261, 22);
-            this.sortObservationsByDateToolStripMenuItem.Text = "Sort Observations By Date";
-            this.sortObservationsByDateToolStripMenuItem.Click += new System.EventHandler(this.sortObservationsByDateToolStripMenuItem_Click);
+            this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
+            this.toolStripStatusLabel1.Size = new System.Drawing.Size(78, 17);
+            this.toolStripStatusLabel1.Text = "SILICUPS v0.9";
             // 
             // MainForm
             // 
@@ -583,6 +593,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.trackBarP)).EndInit();
             this.menuStrip.ResumeLayout(false);
             this.menuStrip.PerformLayout();
+            this.statusStrip.ResumeLayout(false);
+            this.statusStrip.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -636,6 +648,7 @@
         private System.Windows.Forms.ToolStripMenuItem renameObjectToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem minimaPredictionsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem sortObservationsByDateToolStripMenuItem;
+        private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
 
     }
 }

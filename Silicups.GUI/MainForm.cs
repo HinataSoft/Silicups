@@ -738,6 +738,27 @@ namespace Silicups.GUI
 
         private void SaveSolution(string path)
         {
+            try
+            {
+                if (System.IO.File.Exists(path))
+                {
+                    string directory = System.IO.Path.GetDirectoryName(path);
+                    string backupDirectory = System.IO.Path.Combine(directory, "backup");
+                    if (System.IO.Directory.Exists(backupDirectory))
+                    {
+                        string file = System.IO.Path.GetFileNameWithoutExtension(path);
+                        string timestamp = DateTime.Now.ToString("yyyy'-'MM'-'dd'_'HH'-'mm'-'ss'-'fffffff");
+                        string extension = System.IO.Path.GetExtension(path);
+                        string backupPath = System.IO.Path.Combine(backupDirectory, String.Format("{0}_{1}{2}", file, timestamp, extension));
+                        System.IO.File.Copy(path, backupPath);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                toolStripStatusLabel1.Text = "Exception when creating backup: " + e.Message;
+            }
+
             var doc = new XmlDocument();
             XmlNode rootNode = doc.AppendXmlElement("Silicups");
             XmlNode solutionNode = rootNode.AppendXmlElement("Solution");
