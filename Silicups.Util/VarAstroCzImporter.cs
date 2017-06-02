@@ -118,7 +118,7 @@ namespace Silicups.Util
                                 continue;
                             }
 
-                            set.AddXMark((int)pointType, time);
+                            set.AddXMark((int)pointType, time, 0);
                         }
                     }
                 }

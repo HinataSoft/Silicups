@@ -9,6 +9,7 @@ namespace Silicups.Core
         string AbsolutePath { get; }
         string RelativePath { get; }
         string Caption { get; set; }
+        string Filter { get; set; }
 
         bool Enabled { get; set; }
         bool Hightlighted { get; set; }
@@ -40,6 +41,7 @@ namespace Silicups.Core
         public string AbsolutePath { get; internal set; }
         public string RelativePath { get; internal set; }
         public string Caption { get; set; }
+        public string Filter { get; set; }
         public bool Enabled { get; set; }
         public bool Hightlighted { get; set; }
         public double OffsetY { get; set; }

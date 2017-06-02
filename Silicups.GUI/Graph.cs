@@ -46,6 +46,7 @@ namespace Silicups.GUI
         public Pen XMarkPrimErr = DashedPen.Create(Color.Blue);
         public Pen XMarkSec = Pens.Red;
         public Pen XMarkSecErr = DashedPen.Create(Color.Red);
+        public Pen DataPointHighlightedPen = Pens.Red;
 
         public Brush DataPointBrush = Brushes.Black;
         public Brush DataPointHighlightedBrush = Brushes.Red;
@@ -289,21 +290,6 @@ namespace Silicups.GUI
                             { g.DrawLine(penErr, graphLeft + x + xerr, graphTop, graphLeft + x + xerr, graphBottom); }
                         }
                     }
-                } 
-                foreach (IDataSet set in DataSource.Series)
-                {
-                    if (!set.Metadata.Enabled || set.Metadata.Hightlighted)
-                    { continue; }
-                    foreach (DataPoint p in set.Set)
-                    {
-                        float x = (float)(((p.X - ViewBB.Left) / ViewBB.Width) * graphWidth);
-                        float y = (float)(((p.Y - ViewBB.Top) / ViewBB.Height) * graphHeight);
-                        float yerr = (float)(p.Yerr / ViewBB.Height * graphHeight);
-                        if ((x < markSize2) || (x > graphWidth - markSize2) || (y < markSize2) || (y > graphHeight - markSize2))
-                        { continue; }
-
-                        g.FillEllipse(DataPointBrush, graphLeft + x - markSize2, graphTop + y - markSize2, markSize, markSize);
-                    }
                 }
                 foreach (IDataSet set in DataSource.Series)
                 {
@@ -314,10 +300,28 @@ namespace Silicups.GUI
                         float x = (float)(((p.X - ViewBB.Left) / ViewBB.Width) * graphWidth);
                         float y = (float)(((p.Y - ViewBB.Top) / ViewBB.Height) * graphHeight);
                         float yerr = (float)(p.Yerr / ViewBB.Height * graphHeight);
+                        if ((x < markSize) || (x > graphWidth - markSize) || (y < markSize) || (y > graphHeight - markSize))
+                        { continue; }
+
+                        g.DrawEllipse(DataPointHighlightedPen, graphLeft + x - markSize, graphTop + y - markSize, markSize * 2, markSize * 2);
+                    }
+                }
+                foreach (IDataSet set in DataSource.Series)
+                {
+                    if (!set.Metadata.Enabled)
+                    { continue; }
+                    foreach (DataPoint p in set.Set)
+                    {
+                        float x = (float)(((p.X - ViewBB.Left) / ViewBB.Width) * graphWidth);
+                        float y = (float)(((p.Y - ViewBB.Top) / ViewBB.Height) * graphHeight);
+                        float yerr = (float)(p.Yerr / ViewBB.Height * graphHeight);
                         if ((x < markSize2) || (x > graphWidth - markSize2) || (y < markSize2) || (y > graphHeight - markSize2))
                         { continue; }
 
-                        g.FillEllipse(DataPointHighlightedBrush, graphLeft + x - markSize2, graphTop + y - markSize2, markSize, markSize);
+                        Brush brush = DataPointBrush;
+                        if (!String.IsNullOrEmpty(set.Metadata.Filter))
+                        { brush = new SolidBrush(Color.FromName(set.Metadata.Filter)); }
+                        g.FillEllipse(brush, graphLeft + x - markSize2, graphTop + y - markSize2, markSize, markSize);
                     }
                 }
             }

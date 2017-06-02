@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Xml;
+using System.Text.RegularExpressions;
 
 namespace Silicups.Core
 {
@@ -214,6 +215,7 @@ namespace Silicups.Core
                     set.Metadata.OffsetY = setNode.FindAttribute("offsetY").AsDouble(0);
                     set.Metadata.Enabled = setNode.FindAttribute("enabled").AsBoolean(true);
                     set.Metadata.Caption = setNode.FindAttribute("caption").AsString(null);
+                    set.Metadata.Filter = setNode.FindAttribute("filter").AsString(null);
                     AppendMagFile(set, absolutePath);
                     DataSeries.AddSet(set);
                 }
@@ -286,6 +288,8 @@ namespace Silicups.Core
                 setNode.AppendXmlElement("RelativePath", relativePath);
                 setNode.AppendXmlAttribute("source", "file");
                 setNode.AppendXmlAttribute("offsetY", set.Metadata.OffsetY);
+                if (!String.IsNullOrEmpty(set.Metadata.Filter))
+                { setNode.AppendXmlAttribute("filter", set.Metadata.Filter); }
                 setNode.AppendXmlAttribute("enabled", set.Metadata.Enabled);
                 if (!String.IsNullOrEmpty(set.Metadata.Caption))
                 { setNode.AppendXmlAttribute("caption", set.Metadata.Caption); }
@@ -322,7 +326,9 @@ namespace Silicups.Core
             }
         }
 
-        private readonly static string MagFilePhasedTag = "Phased with elements ";
+        private const string MagFilePhasedTag = "Phased with elements ";
+        private readonly static Regex FilterRegex = new Regex("Filter: ([_a-zA-Z][_a-zA-Z0-9]*)");
+
         private void AppendMagFile(DataPointSet set, string filename)
         {
             foreach (string s in System.IO.File.ReadAllLines(filename))
@@ -340,15 +346,21 @@ namespace Silicups.Core
 
                         set.Add(x, y, yerr);
                     }
-                    else if(!P.HasValue && !M0.HasValue)
+                    else
                     {
-                        int i = s.IndexOf(MagFilePhasedTag);
-                        if (i > 0)
+                        if (!P.HasValue && !M0.HasValue)
                         {
-                            string[] parts = s.Substring(i + MagFilePhasedTag.Length).Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                            M0 = FormatEx.ParseDouble(parts[0]);
-                            P = FormatEx.ParseDouble(parts[2]);
+                            int i = s.IndexOf(MagFilePhasedTag);
+                            if (i > 0)
+                            {
+                                string[] parts = s.Substring(i + MagFilePhasedTag.Length).Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                                M0 = FormatEx.ParseDouble(parts[0]);
+                                P = FormatEx.ParseDouble(parts[2]);
+                            }
                         }
+                        var match = FilterRegex.Match(s);
+                        if (match.Success)
+                        { set.Metadata.Filter = match.Groups[1].Value; }
                     }
                 }
                 catch

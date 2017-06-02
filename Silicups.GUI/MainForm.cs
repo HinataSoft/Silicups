@@ -403,6 +403,49 @@ namespace Silicups.GUI
             }
         }
 
+        private void RenameSet()
+        {
+            if (IsInitializing || (CurrentProject == null) || (SelectedMetadata == null))
+            { return; }
+
+            RenameSet(SelectedMetadata);
+        }
+
+        private void RenameSet(IDataSetMetadata metadata)
+        {
+            using (var form = new InputBoxForm("Set name:", SelectedMetadata.Caption))
+            {
+                if (form.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                {
+                    SelectedMetadata.Caption = form.PromptValue;
+                    listBoxObs.Refresh();
+                    SetDirty();
+                }
+            }
+        }
+
+        private void SetFilter()
+        {
+            if (IsInitializing || (CurrentProject == null) || (SelectedMetadata == null))
+            { return; }
+
+            SetFilter(SelectedMetadata);
+        }
+
+        private void SetFilter(IDataSetMetadata metadata)
+        {
+            using (var form = new InputBoxForm("Set filter:", SelectedMetadata.Filter))
+            {
+                if (form.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                {
+                    SelectedMetadata.Filter = form.PromptValue;
+                    listBoxObs.Refresh();
+                    graph.Invalidate();
+                    SetDirty();
+                }
+            }
+        }
+
         // observation list box
 
         void listBoxObs_ItemCheck(object sender, ItemCheckEventArgs e)
@@ -471,15 +514,7 @@ namespace Silicups.GUI
 
             if (e.KeyCode == Keys.F2)
             {
-                using (var form = new InputBoxForm("Set name:", SelectedMetadata.Caption))
-                {
-                    if (form.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-                    {
-                        SelectedMetadata.Caption = form.PromptValue;
-                        listBoxObs.Refresh();
-                        SetDirty();
-                    }
-                }
+                RenameSet();
             }
 
             if (e.KeyCode == Keys.Delete)
@@ -1139,6 +1174,16 @@ namespace Silicups.GUI
             CurrentProject.SortByDate();
             RefreshCurrentProject();
             SetDirty();
+        }
+
+        private void setCaptionToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            RenameSet();
+        }
+
+        private void setFilterToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SetFilter();
         }
     }
 

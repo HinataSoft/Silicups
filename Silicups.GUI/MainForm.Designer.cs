@@ -75,6 +75,9 @@
             this.importFromVarastroczToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exportToTxtToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.minimaPredictionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.observationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.setCaptionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.setFilterToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerMain)).BeginInit();
@@ -421,7 +424,8 @@
             // 
             this.menuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileToolStripMenuItem,
-            this.projectToolStripMenuItem});
+            this.projectToolStripMenuItem,
+            this.observationToolStripMenuItem});
             this.menuStrip.Location = new System.Drawing.Point(0, 0);
             this.menuStrip.Name = "menuStrip";
             this.menuStrip.Size = new System.Drawing.Size(1166, 24);
@@ -551,6 +555,29 @@
             this.minimaPredictionsToolStripMenuItem.Text = "Minima Predictions...";
             this.minimaPredictionsToolStripMenuItem.Click += new System.EventHandler(this.minimaPredictionsToolStripMenuItem_Click);
             // 
+            // observationToolStripMenuItem
+            // 
+            this.observationToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.setCaptionToolStripMenuItem,
+            this.setFilterToolStripMenuItem});
+            this.observationToolStripMenuItem.Name = "observationToolStripMenuItem";
+            this.observationToolStripMenuItem.Size = new System.Drawing.Size(83, 20);
+            this.observationToolStripMenuItem.Text = "Observation";
+            // 
+            // setCaptionToolStripMenuItem
+            // 
+            this.setCaptionToolStripMenuItem.Name = "setCaptionToolStripMenuItem";
+            this.setCaptionToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.setCaptionToolStripMenuItem.Text = "Set Caption...";
+            this.setCaptionToolStripMenuItem.Click += new System.EventHandler(this.setCaptionToolStripMenuItem_Click);
+            // 
+            // setFilterToolStripMenuItem
+            // 
+            this.setFilterToolStripMenuItem.Name = "setFilterToolStripMenuItem";
+            this.setFilterToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.setFilterToolStripMenuItem.Text = "Set Filter...";
+            this.setFilterToolStripMenuItem.Click += new System.EventHandler(this.setFilterToolStripMenuItem_Click);
+            // 
             // statusStrip
             // 
             this.statusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -649,6 +676,9 @@
         private System.Windows.Forms.ToolStripMenuItem minimaPredictionsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem sortObservationsByDateToolStripMenuItem;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
+        private System.Windows.Forms.ToolStripMenuItem observationToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem setCaptionToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem setFilterToolStripMenuItem;
 
     }
 }
