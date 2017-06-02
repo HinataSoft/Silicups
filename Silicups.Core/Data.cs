@@ -68,17 +68,20 @@ namespace Silicups.Core
     {
         public int Type;
         public double N;
+        public double Nerr;
 
         public DataMark(DataMark m)
         {
             this.Type = m.Type;
             this.N = m.N;
+            this.Nerr = m.Nerr;
         }
 
-        public DataMark(int type, double n)
+        public DataMark(int type, double n, double nerr)
         {
             this.Type = type;
             this.N = n;
+            this.Nerr = nerr;
         }
     }
 
@@ -131,9 +134,9 @@ namespace Silicups.Core
             xmarks.Add(m);
         }
 
-        public void AddXMark(int type, double x)
+        public void AddXMark(int type, double x, double xerr)
         {
-            xmarks.Add(new DataMark(type, x));
+            xmarks.Add(new DataMark(type, x, xerr));
         }
 
         public void ClearXMarks()
@@ -243,6 +246,7 @@ namespace Silicups.Core
     {
         bool CanProvidePeriodData { get; }
         double GetPhased(double time);
+        double GetFrequency(double timespan);
         IEnumerable<double> GetFullPhasesBetween(double t1, double t2);
     }
 
@@ -313,7 +317,7 @@ namespace Silicups.Core
                 { set.Add(p.X + xOffset, p.Y - originalSet.Metadata.OffsetY, p.Yerr); }
 
                 foreach (DataMark m in originalSet.XMarks)
-                { set.AddXMark(m.Type, m.N + xOffset); }
+                { set.AddXMark(m.Type, m.N + xOffset, m.Nerr); }
 
                 InsertPhaseMarks();
                 Add(set);
@@ -351,11 +355,12 @@ namespace Silicups.Core
                     set.Add(phase - 1, p.Y - originalSet.Metadata.OffsetY, p.Yerr);
                 }
 
+                double frequency = PeriodDataProvider.GetFrequency(1);
                 foreach (DataMark m in originalSet.XMarks)
                 {
                     double phase = PeriodDataProvider.GetPhased(m.N);
-                    set.AddXMark(m.Type, phase);
-                    set.AddXMark(m.Type, phase - 1);
+                    set.AddXMark(m.Type, phase, m.Nerr * frequency);
+                    set.AddXMark(m.Type, phase - 1, m.Nerr * frequency);
                 }
 
                 InsertPhaseMarks();

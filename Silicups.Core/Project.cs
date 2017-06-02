@@ -121,6 +121,11 @@ namespace Silicups.Core
             return phased - Math.Floor(phased);
         }
 
+        public double GetFrequency(double timespan)
+        {
+            return timespan / P.Value;
+        }
+
         public IEnumerable<double> GetFullPhasesBetween(double t1, double t2)
         {
             yield break;
@@ -199,7 +204,13 @@ namespace Silicups.Core
 
                     var set = new DataPointSet(absolutePath, relativePath);
                     foreach (XmlNode xmarkNode in setNode.FindNodes("XMark"))
-                    { set.AddXMark(FormatEx.ParseEnumToInt<XMarkTypeEnum>(xmarkNode.FindAttribute("type").AsString("AnyMinimum")), xmarkNode.AsDouble()); }
+                    {
+                        set.AddXMark(
+                            FormatEx.ParseEnumToInt<XMarkTypeEnum>(xmarkNode.FindAttribute("type").AsString("AnyMinimum")),
+                            xmarkNode.AsDouble(),
+                            xmarkNode.FindAttribute("error").AsDouble(0)
+                        );
+                    }
                     set.Metadata.OffsetY = setNode.FindAttribute("offsetY").AsDouble(0);
                     set.Metadata.Enabled = setNode.FindAttribute("enabled").AsBoolean(true);
                     set.Metadata.Caption = setNode.FindAttribute("caption").AsString(null);
@@ -282,6 +293,7 @@ namespace Silicups.Core
                 {
                     XmlNode xmarkNode = setNode.AppendXmlElement("XMark", FormatEx.FormatDouble(m.N));
                     xmarkNode.AppendXmlAttribute("type", ((XMarkTypeEnum)m.Type).ToString());
+                    xmarkNode.AppendXmlAttribute("error", FormatEx.FormatDouble(m.Nerr));
                 }
             }
 

@@ -41,8 +41,11 @@ namespace Silicups.GUI
         public Pen DataPointError = Pens.Gray;
         public Pen CoordMark = Pens.LightGray;
         public Pen XMark = Pens.Gray;
+        public Pen XMarkErr = DashedPen.Create(Color.Gray);
         public Pen XMarkPrim = Pens.Blue;
+        public Pen XMarkPrimErr = DashedPen.Create(Color.Blue);
         public Pen XMarkSec = Pens.Red;
+        public Pen XMarkSecErr = DashedPen.Create(Color.Red);
 
         public Brush DataPointBrush = Brushes.Black;
         public Brush DataPointHighlightedBrush = Brushes.Red;
@@ -270,12 +273,21 @@ namespace Silicups.GUI
                     foreach (DataMark m in set.XMarks)
                     {
                         float x = (float)(((m.N - ViewBB.Left) / ViewBB.Width) * graphWidth);
+                        float xerr = (float)((m.Nerr / ViewBB.Width) * graphWidth);
                         if ((x < markSize2) || (x > graphWidth - markSize2))
                         { continue; }
                         Pen pen = XMark;
-                        if (m.Type == 1) { pen = XMarkPrim; }
-                        if (m.Type == 2) { pen = XMarkSec; }
+                        Pen penErr = XMarkErr;
+                        if (m.Type == 1) { pen = XMarkPrim; penErr = XMarkPrimErr; }
+                        if (m.Type == 2) { pen = XMarkSec; penErr = XMarkSecErr; }
                         g.DrawLine(pen, graphLeft + x, graphTop, graphLeft + x, graphBottom);
+                        if (xerr > 1)
+                        {
+                            if ((x - xerr) > markSize2)
+                            { g.DrawLine(penErr, graphLeft + x - xerr, graphTop, graphLeft + x - xerr, graphBottom); }
+                            if ((x + xerr) < (graphWidth - markSize2))
+                            { g.DrawLine(penErr, graphLeft + x + xerr, graphTop, graphLeft + x + xerr, graphBottom); }
+                        }
                     }
                 } 
                 foreach (IDataSet set in DataSource.Series)
@@ -351,5 +363,15 @@ namespace Silicups.GUI
         public float coord;
         public int intCoord;
         public int index;
+    }
+
+    public static class DashedPen
+    {
+        public static Pen Create(Color color)
+        {
+            var pen = new Pen(color, 1);
+            pen.DashStyle = System.Drawing.Drawing2D.DashStyle.Dash;
+            return pen;
+        }
     }
 }

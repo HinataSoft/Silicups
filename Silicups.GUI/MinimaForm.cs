@@ -30,6 +30,8 @@ namespace Silicups.GUI
                 foreach (DataMark mark in set.XMarks)
                 {
                     sb.Append(FormatEx.FormatDouble(mark.N));
+                    if (mark.Nerr > 0)
+                    { sb.Append("+-").Append(FormatEx.FormatDouble(mark.Nerr)); }
                     switch (mark.Type)
                     {
                         case (int)Project.XMarkTypeEnum.PrimaryMinimum: sb.Append(" p"); break;
@@ -85,6 +87,15 @@ namespace Silicups.GUI
                         minString = minString.Substring("TminHJD=".Length);
                     }
 
+                    double minErr = 0;
+                    int minErrPos = minString.IndexOf("+-");
+                    if (minErrPos > 0)
+                    {
+                        string minErrString = minString.Substring(minErrPos + 2);
+                        minErr = FormatEx.ParseDouble(minErrString);
+                        minString = minString.Substring(0, minErrPos);
+                    }
+
                     double min = FormatEx.ParseDouble(minString.Trim());
 
                     IDataSet bestSet = null;
@@ -110,7 +121,7 @@ namespace Silicups.GUI
                         }
                     }
 
-                    ((DataPointSet)bestSet).AddXMark((int)type, min);
+                    ((DataPointSet)bestSet).AddXMark((int)type, min, minErr);
                 }
                 catch(Exception e)
                 {
