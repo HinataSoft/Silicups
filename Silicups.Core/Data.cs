@@ -38,6 +38,8 @@ namespace Silicups.Core
 
     public class DataSetMetadata : IDataSetMetadata
     {
+        private BoundingBox BoundingBox;
+
         public string AbsolutePath { get; internal set; }
         public string RelativePath { get; internal set; }
         public string Caption { get; set; }
@@ -46,9 +48,22 @@ namespace Silicups.Core
         public bool Hightlighted { get; set; }
         public double OffsetY { get; set; }
 
+        public DataSetMetadata(BoundingBox boundingBox)
+        {
+            this.BoundingBox = boundingBox;
+        }
+
         public override string ToString()
         {
-            return Caption ?? RelativePath ?? AbsolutePath ?? "DataSet";
+            //return Caption ?? RelativePath ?? AbsolutePath ?? "DataSet";
+            if (!String.IsNullOrEmpty(Caption))
+            { return Caption; }
+
+            string dateCaption = JD.JDToDateTime(BoundingBox.Left).ToString("yyyy'-'MM'-'dd");
+            if (!String.IsNullOrEmpty(Filter))
+            { return String.Format("{0} [{1}]", dateCaption, Filter); }
+            else
+            { return dateCaption; }
         }
     }
 
@@ -105,7 +120,7 @@ namespace Silicups.Core
         public DataPointSet(string absolutePath, string relativePath)
         {
             this.BoundingBox = BoundingBox.CloneEmpty();
-            this.Metadata = new DataSetMetadata()
+            this.Metadata = new DataSetMetadata(BoundingBox)
             {
                 AbsolutePath = absolutePath,
                 RelativePath = relativePath,

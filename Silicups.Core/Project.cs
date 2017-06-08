@@ -214,7 +214,7 @@ namespace Silicups.Core
                     }
                     set.Metadata.OffsetY = setNode.FindAttribute("offsetY").AsDouble(0);
                     set.Metadata.Enabled = setNode.FindAttribute("enabled").AsBoolean(true);
-                    set.Metadata.Caption = setNode.FindAttribute("caption").AsString(null);
+                    set.Metadata.Caption = null; // TOFIX: retore caption loading: setNode.FindAttribute("caption").AsString(null);
                     set.Metadata.Filter = setNode.FindAttribute("filter").AsString(null);
                     AppendMagFile(set, absolutePath);
                     DataSeries.AddSet(set);
@@ -365,11 +365,6 @@ namespace Silicups.Core
                 }
                 catch
                 { }
-            }
-            if (String.IsNullOrEmpty(set.Metadata.Caption) && !set.BoundingBox.IsEmpty)
-            {
-                DateTime date = JD.JDToDateTime(set.BoundingBox.Left);
-                set.Metadata.Caption = date.ToString("yyyy'-'MM'-'dd");
             }
         }
 

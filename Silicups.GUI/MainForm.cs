@@ -76,6 +76,8 @@ namespace Silicups.GUI
             RefreshGliderStyle();
             checkBoxStyle.CheckedChanged += new EventHandler(checkBoxStyle_CheckedChanged);
 
+            setCaptionToolStripMenuItem.Enabled = false;
+
 #if DEBUG
             if (System.IO.File.Exists("autoload.xml"))
             { LoadSolution("autoload.xml"); }
@@ -413,15 +415,16 @@ namespace Silicups.GUI
 
         private void RenameSet(IDataSetMetadata metadata)
         {
-            using (var form = new InputBoxForm("Set name:", SelectedMetadata.Caption))
-            {
-                if (form.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-                {
-                    SelectedMetadata.Caption = form.PromptValue;
-                    listBoxObs.Refresh();
-                    SetDirty();
-                }
-            }
+            MessageBox.Show("Custom set renaming has been disabled", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            //using (var form = new InputBoxForm("Set name:", SelectedMetadata.Caption))
+            //{
+            //    if (form.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            //    {
+            //        SelectedMetadata.Caption = form.PromptValue;
+            //        listBoxObs.Refresh();
+            //        SetDirty();
+            //    }
+            //}
         }
 
         private void SetFilter()
