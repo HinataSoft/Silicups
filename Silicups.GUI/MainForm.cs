@@ -1210,17 +1210,17 @@ namespace Silicups.GUI
             {
                 using (var writer = new System.IO.StreamWriter(path))
                 {
-                    writer.WriteLine("OBJECT,M0,P");
+                    writer.WriteLine("OBJECT;M0;P");
                     foreach (Project project in Solution)
                     {
                         string objectName = project.Caption;
-                        if (objectName.Contains("\"") || objectName.Contains(","))
+                        if (objectName.Contains("\"") || objectName.Contains(";"))
                         {
                             objectName = objectName.Replace("\"", "\"\"");
                             objectName = "\"" + objectName + "\"";
                         }
                         if (project.CanProvidePeriodData)
-                        { writer.WriteLine("{0},{1},{2}", objectName, FormatEx.FormatDouble(project.M0), FormatEx.FormatDouble(project.P)); }
+                        { writer.WriteLine("{0};{1};{2}", objectName, FormatEx.FormatDouble(project.M0), FormatEx.FormatDouble(project.P)); }
                         else
                         { writer.WriteLine(objectName); }
                     }
