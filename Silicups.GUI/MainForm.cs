@@ -1193,6 +1193,7 @@ namespace Silicups.GUI
         {
             using (var fd = new SaveFileDialog())
             {
+                fd.Title = "Export to CSV";
                 fd.Filter = "CSV Files (.csv)|*.csv|All Files (*.*)|*.*";
                 RegistryHelper.TryGetFromRegistry(RegistryPath, new RegistryHelper.GetRegistryStringAction("ExportToCSVPath", (s) => { fd.InitialDirectory = s; }));
                 DialogResult dialogResult = fd.ShowDialog();
@@ -1229,6 +1230,71 @@ namespace Silicups.GUI
             catch (Exception e)
             {
                 MessageBox.Show(e.ToString(), "Error when exporting to CSV", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void usingTemplateToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            string template = null;
+            RegistryHelper.TryGetFromRegistry(RegistryPath, new RegistryHelper.GetRegistryStringAction("TemplatePath", (s) => { template = s; }));
+            if (String.IsNullOrEmpty(template))
+            {
+                if (MessageBox.Show("No template file selected, do you want to select a template file?", "Export using a template", MessageBoxButtons.YesNo, MessageBoxIcon.Error) == System.Windows.Forms.DialogResult.Yes)
+                { selectTemplateToolStripMenuItem_Click(sender, e); }
+                else
+                { return; }
+            }
+
+            RegistryHelper.TryGetFromRegistry(RegistryPath, new RegistryHelper.GetRegistryStringAction("TemplatePath", (s) => { template = s; }));
+            if (String.IsNullOrEmpty(template))
+            { MessageBox.Show("No template found", "Error when exporting using a template", MessageBoxButtons.OK, MessageBoxIcon.Error); return; }
+            if (!System.IO.File.Exists(template))
+            { MessageBox.Show("Template file not found found: " + template, "Error when exporting using a template", MessageBoxButtons.OK, MessageBoxIcon.Error); return; }
+
+            using (var fd = new SaveFileDialog())
+            {
+                fd.Title = "Export using a template";
+                fd.Filter = "All Files (*.*)|*.*";
+                RegistryHelper.TryGetFromRegistry(RegistryPath, new RegistryHelper.GetRegistryStringAction("ExportUsingTemplatePath", (s) => { fd.InitialDirectory = s; }));
+                DialogResult dialogResult = fd.ShowDialog();
+                if (dialogResult == DialogResult.OK)
+                {
+                    RegistryHelper.TrySetToRegistry(RegistryPath, new RegistryHelper.SetRegistryAction("ExportUsingTemplatePath", System.IO.Path.GetDirectoryName(fd.FileName)));
+                    SaveUsingTemplate(template, fd.FileName);
+                }
+            }
+        }
+
+        private void SaveUsingTemplate(string template, string path)
+        {
+            try
+            {
+                using (var templateStream = System.IO.File.OpenRead(template))
+                using (var outputStream = System.IO.File.Open(path, System.IO.FileMode.Create))
+                {
+                    var templateEngine = new SolutionTemplate(Solution);
+                    templateEngine.GenerateOutputStream(templateStream, outputStream);
+                }
+            }
+            catch (NoNullAllowedException e)
+            {
+                MessageBox.Show(e.ToString(), "Error when exporting using a template", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void selectTemplateToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using (var fd = new OpenFileDialog())
+            {
+                fd.Title = "Select a template file";
+                fd.Filter = "All Files (*.*)|*.*";
+                fd.CheckFileExists = true;
+                RegistryHelper.TryGetFromRegistry(RegistryPath, new RegistryHelper.GetRegistryStringAction("TemplatePath", (s) => { fd.InitialDirectory = System.IO.Path.GetDirectoryName(s); }));
+                DialogResult dialogResult = fd.ShowDialog();
+                if (dialogResult == DialogResult.OK)
+                {
+                    RegistryHelper.TrySetToRegistry(RegistryPath, new RegistryHelper.SetRegistryAction("TemplatePath", fd.FileName));
+                }
             }
         }
     }

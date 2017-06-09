@@ -415,4 +415,87 @@ namespace Silicups.Core
             project.RefreshM0AndP();
         }
     }
+
+    public class SolutionTemplate : Template
+    {
+        IEnumerable<Project> Solution;
+
+        public SolutionTemplate(IEnumerable<Project> solution)
+            : base("SILICUPS")
+        {
+            this.Solution = solution;
+        }
+
+        protected override void GenerateContent()
+        {
+            WriteSection("BEGIN");
+
+            foreach (Project project in Solution)
+            {
+                WriteSection("BEGIN-PROJECT", project.Caption);
+
+                if (project.CanProvidePeriodData)
+                {
+                    WriteSection("M0", FormatEx.FormatDouble(project.M0));
+                    WriteSection("P", FormatEx.FormatDouble(project.P));
+                }
+
+                WriteSection("BEGIN-SETS");
+
+                foreach (IDataSetMetadata metadata in project.GetMetadata())
+                {
+                    var setCaption = metadata.ToString();
+                    WriteSection("BEGIN-SET", setCaption);
+
+                    WriteSection("FILTER", metadata.Filter);
+
+                    WriteSection("END-SET", setCaption);
+                }
+
+                WriteSection("END-SETS");
+
+                WriteSection("END-PROJECT", project.Caption);
+            }
+
+            WriteSection("END");
+        }
+
+        protected override IEnumerable<string> SectionArgumentsGetter(string sectionName)
+        {
+            switch (sectionName)
+            {
+                case "BEGIN":
+                case "END":
+                case "BEGIN-SETS":
+                case "END-SETS":
+                    return new string[] { };
+
+                case "BEGIN-PROJECT":
+                case "END-PROJECT":
+                case "BEGIN-SET":
+                case "END-SET":
+                    return new string[] {
+                        "caption"
+                    };
+
+                case "M0":
+                    return new string[] {
+                        "m0",
+                    };
+
+                case "P":
+                    return new string[] {
+                        "p",
+                    };
+
+                case "FILTER":
+                    return new string[] {
+                        "filter",
+                    };
+
+                default:
+                    throw new Exception("Unknown SILICUPS template section " + sectionName);
+            }
+        }
+    }
 }

@@ -74,14 +74,16 @@
             this.setFilterToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
+            this.exportSolutionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.exportSolutionToCSVToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.listBoxSolution = new Silicups.GUI.MyListBox();
             this.graph = new Silicups.GUI.Graph(this.components);
             this.gliderOffset = new Silicups.GUI.Glider();
             this.gliderP = new Silicups.GUI.Glider();
             this.textBoxOffset = new Silicups.GUI.MyTextBox();
             this.textBoxP = new Silicups.GUI.MyTextBox();
-            this.exportSolutionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.exportSolutionToCSVToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.usingTemplateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.selectTemplateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerMain)).BeginInit();
             this.splitContainerMain.Panel1.SuspendLayout();
             this.splitContainerMain.Panel2.SuspendLayout();
@@ -507,14 +509,14 @@
             // setCaptionToolStripMenuItem
             // 
             this.setCaptionToolStripMenuItem.Name = "setCaptionToolStripMenuItem";
-            this.setCaptionToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.setCaptionToolStripMenuItem.Size = new System.Drawing.Size(144, 22);
             this.setCaptionToolStripMenuItem.Text = "Set Caption...";
             this.setCaptionToolStripMenuItem.Click += new System.EventHandler(this.setCaptionToolStripMenuItem_Click);
             // 
             // setFilterToolStripMenuItem
             // 
             this.setFilterToolStripMenuItem.Name = "setFilterToolStripMenuItem";
-            this.setFilterToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.setFilterToolStripMenuItem.Size = new System.Drawing.Size(144, 22);
             this.setFilterToolStripMenuItem.Text = "Set Filter...";
             this.setFilterToolStripMenuItem.Click += new System.EventHandler(this.setFilterToolStripMenuItem_Click);
             // 
@@ -533,6 +535,23 @@
             this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
             this.toolStripStatusLabel1.Size = new System.Drawing.Size(78, 17);
             this.toolStripStatusLabel1.Text = "SILICUPS v0.9";
+            // 
+            // exportSolutionToolStripMenuItem
+            // 
+            this.exportSolutionToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.exportSolutionToCSVToolStripMenuItem,
+            this.usingTemplateToolStripMenuItem,
+            this.selectTemplateToolStripMenuItem});
+            this.exportSolutionToolStripMenuItem.Name = "exportSolutionToolStripMenuItem";
+            this.exportSolutionToolStripMenuItem.Size = new System.Drawing.Size(185, 22);
+            this.exportSolutionToolStripMenuItem.Text = "Export Solution To";
+            // 
+            // exportSolutionToCSVToolStripMenuItem
+            // 
+            this.exportSolutionToCSVToolStripMenuItem.Name = "exportSolutionToCSVToolStripMenuItem";
+            this.exportSolutionToCSVToolStripMenuItem.Size = new System.Drawing.Size(166, 22);
+            this.exportSolutionToCSVToolStripMenuItem.Text = "CSV...";
+            this.exportSolutionToCSVToolStripMenuItem.Click += new System.EventHandler(this.exportSolutionToCSVToolStripMenuItem_Click);
             // 
             // listBoxSolution
             // 
@@ -597,20 +616,19 @@
             this.textBoxP.TextChanged += new System.EventHandler(this.textBoxP_TextChanged);
             this.textBoxP.KeyUp += new System.Windows.Forms.KeyEventHandler(this.textBoxP_KeyUp);
             // 
-            // exportSolutionToolStripMenuItem
+            // usingTemplateToolStripMenuItem
             // 
-            this.exportSolutionToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.exportSolutionToCSVToolStripMenuItem});
-            this.exportSolutionToolStripMenuItem.Name = "exportSolutionToolStripMenuItem";
-            this.exportSolutionToolStripMenuItem.Size = new System.Drawing.Size(185, 22);
-            this.exportSolutionToolStripMenuItem.Text = "Export Solution To";
+            this.usingTemplateToolStripMenuItem.Name = "usingTemplateToolStripMenuItem";
+            this.usingTemplateToolStripMenuItem.Size = new System.Drawing.Size(166, 22);
+            this.usingTemplateToolStripMenuItem.Text = "Using Template...";
+            this.usingTemplateToolStripMenuItem.Click += new System.EventHandler(this.usingTemplateToolStripMenuItem_Click);
             // 
-            // exportSolutionToCSVToolStripMenuItem
+            // selectTemplateToolStripMenuItem
             // 
-            this.exportSolutionToCSVToolStripMenuItem.Name = "exportSolutionToCSVToolStripMenuItem";
-            this.exportSolutionToCSVToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.exportSolutionToCSVToolStripMenuItem.Text = "CSV...";
-            this.exportSolutionToCSVToolStripMenuItem.Click += new System.EventHandler(this.exportSolutionToCSVToolStripMenuItem_Click);
+            this.selectTemplateToolStripMenuItem.Name = "selectTemplateToolStripMenuItem";
+            this.selectTemplateToolStripMenuItem.Size = new System.Drawing.Size(166, 22);
+            this.selectTemplateToolStripMenuItem.Text = "Select Template...";
+            this.selectTemplateToolStripMenuItem.Click += new System.EventHandler(this.selectTemplateToolStripMenuItem_Click);
             // 
             // MainForm
             // 
@@ -699,6 +717,8 @@
         private System.Windows.Forms.ToolStripMenuItem setFilterToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem exportSolutionToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem exportSolutionToCSVToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem usingTemplateToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem selectTemplateToolStripMenuItem;
 
     }
 }
