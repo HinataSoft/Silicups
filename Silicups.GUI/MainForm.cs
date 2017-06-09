@@ -1188,6 +1188,49 @@ namespace Silicups.GUI
         {
             SetFilter();
         }
+
+        private void exportSolutionToCSVToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using (var fd = new SaveFileDialog())
+            {
+                fd.Filter = "CSV Files (.csv)|*.csv|All Files (*.*)|*.*";
+                RegistryHelper.TryGetFromRegistry(RegistryPath, new RegistryHelper.GetRegistryStringAction("ExportToCSVPath", (s) => { fd.InitialDirectory = s; }));
+                DialogResult dialogResult = fd.ShowDialog();
+                if (dialogResult == DialogResult.OK)
+                {
+                    RegistryHelper.TrySetToRegistry(RegistryPath, new RegistryHelper.SetRegistryAction("ExportToCSVPath", System.IO.Path.GetDirectoryName(fd.FileName)));
+                    SaveToCSV(fd.FileName);
+                }
+            }
+        }
+
+        private void SaveToCSV(string path)
+        {
+            try
+            {
+                using (var writer = new System.IO.StreamWriter(path))
+                {
+                    writer.WriteLine("OBJECT,M0,P");
+                    foreach (Project project in Solution)
+                    {
+                        string objectName = project.Caption;
+                        if (objectName.Contains("\"") || objectName.Contains(","))
+                        {
+                            objectName = objectName.Replace("\"", "\"\"");
+                            objectName = "\"" + objectName + "\"";
+                        }
+                        if (project.CanProvidePeriodData)
+                        { writer.WriteLine("{0},{1},{2}", objectName, FormatEx.FormatDouble(project.M0), FormatEx.FormatDouble(project.P)); }
+                        else
+                        { writer.WriteLine(objectName); }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.ToString(), "Error when exporting to CSV", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
     }
 
     public class MyListBox : ListBox
