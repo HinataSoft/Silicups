@@ -360,7 +360,11 @@ namespace Silicups.Core
                         }
                         var match = FilterRegex.Match(s);
                         if (match.Success)
-                        { set.Metadata.Filter = match.Groups[1].Value; }
+                        {
+                            string filter = match.Groups[1].Value;
+                            if (filter != "NoFilter")
+                            { set.Metadata.Filter = filter; }
+                        }
                     }
                 }
                 catch
