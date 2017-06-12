@@ -56,6 +56,8 @@ namespace Silicups.GUI
         private IDataSeries DataSource = null;
         private bool DataSourceInited = false;
 
+        private HashSet<string> ColorNames = new HashSet<string>(Enum.GetNames(typeof(System.Drawing.KnownColor)));
+
         private void InitializeGraph()
         {
             this.SetStyle(ControlStyles.DoubleBuffer |
@@ -319,7 +321,7 @@ namespace Silicups.GUI
                         { continue; }
 
                         Brush brush = DataPointBrush;
-                        if (!String.IsNullOrEmpty(set.Metadata.Filter))
+                        if (!String.IsNullOrEmpty(set.Metadata.Filter) && ColorNames.Contains(set.Metadata.Filter))
                         { brush = new SolidBrush(Color.FromName(set.Metadata.Filter)); }
                         g.FillEllipse(brush, graphLeft + x - markSize2, graphTop + y - markSize2, markSize, markSize);
                     }
