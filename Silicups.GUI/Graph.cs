@@ -40,8 +40,8 @@ namespace Silicups.GUI
         public Pen GraphBorder = Pens.Black;
         public Pen DataPointError = Pens.Gray;
         public Pen CoordMark = Pens.LightGray;
-        public Pen XMark = Pens.Gray;
-        public Pen XMarkErr = DashedPen.Create(Color.Gray);
+        public Pen XMark = Pens.Blue;
+        public Pen XMarkErr = DashedPen.Create(Color.Blue);
         public Pen XMarkPrim = Pens.Blue;
         public Pen XMarkPrimErr = DashedPen.Create(Color.Blue);
         public Pen XMarkSec = Pens.Red;

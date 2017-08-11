@@ -82,6 +82,7 @@
             // 
             // buttonEstimator
             // 
+            this.buttonEstimator.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.buttonEstimator.Location = new System.Drawing.Point(103, 291);
             this.buttonEstimator.Name = "buttonEstimator";
             this.buttonEstimator.Size = new System.Drawing.Size(105, 23);
@@ -92,7 +93,6 @@
             // 
             // MinimaForm
             // 
-            this.AcceptButton = this.buttonOK;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.buttonCancel;
