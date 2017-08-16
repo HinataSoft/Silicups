@@ -31,6 +31,7 @@
             this.predictionsListBox = new Silicups.GUI.MyListBox();
             this.buttonPrevious = new System.Windows.Forms.Button();
             this.buttonNext = new System.Windows.Forms.Button();
+            this.buttonClipboard = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // predictionsListBox
@@ -68,11 +69,23 @@
             this.buttonNext.UseVisualStyleBackColor = true;
             this.buttonNext.Click += new System.EventHandler(this.buttonNext_Click);
             // 
+            // buttonClipboard
+            // 
+            this.buttonClipboard.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.buttonClipboard.Location = new System.Drawing.Point(93, 230);
+            this.buttonClipboard.Name = "buttonClipboard";
+            this.buttonClipboard.Size = new System.Drawing.Size(111, 23);
+            this.buttonClipboard.TabIndex = 3;
+            this.buttonClipboard.Text = "Copy to Clipboard";
+            this.buttonClipboard.UseVisualStyleBackColor = true;
+            this.buttonClipboard.Click += new System.EventHandler(this.buttonClipboard_Click);
+            // 
             // MinimaPredictionsForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(493, 265);
+            this.Controls.Add(this.buttonClipboard);
             this.Controls.Add(this.buttonNext);
             this.Controls.Add(this.buttonPrevious);
             this.Controls.Add(this.predictionsListBox);
@@ -88,5 +101,6 @@
         private MyListBox predictionsListBox;
         private System.Windows.Forms.Button buttonPrevious;
         private System.Windows.Forms.Button buttonNext;
+        private System.Windows.Forms.Button buttonClipboard;
     }
 }

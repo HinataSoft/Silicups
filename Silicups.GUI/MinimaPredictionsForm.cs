@@ -66,5 +66,18 @@ namespace Silicups.GUI
             FillPredictions();
             DisableUpdate = false;
         }
+
+        private void CopyPredictionsToClipboard()
+        {
+            var sb = new StringBuilder();
+            foreach (var item in predictionsListBox.Items)
+            { sb.AppendLine(item.ToString()); }
+            Clipboard.SetText(sb.ToString());
+        }
+
+        private void buttonClipboard_Click(object sender, EventArgs e)
+        {
+            CopyPredictionsToClipboard();
+        }
     }
 }
