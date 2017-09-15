@@ -1140,7 +1140,6 @@ namespace Silicups.GUI
             var minimaForm = new MinimaForm(CurrentProject);
             if (minimaForm.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
-                minimaForm.SetMinimaToProject();
                 SetDirty();
                 RefreshDataSource(true);
             }

@@ -50,10 +50,8 @@ namespace Silicups.GUI
 
         public void SetMinimaToProject(Project project)
         {
-            foreach (IDataSet set in project.DataSeries.Series)
-            {
-                ((DataPointSet)set).ClearXMarks();
-            }
+            var newMinimaList = new List<Tuple<DataPointSet, DataMark>>();
+            var exceptionSB = new StringBuilder();
 
             string[] lines = textBoxMinima.Text.Split(new char[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
             foreach (string line in lines)
@@ -121,18 +119,37 @@ namespace Silicups.GUI
                         }
                     }
 
-                    ((DataPointSet)bestSet).AddXMark((int)type, min, minErr);
+                    newMinimaList.Add(new Tuple<DataPointSet, DataMark>((DataPointSet)bestSet, new DataMark((int)type, min, minErr)));
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
-                    MessageBox.Show(e.ToString(), "Exception");
+                    exceptionSB.Append(line).Append(": ").AppendLine(e.Message);
                 }
             }
+
+            if (exceptionSB.Length > 0)
+            {
+                throw new Exception(exceptionSB.ToString());
+            }
+
+            foreach (IDataSet set in project.DataSeries.Series)
+            { ((DataPointSet)set).ClearXMarks(); }
+
+            foreach (Tuple<DataPointSet, DataMark> tuple in newMinimaList)
+            { tuple.Item1.AddXMark(tuple.Item2); }
         }
 
         private void buttonOK_Click(object sender, EventArgs e)
         {
-            this.DialogResult = DialogResult.OK;
+            try
+            {
+                SetMinimaToProject();
+                this.DialogResult = DialogResult.OK;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Exception when processing minima list -- try to correct the list or cancel the dialog for no changes");
+            }
         }
 
         private void buttonEstimator_Click(object sender, EventArgs e)
