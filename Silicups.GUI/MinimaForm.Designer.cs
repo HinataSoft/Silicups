@@ -29,7 +29,6 @@
         private void InitializeComponent()
         {
             this.textBoxMinima = new System.Windows.Forms.TextBox();
-            this.buttonAdd = new System.Windows.Forms.Button();
             this.buttonOK = new System.Windows.Forms.Button();
             this.buttonCancel = new System.Windows.Forms.Button();
             this.buttonEstimator = new System.Windows.Forms.Button();
@@ -45,18 +44,6 @@
             this.textBoxMinima.Name = "textBoxMinima";
             this.textBoxMinima.Size = new System.Drawing.Size(411, 273);
             this.textBoxMinima.TabIndex = 0;
-            // 
-            // buttonAdd
-            // 
-            this.buttonAdd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.buttonAdd.Enabled = false;
-            this.buttonAdd.Location = new System.Drawing.Point(12, 291);
-            this.buttonAdd.Name = "buttonAdd";
-            this.buttonAdd.Size = new System.Drawing.Size(85, 23);
-            this.buttonAdd.TabIndex = 10;
-            this.buttonAdd.TabStop = false;
-            this.buttonAdd.Text = "Add (mirroring)";
-            this.buttonAdd.UseVisualStyleBackColor = true;
             // 
             // buttonOK
             // 
@@ -83,11 +70,11 @@
             // buttonEstimator
             // 
             this.buttonEstimator.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.buttonEstimator.Location = new System.Drawing.Point(103, 291);
+            this.buttonEstimator.Location = new System.Drawing.Point(12, 291);
             this.buttonEstimator.Name = "buttonEstimator";
-            this.buttonEstimator.Size = new System.Drawing.Size(105, 23);
+            this.buttonEstimator.Size = new System.Drawing.Size(118, 23);
             this.buttonEstimator.TabIndex = 11;
-            this.buttonEstimator.Text = "format for Estimator";
+            this.buttonEstimator.Text = "Format for Estimator";
             this.buttonEstimator.UseVisualStyleBackColor = true;
             this.buttonEstimator.Click += new System.EventHandler(this.buttonEstimator_Click);
             // 
@@ -100,7 +87,6 @@
             this.Controls.Add(this.buttonEstimator);
             this.Controls.Add(this.buttonCancel);
             this.Controls.Add(this.buttonOK);
-            this.Controls.Add(this.buttonAdd);
             this.Controls.Add(this.textBoxMinima);
             this.Name = "MinimaForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
@@ -113,7 +99,6 @@
         #endregion
 
         private System.Windows.Forms.TextBox textBoxMinima;
-        private System.Windows.Forms.Button buttonAdd;
         private System.Windows.Forms.Button buttonOK;
         private System.Windows.Forms.Button buttonCancel;
         private System.Windows.Forms.Button buttonEstimator;

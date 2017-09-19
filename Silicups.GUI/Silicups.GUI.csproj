@@ -45,6 +45,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AddMinimaForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AddMinimaForm.Designer.cs">
+      <DependentUpon>AddMinimaForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="FileListForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -101,6 +107,9 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="AddMinimaForm.resx">
+      <DependentUpon>AddMinimaForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="FileListForm.resx">
       <DependentUpon>FileListForm.cs</DependentUpon>
     </EmbeddedResource>

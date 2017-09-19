@@ -449,6 +449,32 @@ namespace Silicups.GUI
             }
         }
 
+        private void AddMinimum()
+        {
+            if (IsInitializing || (CurrentProject == null) || (SelectedMetadata == null))
+            { return; }
+
+            AddMinimum(CurrentProject, SelectedMetadata);
+        }
+
+        private void AddMinimum(Project project, IDataSetMetadata metadata)
+        {
+            IDataSet dataSet = System.Linq.Enumerable.Single(System.Linq.Enumerable.Where(project.DataSeries.Series, (set) => set.Metadata == metadata));
+            if (dataSet.BoundingBox.IsEmpty)
+            { return; }
+
+            using (var form = new AddMinimaForm(dataSet))
+            {
+                if (form.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                {
+                    ((DataPointSet)dataSet).AddXMark(form.XMark);
+                    RefreshDataSource(true);
+                    graph.Invalidate();
+                    SetDirty();
+                }
+            }
+        }
+
         // observation list box
 
         void listBoxObs_ItemCheck(object sender, ItemCheckEventArgs e)
@@ -1186,6 +1212,11 @@ namespace Silicups.GUI
         private void setFilterToolStripMenuItem_Click(object sender, EventArgs e)
         {
             SetFilter();
+        }
+
+        private void addMinimumToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            AddMinimum();
         }
 
         private void exportSolutionToCSVToolStripMenuItem_Click(object sender, EventArgs e)
