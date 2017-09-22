@@ -23,6 +23,7 @@ namespace Silicups.GUI
 
         private static readonly string RegistryPath = @"SOFTWARE\HinataSoft\Silicups\MainForm";
 
+        private Version Version;
         private List<Project> Solution = new List<Project>();
         private Project CurrentProject = null;
         private IDataSeries CurrentDataSeries = null;
@@ -39,6 +40,10 @@ namespace Silicups.GUI
         {
             InitializeComponent();
             ResetTitle();
+
+            this.Version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+            DateTime buildDate = new DateTime(2000, 1, 1).AddDays(Version.Build).AddSeconds(Version.Revision * 2);
+            toolStripStatusLabel1.Text = String.Format("Silicups {0} (built {1})", Version, buildDate); 
 
             RegistryHelper.TryGetFromRegistry(RegistryPath,
                 new RegistryHelper.GetRegistryStringAction("GliderStyle", (s) => { checkBoxStyle.Checked = (s == "1"); } )
@@ -109,6 +114,12 @@ namespace Silicups.GUI
                     e.Handled = true;
                     return;
                 }
+            }
+            if (e.Control && (e.KeyCode == Keys.B))
+            {
+                Clipboard.SetText(Version.ToString());
+                e.Handled = true;
+                return;
             }
         }
 
