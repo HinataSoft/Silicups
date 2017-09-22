@@ -395,6 +395,21 @@ namespace Silicups.GUI
                 if(result == DialogResult.OK)
                 { RemoveProjectFromSolution(CurrentProject); SetDirty(); }
             }
+
+            if (e.Control && ((e.KeyCode == Keys.Up) || (e.KeyCode == Keys.Down)))
+            {
+                if ((listBoxSolution.Items.Count > 0) && (listBoxSolution.SelectedIndex >= 0))
+                {
+                    int index = listBoxSolution.SelectedIndex;
+                    if ((e.KeyCode == Keys.Up) && (listBoxSolution.SelectedIndex > 0))
+                    { IListExtensions.Swap(Solution, listBoxSolution.Items, index - 1, index); listBoxSolution.SelectedIndex--; }
+                    if ((e.KeyCode == Keys.Down) && (listBoxSolution.SelectedIndex + 1 < listBoxSolution.Items.Count))
+                    { IListExtensions.Swap(Solution, listBoxSolution.Items, index, index + 1); listBoxSolution.SelectedIndex++; }
+                    SetDirty();
+                    e.Handled = true;
+                    return;
+                }
+            }
         }
 
         private void RenameProject()
@@ -1371,6 +1386,35 @@ namespace Silicups.GUI
         public static double NormalizedValue(this TrackBar trackBar)
         {
             return trackBar.Value * 1.0 / trackBar.Maximum;
+        }
+    }
+
+    public static class IListExtensions
+    {
+        public static void Swap(this System.Collections.IList list, int index1, int index2)
+        {
+            object tmp = list[index1];
+            list[index1] = list[index2];
+            list[index2] = tmp;
+        }
+
+        public static void Swap<T>(this IList<T> list, int index1, int index2)
+        {
+            T tmp = list[index1];
+            list[index1] = list[index2];
+            list[index2] = tmp;
+        }
+
+        public static void Swap<T1, T2>(IList<T1> list1, IList<T2> list2, int index1, int index2)
+        {
+            Swap(list1, index1, index2);
+            Swap(list2, index1, index2);
+        }
+
+        public static void Swap<T1>(IList<T1> list1, System.Collections.IList list2, int index1, int index2)
+        {
+            Swap(list1, index1, index2);
+            Swap(list2, index1, index2);
         }
     }
 }
