@@ -85,6 +85,7 @@
             this.addMinimumToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
+            this.exportGraphToPNGToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerMain)).BeginInit();
             this.splitContainerMain.Panel1.SuspendLayout();
             this.splitContainerMain.Panel2.SuspendLayout();
@@ -527,6 +528,7 @@
             this.sortObservationsByDateToolStripMenuItem,
             this.importFromVarastroczToolStripMenuItem,
             this.exportToTxtToolStripMenuItem,
+            this.exportGraphToPNGToolStripMenuItem,
             this.minimaPredictionsToolStripMenuItem});
             this.projectToolStripMenuItem.Name = "projectToolStripMenuItem";
             this.projectToolStripMenuItem.Size = new System.Drawing.Size(54, 20);
@@ -639,6 +641,13 @@
             this.toolStripStatusLabel1.Size = new System.Drawing.Size(78, 17);
             this.toolStripStatusLabel1.Text = "SILICUPS v0.9";
             // 
+            // exportGraphToPNGToolStripMenuItem
+            // 
+            this.exportGraphToPNGToolStripMenuItem.Name = "exportGraphToPNGToolStripMenuItem";
+            this.exportGraphToPNGToolStripMenuItem.Size = new System.Drawing.Size(261, 22);
+            this.exportGraphToPNGToolStripMenuItem.Text = "Export Graph to PNG...";
+            this.exportGraphToPNGToolStripMenuItem.Click += new System.EventHandler(this.exportGraphToPNGToolStripMenuItem_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
@@ -729,6 +738,7 @@
         private System.Windows.Forms.ToolStripMenuItem usingTemplateToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem selectTemplateToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem addMinimumToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem exportGraphToPNGToolStripMenuItem;
 
     }
 }

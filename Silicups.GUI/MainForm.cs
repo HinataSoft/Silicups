@@ -1289,6 +1289,36 @@ namespace Silicups.GUI
             }
         }
 
+        private void exportGraphToPNGToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using (var fd = new SaveFileDialog())
+            {
+                fd.Title = "Export to PNG";
+                fd.Filter = "PNG Files (.png)|*.png|All Files (*.*)|*.*";
+                RegistryHelper.TryGetFromRegistry(RegistryPath, new RegistryHelper.GetRegistryStringAction("ExportToPNGPath", (s) => { fd.InitialDirectory = s; }));
+                DialogResult dialogResult = fd.ShowDialog();
+                if (dialogResult == DialogResult.OK)
+                {
+                    RegistryHelper.TrySetToRegistry(RegistryPath, new RegistryHelper.SetRegistryAction("ExportToPNGPath", System.IO.Path.GetDirectoryName(fd.FileName)));
+                    SaveToPNG(fd.FileName);
+                }
+            }
+        }
+
+        private void SaveToPNG(string path)
+        {
+            try
+            {
+                Bitmap b = new Bitmap(graph.Width, graph.Height);
+                graph.DrawToBitmap(b, new Rectangle(Point.Empty, b.Size));
+                b.Save(path);
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.ToString(), "Error when exporting to CSV", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
         private void usingTemplateToolStripMenuItem_Click(object sender, EventArgs e)
         {
             string template = null;
