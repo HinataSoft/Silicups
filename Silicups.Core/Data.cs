@@ -225,7 +225,7 @@ namespace Silicups.Core
     public class DerivedSeries : IDataSeries
     {
         protected IDataSeries DataSeries { get; set; }
-        protected List<DataPointSet> List = new List<DataPointSet>();
+        protected List<IDataSet> List = new List<IDataSet>();
 
         public BoundingBox BoundingBox { get; protected set; }
 
@@ -246,11 +246,11 @@ namespace Silicups.Core
 
         protected void Clean()
         {
-            List = new List<DataPointSet>();
+            List = new List<IDataSet>();
             BoundingBox = BoundingBox.CloneEmpty();
         }
 
-        protected void Add(DataPointSet set)
+        protected void Add(IDataSet set)
         {
             List.Add(set);
             BoundingBox.Union(set.BoundingBox);
