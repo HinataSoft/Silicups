@@ -229,7 +229,7 @@ namespace Silicups.Core
 
         public BoundingBox BoundingBox { get; protected set; }
 
-        public DerivedSeries(DataPointSeries dataSeries)
+        public DerivedSeries(IDataSeries dataSeries)
         {
             this.DataSeries = dataSeries;
             this.BoundingBox = BoundingBox.CloneEmpty();
@@ -271,7 +271,7 @@ namespace Silicups.Core
     {
         protected IPeriodDataProvider PeriodDataProvider { get; private set; }
 
-        public DerivedSeriesWithPeriodProvider(DataPointSeries dataSeries, IPeriodDataProvider periodDataProvider)
+        public DerivedSeriesWithPeriodProvider(IDataSeries dataSeries, IPeriodDataProvider periodDataProvider)
             : base(dataSeries)
         {
             this.PeriodDataProvider = periodDataProvider;
@@ -284,7 +284,7 @@ namespace Silicups.Core
 
     public class TimeSeries : DerivedSeriesWithPeriodProvider, IRefreshableDataSeries
     {
-        public TimeSeries(DataPointSeries dataSeries, IPeriodDataProvider periodDataProvider)
+        public TimeSeries(IDataSeries dataSeries, IPeriodDataProvider periodDataProvider)
             : base(dataSeries, periodDataProvider)
         {
         }
@@ -313,7 +313,7 @@ namespace Silicups.Core
 
     public class CompressedSeries : DerivedSeriesWithPeriodProvider, IRefreshableDataSeries
     {
-        public CompressedSeries(DataPointSeries dataSeries, IPeriodDataProvider periodDataProvider)
+        public CompressedSeries(IDataSeries dataSeries, IPeriodDataProvider periodDataProvider)
             : base(dataSeries, periodDataProvider)
         {
         }
@@ -345,7 +345,7 @@ namespace Silicups.Core
 
     public class PhasedSeries : DerivedSeriesWithPeriodProvider, IRefreshableDataSeries
     {
-        public PhasedSeries(DataPointSeries dataSeries, IPeriodDataProvider periodDataProvider)
+        public PhasedSeries(IDataSeries dataSeries, IPeriodDataProvider periodDataProvider)
             : base(dataSeries, periodDataProvider)
         {
         }
