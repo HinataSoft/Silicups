@@ -1309,9 +1309,11 @@ namespace Silicups.GUI
         {
             try
             {
-                Bitmap b = new Bitmap(graph.Width, graph.Height);
-                graph.DrawToBitmap(b, new Rectangle(Point.Empty, b.Size));
-                b.Save(path);
+                using (Bitmap b = new Bitmap(graph.Width, graph.Height))
+                {
+                    graph.DrawToBitmap(b, new Rectangle(Point.Empty, b.Size));
+                    b.Save(path);
+                }
             }
             catch (Exception e)
             {
