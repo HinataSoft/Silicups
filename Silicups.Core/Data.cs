@@ -239,8 +239,7 @@ namespace Silicups.Core
         {
             get
             {
-                foreach (DataPointSet set in List)
-                { yield return set; }
+                return List;
             }
         }
 
