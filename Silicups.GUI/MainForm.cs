@@ -1233,6 +1233,11 @@ namespace Silicups.GUI
             }
         }
 
+        private void buttonAddMinimum_Click(object sender, EventArgs e)
+        {
+            AddMinimum();
+        }
+
         private void importFromVarastroczToolStripMenuItem_Click(object sender, EventArgs e)
         {
             var importVarAstroCzForm = new ImportVarAstroCzForm();

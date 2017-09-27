@@ -89,6 +89,7 @@
             this.gliderP = new Silicups.GUI.Glider();
             this.textBoxOffset = new Silicups.GUI.MyTextBox();
             this.textBoxP = new Silicups.GUI.MyTextBox();
+            this.buttonAddMinimum = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerMain)).BeginInit();
             this.splitContainerMain.Panel1.SuspendLayout();
             this.splitContainerMain.Panel2.SuspendLayout();
@@ -155,6 +156,7 @@
             // 
             this.panelTools.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.panelTools.Controls.Add(this.buttonAddMinimum);
             this.panelTools.Controls.Add(this.checkBoxBinning);
             this.panelTools.Controls.Add(this.label6);
             this.panelTools.Controls.Add(this.textBoxBinning);
@@ -188,7 +190,7 @@
             // 
             // buttonMinima
             // 
-            this.buttonMinima.Location = new System.Drawing.Point(38, 49);
+            this.buttonMinima.Location = new System.Drawing.Point(43, 49);
             this.buttonMinima.Name = "buttonMinima";
             this.buttonMinima.Size = new System.Drawing.Size(51, 23);
             this.buttonMinima.TabIndex = 22;
@@ -681,6 +683,16 @@
             this.textBoxP.TextChanged += new System.EventHandler(this.textBoxP_TextChanged);
             this.textBoxP.KeyUp += new System.Windows.Forms.KeyEventHandler(this.textBoxP_KeyUp);
             // 
+            // buttonAddMinimum
+            // 
+            this.buttonAddMinimum.Location = new System.Drawing.Point(6, 49);
+            this.buttonAddMinimum.Name = "buttonAddMinimum";
+            this.buttonAddMinimum.Size = new System.Drawing.Size(34, 23);
+            this.buttonAddMinimum.TabIndex = 26;
+            this.buttonAddMinimum.Text = "Add";
+            this.buttonAddMinimum.UseVisualStyleBackColor = true;
+            this.buttonAddMinimum.Click += new System.EventHandler(this.buttonAddMinimum_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
@@ -775,6 +787,7 @@
         private System.Windows.Forms.CheckBox checkBoxBinning;
         private System.Windows.Forms.Label label6;
         private MyTextBox textBoxBinning;
+        private System.Windows.Forms.Button buttonAddMinimum;
 
     }
 }
