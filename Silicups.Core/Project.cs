@@ -30,11 +30,15 @@ namespace Silicups.Core
             { (int)XMarkTypeEnum.CalculatedSecondaryMinimum, "Red" },
         };
 
-        public DataPointSeries DataSeries { get; private set; }
-        public TimeSeries TimeSeries { get; private set; }
-        public CompressedSeries CompressedSeries { get; private set; }
-        private PhasedSeries PhasedSeries { get; set; }
-        public PhasedSeries PhasedSeriesOrDefault { get { return CanProvidePeriodData ? PhasedSeries : null; } }
+        private DataPointSeries mDataSeries { get; set; }
+        private TimeSeries mTimeSeries { get; set; }
+        private CompressedSeries mCompressedSeries { get; set; }
+        private PhasedSeries mPhasedSeries { get; set; }
+
+        public IDataSeries DataSeries { get { return mDataSeries; } }
+        public IDataSeries TimeSeries { get { return mTimeSeries; } }
+        public IDataSeries CompressedSeries { get { return mCompressedSeries; } }
+        public IDataSeries PhasedSeries { get { return mPhasedSeries; } }
 
         public double? M0 { get; internal set; }
         public double? P { get; internal set; }
@@ -51,10 +55,10 @@ namespace Silicups.Core
 
         public Project()
         {
-            this.DataSeries = new DataPointSeries();
-            this.TimeSeries = new TimeSeries(this.DataSeries, this);
-            this.CompressedSeries = new CompressedSeries(this.DataSeries, this);
-            this.PhasedSeries = new PhasedSeries(this.DataSeries, this);
+            this.mDataSeries = new DataPointSeries();
+            this.mTimeSeries = new TimeSeries(mDataSeries, this);
+            this.mCompressedSeries = new CompressedSeries(mDataSeries, this);
+            this.mPhasedSeries = new PhasedSeries(mDataSeries, this);
             this.M0 = null;
             this.P = null;
             this.OffsetAmplitude = null;
@@ -87,8 +91,8 @@ namespace Silicups.Core
 
         public void Refresh()
         {
-            TimeSeries.Refresh();
-            CompressedSeries.Refresh();
+            mTimeSeries.Refresh();
+            mCompressedSeries.Refresh();
 
             if (P.HasValue && !PAmplitude.HasValue)
             { PAmplitude = MathEx.GetLower125Base(P.Value); }
@@ -101,14 +105,14 @@ namespace Silicups.Core
 
         internal void RefreshM0AndP()
         {
-            TimeSeries.Refresh();
-            CompressedSeries.Refresh();
-            PhasedSeries.Refresh();
+            mTimeSeries.Refresh();
+            mCompressedSeries.Refresh();
+            mPhasedSeries.Refresh();
         }
 
         public void SortByDate()
         {
-            DataSeries.SortByDate();
+            mDataSeries.SortByDate();
         }
 
         public bool CanProvidePeriodData
@@ -138,7 +142,7 @@ namespace Silicups.Core
             string relativePath = System.IO.Path.GetFileName(absolutePath);
             var set = new DataPointSet(absolutePath, relativePath);
             AppendMagFile(set, file);
-            DataSeries.AddSet(set);
+            mDataSeries.AddSet(set);
             return set;
         }
 
@@ -151,7 +155,7 @@ namespace Silicups.Core
                 { setToRemove = set; break; }
             }
             if (setToRemove != null)
-            { DataSeries.RemoveSet(setToRemove); }
+            { mDataSeries.RemoveSet(setToRemove); }
         }
 
         public void RefreshDataFile(string file)
@@ -217,7 +221,7 @@ namespace Silicups.Core
                     set.Metadata.Caption = null; // TOFIX: retore caption loading: setNode.FindAttribute("caption").AsString(null);
                     set.Metadata.Filter = setNode.FindAttribute("filter").AsString(null);
                     AppendMagFile(set, absolutePath);
-                    DataSeries.AddSet(set);
+                    mDataSeries.AddSet(set);
                 }
                 catch (Exception e)
                 {
@@ -382,7 +386,7 @@ namespace Silicups.Core
             }
             if (setToRemove != null)
             {
-                DataSeries.RemoveSet((DataPointSet)setToRemove);
+                mDataSeries.RemoveSet((DataPointSet)setToRemove);
                 Refresh();
                 return true;
             }

@@ -224,7 +224,7 @@ namespace Silicups.Core
 
     public class DerivedSeries : IDataSeries
     {
-        protected DataPointSeries DataSeries { get; set; }
+        protected IDataSeries DataSeries { get; set; }
         protected List<DataPointSet> List = new List<DataPointSet>();
 
         public BoundingBox BoundingBox { get; protected set; }
@@ -292,7 +292,7 @@ namespace Silicups.Core
         public void Refresh()
         {
             Clean();
-            foreach (DataPointSet originalSet in DataSeries.DataSetSeries)
+            foreach (IDataSet originalSet in DataSeries.Series)
             {
                 if (!originalSet.Metadata.Enabled)
                 { continue; }
@@ -322,7 +322,7 @@ namespace Silicups.Core
         {
             Clean();
             double x = 0;
-            foreach (DataPointSet originalSet in DataSeries.DataSetSeries)
+            foreach (IDataSet originalSet in DataSeries.Series)
             {
                 if (!originalSet.Metadata.Enabled)
                 { continue; }
@@ -359,7 +359,7 @@ namespace Silicups.Core
                 return;
             }
 
-            foreach (DataPointSet originalSet in DataSeries.DataSetSeries)
+            foreach (IDataSet originalSet in DataSeries.Series)
             {
                 if (!originalSet.Metadata.Enabled)
                 { continue; }
