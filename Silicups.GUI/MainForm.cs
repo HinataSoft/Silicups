@@ -957,14 +957,14 @@ namespace Silicups.GUI
 
         private void SaveToTxt(string filename)
         {
-            if (CurrentProject == null)
+            if ((CurrentProject == null) || (CurrentDataSeries == null))
             { return; }
 
             using (var writer = new System.IO.StreamWriter(filename))
             {
                 //writer.WriteLine("Data for project {0} (Silicups)", CurrentProject.Caption ?? CurrentProject.Id);
                 //writer.WriteLine("JD MAG ERR");
-                foreach (IDataSet set in CurrentProject.TimeSeries.Series)
+                foreach (IDataSet set in CurrentDataSeries.Series)
                 {
                     if (!set.Metadata.Enabled)
                     { continue; }
