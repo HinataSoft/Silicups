@@ -43,10 +43,14 @@ namespace Silicups.GUI
 
             this.Version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
             DateTime buildDate = new DateTime(2000, 1, 1).AddDays(Version.Build).AddSeconds(Version.Revision * 2);
-            toolStripStatusLabel1.Text = String.Format("Silicups {0} (built {1})", Version, buildDate); 
+            toolStripStatusLabel1.Text = String.Format("Silicups {0} (built {1})", Version, buildDate);
 
+            checkBoxBinning.Checked = false;
+            textBoxBinning.Text = "0.01";
             RegistryHelper.TryGetFromRegistry(RegistryPath,
-                new RegistryHelper.GetRegistryStringAction("GliderStyle", (s) => { checkBoxStyle.Checked = (s == "1"); } )
+                new RegistryHelper.GetRegistryStringAction("GliderStyle", (s) => { checkBoxStyle.Checked = (s == "1"); } ),
+                new RegistryHelper.GetRegistryStringAction("BinningEnabled", (s) => { checkBoxBinning.Checked = (s == "1"); } ),
+                new RegistryHelper.GetRegistryStringAction("BinningValue", (s) => { textBoxBinning.Text = s; } )
             );
 
             radioButtonTimeseries.CheckedChanged += new EventHandler(radioButtonTimeseries_CheckedChanged);
@@ -72,6 +76,8 @@ namespace Silicups.GUI
             buttonSetP.Click += new EventHandler(buttonSetP_Click);
             buttonZeroP.Click += new EventHandler(buttonZeroP_Click);
             buttonZeroOffset.Click += new EventHandler(buttonZeroOffset_Click);
+            checkBoxBinning.CheckedChanged += new EventHandler(checkBoxBinning_CheckedChanged);
+            textBoxBinning.TextChanged += new EventHandler(textBoxBinning_TextChanged);
 
             this.FormClosing += new FormClosingEventHandler(MainForm_FormClosing);
 
@@ -132,7 +138,9 @@ namespace Silicups.GUI
             }
 
             RegistryHelper.TrySetToRegistry(RegistryPath,
-                new RegistryHelper.SetRegistryAction("GliderStyle", checkBoxStyle.Checked ? 1 : 0)
+                new RegistryHelper.SetRegistryAction("GliderStyle", checkBoxStyle.Checked ? 1 : 0),
+                new RegistryHelper.SetRegistryAction("BinningEnabled", checkBoxBinning.Checked ? 1 : 0),
+                new RegistryHelper.SetRegistryAction("BinningValue", textBoxBinning.Text)
              );
         }
 
@@ -650,6 +658,31 @@ namespace Silicups.GUI
             SetDataSource(CurrentDataSeriesType, doUpdate);
         }
 
+        void checkBoxBinning_CheckedChanged(object sender, EventArgs e)
+        {
+            RefreshPhaseBinning();
+        }
+
+        void textBoxBinning_TextChanged(object sender, EventArgs e)
+        {
+            RefreshPhaseBinning();
+        }
+
+        void RefreshPhaseBinning()
+        {
+            if (IsInitializing || (CurrentProject == null))
+            { return; }
+            SetPhaseBinning();
+            UpdateDataSource(true);
+        }
+
+        void SetPhaseBinning()
+        {
+            if (CurrentProject == null)
+            { return; }
+            CurrentProject.SetPhaseBinning(checkBoxBinning.Checked ? FormatEx.ParseDouble(textBoxBinning.Text) : 0);
+        }
+
         // title
 
         private void RefreshTitle()
@@ -1005,7 +1038,9 @@ namespace Silicups.GUI
                 textBoxPPM,
                 textBoxOffsetPM,
                 gliderP,
-                gliderOffset
+                gliderOffset,
+                checkBoxBinning,
+                textBoxBinning
             };
 
             SelectedMetadata = null;
@@ -1036,6 +1071,7 @@ namespace Silicups.GUI
             foreach (IDataSetMetadata metadata in CurrentProject.GetMetadata())
             { listBoxObs.Items.Add(metadata, metadata.Enabled); }
 
+            SetPhaseBinning();
             UpdateDataSource(true);
         }
 

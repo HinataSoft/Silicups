@@ -34,11 +34,12 @@ namespace Silicups.Core
         private TimeSeries mTimeSeries { get; set; }
         private CompressedSeries mCompressedSeries { get; set; }
         private PhasedSeries mPhasedSeries { get; set; }
+        private BinnedSeries mBinnedPhasedSeries { get; set; }
 
         public IDataSeries DataSeries { get { return mDataSeries; } }
         public IDataSeries TimeSeries { get { return mTimeSeries; } }
         public IDataSeries CompressedSeries { get { return mCompressedSeries; } }
-        public IDataSeries PhasedSeries { get { return mPhasedSeries; } }
+        public IDataSeries PhasedSeries { get { return mBinnedPhasedSeries; } }
 
         public double? M0 { get; internal set; }
         public double? P { get; internal set; }
@@ -59,6 +60,7 @@ namespace Silicups.Core
             this.mTimeSeries = new TimeSeries(mDataSeries, this);
             this.mCompressedSeries = new CompressedSeries(mDataSeries, this);
             this.mPhasedSeries = new PhasedSeries(mDataSeries, this);
+            this.mBinnedPhasedSeries = new BinnedSeries(mPhasedSeries, this);
             this.M0 = null;
             this.P = null;
             this.OffsetAmplitude = null;
@@ -91,23 +93,25 @@ namespace Silicups.Core
 
         public void Refresh()
         {
-            mTimeSeries.Refresh();
-            mCompressedSeries.Refresh();
-
             if (P.HasValue && !PAmplitude.HasValue)
             { PAmplitude = MathEx.GetLower125Base(P.Value); }
 
             if(!Double.IsInfinity(DataSeries.BoundingBox.Height) && !OffsetAmplitude.HasValue)
             { OffsetAmplitude = MathEx.GetLower125Base(DataSeries.BoundingBox.Height); }
 
-            RefreshM0AndP();
-        }
-
-        internal void RefreshM0AndP()
-        {
             mTimeSeries.Refresh();
             mCompressedSeries.Refresh();
             mPhasedSeries.Refresh();
+            mBinnedPhasedSeries.Refresh();
+        }
+
+        public void SetPhaseBinning(double binDivision)
+        {
+            if (mBinnedPhasedSeries.BinDivision == binDivision)
+            { return; }
+
+            mBinnedPhasedSeries.BinDivision = binDivision;
+            Refresh();
         }
 
         public void SortByDate()
@@ -414,13 +418,13 @@ namespace Silicups.Core
                 project.M0 = null;
                 project.P = null;
             }
-            project.RefreshM0AndP();
+            project.Refresh();
         }
 
         public static void SetP(this Project project, double? p)
         {
             project.P = p;
-            project.RefreshM0AndP();
+            project.Refresh();
         }
     }
 

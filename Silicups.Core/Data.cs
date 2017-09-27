@@ -388,4 +388,65 @@ namespace Silicups.Core
             BoundingBox.Right = 1;
         }
     }
+
+    public class BinnedSeries : DerivedSeriesWithPeriodProvider, IRefreshableDataSeries
+    {
+        public class Stat
+        {
+            public int Count = 0;
+            public double Sum = 0;
+            public double Err2Sum = 0;
+
+            public double AvgSum { get { return Sum / Count; } }
+            public double AvgErr { get { return Math.Sqrt(Err2Sum / Count); } }
+        }
+
+        public double BinDivision { get; set; }
+
+        public BinnedSeries(IDataSeries dataSeries, IPeriodDataProvider periodDataProvider)
+            : base(dataSeries, periodDataProvider)
+        {
+        }
+
+        public void Refresh()
+        {
+            Clean();
+            if (Double.IsNaN(BinDivision) || (BinDivision <= 0))
+            {
+                // no binning
+                foreach (IDataSet originalSet in DataSeries.Series)
+                { if (originalSet.Metadata.Enabled) { Add(originalSet); } }
+                return;
+            }
+
+            // binning
+            double invbin = 1.0 / BinDivision;
+            var bins = new Dictionary<double, Stat>();
+            var set = new DataPointSet(null, null);
+            foreach (IDataSet originalSet in DataSeries.Series)
+            {
+                if (!originalSet.Metadata.Enabled)
+                { continue; }
+                foreach (DataPoint p in originalSet.Set)
+                {
+                    double binX = Math.Floor(p.X * invbin) / invbin + BinDivision / 2;
+                    Stat stat;
+                    if (!bins.TryGetValue(binX, out stat))
+                    {
+                        stat = new Stat();
+                        bins.Add(binX, stat);
+                    }
+                    stat.Count++;
+                    stat.Sum += p.Y;
+                    stat.Err2Sum += p.Yerr * p.Yerr;
+                }
+                foreach (DataMark m in originalSet.XMarks)
+                { set.AddXMark(m); }
+            }
+
+            foreach (var pair in bins)
+            { set.Add(new DataPoint(pair.Key, pair.Value.AvgSum, pair.Value.AvgErr)); }
+            this.Add(set);
+        }
+    }
 }
