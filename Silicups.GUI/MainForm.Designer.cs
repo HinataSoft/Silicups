@@ -32,8 +32,14 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.splitContainerMain = new System.Windows.Forms.SplitContainer();
             this.splitContainerLeft = new System.Windows.Forms.SplitContainer();
+            this.listBoxSolution = new Silicups.GUI.MyListBox();
             this.listBoxObs = new System.Windows.Forms.CheckedListBox();
+            this.graph = new Silicups.GUI.Graph(this.components);
             this.panelTools = new System.Windows.Forms.Panel();
+            this.buttonAddMinimum = new System.Windows.Forms.Button();
+            this.checkBoxBinning = new System.Windows.Forms.CheckBox();
+            this.label6 = new System.Windows.Forms.Label();
+            this.textBoxBinning = new Silicups.GUI.MyTextBox();
             this.buttonMinima = new System.Windows.Forms.Button();
             this.buttonZeroOffset = new System.Windows.Forms.Button();
             this.buttonZeroP = new System.Windows.Forms.Button();
@@ -44,11 +50,15 @@
             this.trackBarP = new System.Windows.Forms.TrackBar();
             this.label5 = new System.Windows.Forms.Label();
             this.textBoxOffsetPM = new System.Windows.Forms.TextBox();
+            this.gliderOffset = new Silicups.GUI.Glider();
             this.label4 = new System.Windows.Forms.Label();
             this.textBoxPPM = new System.Windows.Forms.TextBox();
+            this.gliderP = new Silicups.GUI.Glider();
             this.label3 = new System.Windows.Forms.Label();
+            this.textBoxOffset = new Silicups.GUI.MyTextBox();
             this.radioButtonCompressed = new System.Windows.Forms.RadioButton();
             this.label2 = new System.Windows.Forms.Label();
+            this.textBoxP = new Silicups.GUI.MyTextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.textBoxM0 = new System.Windows.Forms.TextBox();
             this.radioButtonPhased = new System.Windows.Forms.RadioButton();
@@ -80,16 +90,8 @@
             this.addMinimumToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
-            this.label6 = new System.Windows.Forms.Label();
-            this.checkBoxBinning = new System.Windows.Forms.CheckBox();
-            this.listBoxSolution = new Silicups.GUI.MyListBox();
-            this.graph = new Silicups.GUI.Graph(this.components);
-            this.textBoxBinning = new Silicups.GUI.MyTextBox();
-            this.gliderOffset = new Silicups.GUI.Glider();
-            this.gliderP = new Silicups.GUI.Glider();
-            this.textBoxOffset = new Silicups.GUI.MyTextBox();
-            this.textBoxP = new Silicups.GUI.MyTextBox();
-            this.buttonAddMinimum = new System.Windows.Forms.Button();
+            this.exportPhasedSeriesToTXTToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.exportPhasedTimeSeriesToTXTToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerMain)).BeginInit();
             this.splitContainerMain.Panel1.SuspendLayout();
             this.splitContainerMain.Panel2.SuspendLayout();
@@ -142,6 +144,16 @@
             this.splitContainerLeft.SplitterDistance = 144;
             this.splitContainerLeft.TabIndex = 1;
             // 
+            // listBoxSolution
+            // 
+            this.listBoxSolution.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.listBoxSolution.FormattingEnabled = true;
+            this.listBoxSolution.IntegralHeight = false;
+            this.listBoxSolution.Location = new System.Drawing.Point(0, 0);
+            this.listBoxSolution.Name = "listBoxSolution";
+            this.listBoxSolution.Size = new System.Drawing.Size(144, 474);
+            this.listBoxSolution.TabIndex = 0;
+            // 
             // listBoxObs
             // 
             this.listBoxObs.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -151,6 +163,17 @@
             this.listBoxObs.Name = "listBoxObs";
             this.listBoxObs.Size = new System.Drawing.Size(237, 474);
             this.listBoxObs.TabIndex = 0;
+            // 
+            // graph
+            // 
+            this.graph.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.graph.BackColor = System.Drawing.Color.White;
+            this.graph.Location = new System.Drawing.Point(2, 0);
+            this.graph.Name = "graph";
+            this.graph.Size = new System.Drawing.Size(772, 355);
+            this.graph.TabIndex = 1;
             // 
             // panelTools
             // 
@@ -187,6 +210,43 @@
             this.panelTools.Name = "panelTools";
             this.panelTools.Size = new System.Drawing.Size(772, 110);
             this.panelTools.TabIndex = 0;
+            // 
+            // buttonAddMinimum
+            // 
+            this.buttonAddMinimum.Location = new System.Drawing.Point(6, 49);
+            this.buttonAddMinimum.Name = "buttonAddMinimum";
+            this.buttonAddMinimum.Size = new System.Drawing.Size(34, 23);
+            this.buttonAddMinimum.TabIndex = 26;
+            this.buttonAddMinimum.Text = "Add";
+            this.buttonAddMinimum.UseVisualStyleBackColor = true;
+            this.buttonAddMinimum.Click += new System.EventHandler(this.buttonAddMinimum_Click);
+            // 
+            // checkBoxBinning
+            // 
+            this.checkBoxBinning.AutoSize = true;
+            this.checkBoxBinning.Checked = true;
+            this.checkBoxBinning.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.checkBoxBinning.Location = new System.Drawing.Point(172, 81);
+            this.checkBoxBinning.Name = "checkBoxBinning";
+            this.checkBoxBinning.Size = new System.Drawing.Size(15, 14);
+            this.checkBoxBinning.TabIndex = 25;
+            this.checkBoxBinning.UseVisualStyleBackColor = true;
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(59, 81);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(107, 13);
+            this.label6.TabIndex = 24;
+            this.label6.Text = "Phase Graph Binning";
+            // 
+            // textBoxBinning
+            // 
+            this.textBoxBinning.Location = new System.Drawing.Point(193, 78);
+            this.textBoxBinning.Name = "textBoxBinning";
+            this.textBoxBinning.Size = new System.Drawing.Size(79, 20);
+            this.textBoxBinning.TabIndex = 23;
             // 
             // buttonMinima
             // 
@@ -287,6 +347,18 @@
             this.textBoxOffsetPM.Size = new System.Drawing.Size(60, 20);
             this.textBoxOffsetPM.TabIndex = 13;
             // 
+            // gliderOffset
+            // 
+            this.gliderOffset.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.gliderOffset.Cursor = System.Windows.Forms.Cursors.Cross;
+            this.gliderOffset.Enabled = false;
+            this.gliderOffset.Location = new System.Drawing.Point(371, 52);
+            this.gliderOffset.Name = "gliderOffset";
+            this.gliderOffset.Size = new System.Drawing.Size(392, 20);
+            this.gliderOffset.TabIndex = 12;
+            this.gliderOffset.Visible = false;
+            // 
             // label4
             // 
             this.label4.AutoSize = true;
@@ -303,6 +375,18 @@
             this.textBoxPPM.Size = new System.Drawing.Size(60, 20);
             this.textBoxPPM.TabIndex = 10;
             // 
+            // gliderP
+            // 
+            this.gliderP.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.gliderP.Cursor = System.Windows.Forms.Cursors.Cross;
+            this.gliderP.Enabled = false;
+            this.gliderP.Location = new System.Drawing.Point(371, 26);
+            this.gliderP.Name = "gliderP";
+            this.gliderP.Size = new System.Drawing.Size(392, 20);
+            this.gliderP.TabIndex = 9;
+            this.gliderP.Visible = false;
+            // 
             // label3
             // 
             this.label3.AutoSize = true;
@@ -311,6 +395,15 @@
             this.label3.Size = new System.Drawing.Size(73, 13);
             this.label3.TabIndex = 8;
             this.label3.Text = "Vertical Offset";
+            // 
+            // textBoxOffset
+            // 
+            this.textBoxOffset.Enabled = false;
+            this.textBoxOffset.Location = new System.Drawing.Point(172, 52);
+            this.textBoxOffset.Name = "textBoxOffset";
+            this.textBoxOffset.Size = new System.Drawing.Size(100, 20);
+            this.textBoxOffset.TabIndex = 7;
+            this.textBoxOffset.KeyUp += new System.Windows.Forms.KeyEventHandler(this.textBoxOffset_KeyUp);
             // 
             // radioButtonCompressed
             // 
@@ -331,6 +424,15 @@
             this.label2.Size = new System.Drawing.Size(14, 13);
             this.label2.TabIndex = 5;
             this.label2.Text = "P";
+            // 
+            // textBoxP
+            // 
+            this.textBoxP.Location = new System.Drawing.Point(172, 26);
+            this.textBoxP.Name = "textBoxP";
+            this.textBoxP.Size = new System.Drawing.Size(100, 20);
+            this.textBoxP.TabIndex = 4;
+            this.textBoxP.TextChanged += new System.EventHandler(this.textBoxP_TextChanged);
+            this.textBoxP.KeyUp += new System.Windows.Forms.KeyEventHandler(this.textBoxP_KeyUp);
             // 
             // label1
             // 
@@ -473,6 +575,8 @@
             this.sortObservationsByDateToolStripMenuItem,
             this.importFromVarastroczToolStripMenuItem,
             this.exportToTxtToolStripMenuItem,
+            this.exportPhasedSeriesToTXTToolStripMenuItem,
+            this.exportPhasedTimeSeriesToTXTToolStripMenuItem,
             this.exportGraphToPNGToolStripMenuItem,
             this.minimaPredictionsToolStripMenuItem});
             this.projectToolStripMenuItem.Name = "projectToolStripMenuItem";
@@ -529,7 +633,7 @@
             this.exportToTxtToolStripMenuItem.Name = "exportToTxtToolStripMenuItem";
             this.exportToTxtToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.E)));
             this.exportToTxtToolStripMenuItem.Size = new System.Drawing.Size(261, 22);
-            this.exportToTxtToolStripMenuItem.Text = "Export To Txt...";
+            this.exportToTxtToolStripMenuItem.Text = "Export Time Series To TXT...";
             this.exportToTxtToolStripMenuItem.Click += new System.EventHandler(this.exportToTxtToolStripMenuItem_Click);
             // 
             // exportGraphToPNGToolStripMenuItem
@@ -593,105 +697,19 @@
             this.toolStripStatusLabel1.Size = new System.Drawing.Size(78, 17);
             this.toolStripStatusLabel1.Text = "SILICUPS v0.9";
             // 
-            // label6
+            // exportPhasedSeriesToTXTToolStripMenuItem
             // 
-            this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(59, 81);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(107, 13);
-            this.label6.TabIndex = 24;
-            this.label6.Text = "Phase Graph Binning";
+            this.exportPhasedSeriesToTXTToolStripMenuItem.Name = "exportPhasedSeriesToTXTToolStripMenuItem";
+            this.exportPhasedSeriesToTXTToolStripMenuItem.Size = new System.Drawing.Size(261, 22);
+            this.exportPhasedSeriesToTXTToolStripMenuItem.Text = "Export Phased Series To TXT...";
+            this.exportPhasedSeriesToTXTToolStripMenuItem.Click += new System.EventHandler(this.exportPhasedSeriesToTXTToolStripMenuItem_Click);
             // 
-            // checkBoxBinning
+            // exportPhasedTimeSeriesToTXTToolStripMenuItem
             // 
-            this.checkBoxBinning.AutoSize = true;
-            this.checkBoxBinning.Checked = true;
-            this.checkBoxBinning.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBoxBinning.Location = new System.Drawing.Point(172, 81);
-            this.checkBoxBinning.Name = "checkBoxBinning";
-            this.checkBoxBinning.Size = new System.Drawing.Size(15, 14);
-            this.checkBoxBinning.TabIndex = 25;
-            this.checkBoxBinning.UseVisualStyleBackColor = true;
-            // 
-            // listBoxSolution
-            // 
-            this.listBoxSolution.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.listBoxSolution.FormattingEnabled = true;
-            this.listBoxSolution.IntegralHeight = false;
-            this.listBoxSolution.Location = new System.Drawing.Point(0, 0);
-            this.listBoxSolution.Name = "listBoxSolution";
-            this.listBoxSolution.Size = new System.Drawing.Size(144, 474);
-            this.listBoxSolution.TabIndex = 0;
-            // 
-            // graph
-            // 
-            this.graph.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.graph.BackColor = System.Drawing.Color.White;
-            this.graph.Location = new System.Drawing.Point(2, 0);
-            this.graph.Name = "graph";
-            this.graph.Size = new System.Drawing.Size(772, 355);
-            this.graph.TabIndex = 1;
-            // 
-            // textBoxBinning
-            // 
-            this.textBoxBinning.Location = new System.Drawing.Point(193, 78);
-            this.textBoxBinning.Name = "textBoxBinning";
-            this.textBoxBinning.Size = new System.Drawing.Size(79, 20);
-            this.textBoxBinning.TabIndex = 23;
-            // 
-            // gliderOffset
-            // 
-            this.gliderOffset.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.gliderOffset.Cursor = System.Windows.Forms.Cursors.Cross;
-            this.gliderOffset.Enabled = false;
-            this.gliderOffset.Location = new System.Drawing.Point(371, 52);
-            this.gliderOffset.Name = "gliderOffset";
-            this.gliderOffset.Size = new System.Drawing.Size(392, 20);
-            this.gliderOffset.TabIndex = 12;
-            this.gliderOffset.Visible = false;
-            // 
-            // gliderP
-            // 
-            this.gliderP.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.gliderP.Cursor = System.Windows.Forms.Cursors.Cross;
-            this.gliderP.Enabled = false;
-            this.gliderP.Location = new System.Drawing.Point(371, 26);
-            this.gliderP.Name = "gliderP";
-            this.gliderP.Size = new System.Drawing.Size(392, 20);
-            this.gliderP.TabIndex = 9;
-            this.gliderP.Visible = false;
-            // 
-            // textBoxOffset
-            // 
-            this.textBoxOffset.Enabled = false;
-            this.textBoxOffset.Location = new System.Drawing.Point(172, 52);
-            this.textBoxOffset.Name = "textBoxOffset";
-            this.textBoxOffset.Size = new System.Drawing.Size(100, 20);
-            this.textBoxOffset.TabIndex = 7;
-            this.textBoxOffset.KeyUp += new System.Windows.Forms.KeyEventHandler(this.textBoxOffset_KeyUp);
-            // 
-            // textBoxP
-            // 
-            this.textBoxP.Location = new System.Drawing.Point(172, 26);
-            this.textBoxP.Name = "textBoxP";
-            this.textBoxP.Size = new System.Drawing.Size(100, 20);
-            this.textBoxP.TabIndex = 4;
-            this.textBoxP.TextChanged += new System.EventHandler(this.textBoxP_TextChanged);
-            this.textBoxP.KeyUp += new System.Windows.Forms.KeyEventHandler(this.textBoxP_KeyUp);
-            // 
-            // buttonAddMinimum
-            // 
-            this.buttonAddMinimum.Location = new System.Drawing.Point(6, 49);
-            this.buttonAddMinimum.Name = "buttonAddMinimum";
-            this.buttonAddMinimum.Size = new System.Drawing.Size(34, 23);
-            this.buttonAddMinimum.TabIndex = 26;
-            this.buttonAddMinimum.Text = "Add";
-            this.buttonAddMinimum.UseVisualStyleBackColor = true;
-            this.buttonAddMinimum.Click += new System.EventHandler(this.buttonAddMinimum_Click);
+            this.exportPhasedTimeSeriesToTXTToolStripMenuItem.Name = "exportPhasedTimeSeriesToTXTToolStripMenuItem";
+            this.exportPhasedTimeSeriesToTXTToolStripMenuItem.Size = new System.Drawing.Size(261, 22);
+            this.exportPhasedTimeSeriesToTXTToolStripMenuItem.Text = "Export Phased Time Series To TXT...";
+            this.exportPhasedTimeSeriesToTXTToolStripMenuItem.Click += new System.EventHandler(this.exportPhasedTimeSeriesToTXTToolStripMenuItem_Click);
             // 
             // MainForm
             // 
@@ -788,6 +806,8 @@
         private System.Windows.Forms.Label label6;
         private MyTextBox textBoxBinning;
         private System.Windows.Forms.Button buttonAddMinimum;
+        private System.Windows.Forms.ToolStripMenuItem exportPhasedSeriesToTXTToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem exportPhasedTimeSeriesToTXTToolStripMenuItem;
 
     }
 }

@@ -146,6 +146,11 @@ namespace Silicups.Core
             list.Clear();
         }
 
+        public void Sort()
+        {
+            list.Sort((a, b) => a.X.CompareTo(b.X));
+        }
+
         public void AddXMark(DataMark m)
         {
             xmarks.Add(m);
@@ -262,6 +267,7 @@ namespace Silicups.Core
     {
         bool CanProvidePeriodData { get; }
         double GetPhased(double time);
+        double GetDephased(double phase);
         double GetFrequency(double timespan);
         IEnumerable<double> GetFullPhasesBetween(double t1, double t2);
     }
@@ -344,9 +350,18 @@ namespace Silicups.Core
 
     public class PhasedSeries : DerivedSeriesWithPeriodProvider, IRefreshableDataSeries
     {
+        public double AbsIntervalSize { get; private set; }
+
         public PhasedSeries(IDataSeries dataSeries, IPeriodDataProvider periodDataProvider)
             : base(dataSeries, periodDataProvider)
         {
+            AbsIntervalSize = 1;
+        }
+
+        public void SetAbsIntervalSize(double absIntervalSize)
+        {
+            AbsIntervalSize = absIntervalSize;
+            Refresh();
         }
 
         public void Refresh()
@@ -354,7 +369,7 @@ namespace Silicups.Core
             Clean();
             if (!PeriodDataProvider.CanProvidePeriodData)
             {
-                BoundingBox = new BoundingBox(-1, 0, 1, 1);
+                BoundingBox = new BoundingBox(-AbsIntervalSize, 0, AbsIntervalSize, 1);
                 return;
             }
 
@@ -367,16 +382,20 @@ namespace Silicups.Core
                 foreach (DataPoint p in originalSet.Set)
                 {
                     double phase = PeriodDataProvider.GetPhased(p.X);
-                    set.Add(phase, p.Y - originalSet.Metadata.OffsetY, p.Yerr);
-                    set.Add(phase - 1, p.Y - originalSet.Metadata.OffsetY, p.Yerr);
+                    if (phase <= AbsIntervalSize)
+                    { set.Add(phase, p.Y - originalSet.Metadata.OffsetY, p.Yerr); }
+                    if (phase - 1 >= -AbsIntervalSize)
+                    { set.Add(phase - 1, p.Y - originalSet.Metadata.OffsetY, p.Yerr); }
                 }
 
                 double frequency = PeriodDataProvider.GetFrequency(1);
                 foreach (DataMark m in originalSet.XMarks)
                 {
                     double phase = PeriodDataProvider.GetPhased(m.N);
-                    set.AddXMark(m.Type, phase, m.Nerr * frequency);
-                    set.AddXMark(m.Type, phase - 1, m.Nerr * frequency);
+                    if (phase <= AbsIntervalSize)
+                    { set.AddXMark(m.Type, phase, m.Nerr * frequency); }
+                    if (phase - 1 >= AbsIntervalSize)
+                    { set.AddXMark(m.Type, phase - 1, m.Nerr * frequency); }
                 }
 
                 InsertPhaseMarks();
@@ -384,8 +403,8 @@ namespace Silicups.Core
                 BoundingBox.Union(set.BoundingBox);
             }
 
-            BoundingBox.Left = -1;
-            BoundingBox.Right = 1;
+            BoundingBox.Left = -AbsIntervalSize;
+            BoundingBox.Right = AbsIntervalSize;
         }
     }
 
@@ -446,6 +465,43 @@ namespace Silicups.Core
 
             foreach (var pair in bins)
             { set.Add(new DataPoint(pair.Key, pair.Value.AvgSum, pair.Value.AvgErr)); }
+            set.Sort();
+            this.Add(set);
+        }
+    }
+
+    public class DephaseSeries : DerivedSeriesWithPeriodProvider, IRefreshableDataSeries
+    {
+        private IPeriodDataProvider PeriodDataProvider;
+
+        public DephaseSeries(IDataSeries dataSeries, IPeriodDataProvider periodDataProvider)
+            : base(dataSeries, periodDataProvider)
+        {
+            this.PeriodDataProvider = periodDataProvider;
+        }
+
+        public void Refresh()
+        {
+            Clean();
+            var set = new DataPointSet(null, null);
+            if (PeriodDataProvider.CanProvidePeriodData)
+            {
+                foreach (IDataSet originalSet in DataSeries.Series)
+                {
+                    foreach (DataPoint p in originalSet.Set)
+                    {
+                        double phase = p.X;
+                        if ((phase > -0.5) && (phase <= 0.5))
+                        {
+                            double x = PeriodDataProvider.GetDephased(phase);
+                            set.Add(new DataPoint(x, p.Y, p.Yerr));
+                        }
+                    }
+                    foreach (DataMark m in originalSet.XMarks)
+                    { set.AddXMark(m); }
+                }
+                set.Sort();
+            }
             this.Add(set);
         }
     }

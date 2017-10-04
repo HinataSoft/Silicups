@@ -955,7 +955,7 @@ namespace Silicups.GUI
             }
         }
 
-        private void SaveToTxt(string filename)
+        private void SaveToTxt(string filename, IDataSeries series)
         {
             if ((CurrentProject == null) || (CurrentDataSeries == null))
             { return; }
@@ -964,7 +964,7 @@ namespace Silicups.GUI
             {
                 //writer.WriteLine("Data for project {0} (Silicups)", CurrentProject.Caption ?? CurrentProject.Id);
                 //writer.WriteLine("JD MAG ERR");
-                foreach (IDataSet set in CurrentDataSeries.Series)
+                foreach (IDataSet set in series.Series)
                 {
                     if (!set.Metadata.Enabled)
                     { continue; }
@@ -1205,7 +1205,7 @@ namespace Silicups.GUI
             }
         }
 
-        private void exportToTxtToolStripMenuItem_Click(object sender, EventArgs e)
+        private void exportToTxt(IDataSeries series)
         {
             using (var fd = new SaveFileDialog())
             {
@@ -1215,8 +1215,30 @@ namespace Silicups.GUI
                 if (dialogResult == DialogResult.OK)
                 {
                     RegistryHelper.TrySetToRegistry(RegistryPath, new RegistryHelper.SetRegistryAction("ExportToTxtPath", System.IO.Path.GetDirectoryName(fd.FileName)));
-                    SaveToTxt(fd.FileName);
+                    SaveToTxt(fd.FileName, series);
                 }
+            }
+        }
+
+        private void exportToTxtToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (CurrentProject != null)
+            { exportToTxt(CurrentProject.TimeSeries); }
+        }
+
+        private void exportPhasedSeriesToTXTToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (CurrentProject != null)
+            { exportToTxt(CurrentProject.PhasedSeries); }
+        }
+
+        private void exportPhasedTimeSeriesToTXTToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (CurrentProject != null)
+            {
+                var series = new DephaseSeries(CurrentProject.PhasedSeries, CurrentProject);
+                series.Refresh();
+                exportToTxt(series);
             }
         }
 

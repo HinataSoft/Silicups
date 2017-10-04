@@ -130,6 +130,11 @@ namespace Silicups.Core
             return phased - Math.Floor(phased);
         }
 
+        public double GetDephased(double phase)
+        {
+            return phase * P.Value + M0.Value;
+        }
+
         public double GetFrequency(double timespan)
         {
             return timespan / P.Value;
