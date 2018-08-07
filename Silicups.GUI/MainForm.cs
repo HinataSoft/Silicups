@@ -19,6 +19,7 @@ namespace Silicups.GUI
             Timed,
             Compressed,
             Phased,
+            OC,
         }
 
         private static readonly string RegistryPath = @"SOFTWARE\HinataSoft\Silicups\MainForm";
@@ -35,6 +36,8 @@ namespace Silicups.GUI
 
         private double? OriginalP = null;
         private double? OriginalOffset = null;
+
+        private Point ListBoxObsLastMouseLocation = Point.Empty;
 
         public MainForm()
         {
@@ -56,11 +59,13 @@ namespace Silicups.GUI
             radioButtonTimeseries.CheckedChanged += new EventHandler(radioButtonTimeseries_CheckedChanged);
             radioButtonPhased.CheckedChanged += new EventHandler(radioButtonPhased_CheckedChanged);
             radioButtonCompressed.CheckedChanged += new EventHandler(radioButtonCompressed_CheckedChanged);
+            radioButtonOC.CheckedChanged += new EventHandler(radioButtonOC_CheckedChanged);
             listBoxSolution.SelectedIndexChanged += new EventHandler(listBoxSolution_SelectedIndexChanged);
             listBoxSolution.KeyDown += new KeyEventHandler(listBoxSolution_KeyDown);
             listBoxObs.ItemCheck += new ItemCheckEventHandler(listBoxObs_ItemCheck);
             listBoxObs.SelectedIndexChanged += new EventHandler(listBoxObs_SelectedIndexChanged);
             listBoxObs.KeyDown += new KeyEventHandler(listBoxObs_KeyDown);
+            listBoxObs.MouseDown += new MouseEventHandler(listBoxObs_MouseDown);
             textBoxOffset.TextChanged += new EventHandler(textBoxOffset_TextChanged);
             textBoxPPM.TextChanged += new EventHandler(textBoxPPM_TextChanged);
             textBoxOffsetPM.TextChanged += new EventHandler(textBoxOffsetPM_TextChanged);
@@ -162,6 +167,12 @@ namespace Silicups.GUI
         {
             if (!IsInitializing && radioButtonPhased.Checked)
             { SetDataSource(SeriesTypeEnum.Phased); }
+        }
+
+        void radioButtonOC_CheckedChanged(object sender, EventArgs e)
+        {
+            if (!IsInitializing && radioButtonOC.Checked)
+            { SetDataSource(SeriesTypeEnum.OC); }
         }
 
         // M0 + P
@@ -516,6 +527,19 @@ namespace Silicups.GUI
             if (IsInitializing)
             { return; }
 
+            // https://stackoverflow.com/a/2099209
+            if (!ListBoxObsLastMouseLocation.IsEmpty)
+            {
+                Point loc = ListBoxObsLastMouseLocation;
+                Rectangle rec = this.listBoxObs.GetItemRectangle(e.Index);
+                rec.Width = 16; //checkbox itself has a default width of about 16 pixels
+                if (!rec.Contains(loc))
+                {
+                    e.NewValue = e.CurrentValue;
+                    return;
+                }
+            }
+
             var metadata = (IDataSetMetadata)listBoxObs.Items[e.Index];
             metadata.Enabled = (e.NewValue == CheckState.Checked);
             RefreshDataSource();
@@ -572,6 +596,8 @@ namespace Silicups.GUI
 
         void listBoxObs_KeyDown(object sender, KeyEventArgs e)
         {
+            ListBoxObsLastMouseLocation = Point.Empty;
+
             if (IsInitializing || (SelectedMetadata == null))
             { return; }
 
@@ -586,6 +612,11 @@ namespace Silicups.GUI
                 if (result == DialogResult.OK)
                 { RemoveSetFromProject(SelectedMetadata); SetDirty(); }
             }
+        }
+
+        private void listBoxObs_MouseDown(object sender, MouseEventArgs e)
+        {
+            ListBoxObsLastMouseLocation = e.Location;
         }
 
         // glider style toggle
@@ -633,6 +664,7 @@ namespace Silicups.GUI
                     case SeriesTypeEnum.Timed: dataSeries = CurrentProject.TimeSeries; break;
                     case SeriesTypeEnum.Compressed: dataSeries = CurrentProject.CompressedSeries; break;
                     case SeriesTypeEnum.Phased: dataSeries = CurrentProject.PhasedSeries; break;
+                    case SeriesTypeEnum.OC: dataSeries = CurrentProject.OCSeries; break;
                 }
             }
             CurrentDataSeriesType = dataSeriesType;
@@ -1033,6 +1065,7 @@ namespace Silicups.GUI
                 radioButtonTimeseries,
                 radioButtonCompressed,
                 radioButtonPhased,
+                radioButtonOC,
                 textBoxM0,
                 textBoxP,
                 textBoxPPM,

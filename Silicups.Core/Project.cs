@@ -35,11 +35,13 @@ namespace Silicups.Core
         private CompressedSeries mCompressedSeries { get; set; }
         private PhasedSeries mPhasedSeries { get; set; }
         private BinnedSeries mBinnedPhasedSeries { get; set; }
+        private OCSeries mOCSeries { get; set; }
 
         public IDataSeries DataSeries { get { return mDataSeries; } }
         public IDataSeries TimeSeries { get { return mTimeSeries; } }
         public IDataSeries CompressedSeries { get { return mCompressedSeries; } }
         public IDataSeries PhasedSeries { get { return mBinnedPhasedSeries; } }
+        public IDataSeries OCSeries { get { return mOCSeries; } }
 
         public double? M0 { get; internal set; }
         public double? P { get; internal set; }
@@ -61,6 +63,7 @@ namespace Silicups.Core
             this.mCompressedSeries = new CompressedSeries(mDataSeries, this);
             this.mPhasedSeries = new PhasedSeries(mDataSeries, this);
             this.mBinnedPhasedSeries = new BinnedSeries(mPhasedSeries, this);
+            this.mOCSeries = new OCSeries(mDataSeries, this);
             this.M0 = null;
             this.P = null;
             this.OffsetAmplitude = null;
@@ -103,6 +106,7 @@ namespace Silicups.Core
             mCompressedSeries.Refresh();
             mPhasedSeries.Refresh();
             mBinnedPhasedSeries.Refresh();
+            mOCSeries.Refresh();
         }
 
         public void SetPhaseBinning(double binDivision)
@@ -124,6 +128,23 @@ namespace Silicups.Core
             get { return P.HasValue && M0.HasValue && (P.Value != 0); }
         }
 
+        public double GetM0()
+        {
+            return M0.Value;
+        }
+
+        public double GetPeriod()
+        {
+            return P.Value;
+        }
+
+        public double GetFrequency()
+        {
+            if (!P.HasValue || (P.Value == 0))
+            { return Double.NaN; }
+            return 1 / P.Value;
+        }
+
         public double GetPhased(double time)
         {
             double phased = (time - M0.Value) / P.Value;
@@ -135,14 +156,10 @@ namespace Silicups.Core
             return phase * P.Value + M0.Value;
         }
 
-        public double GetFrequency(double timespan)
-        {
-            return timespan / P.Value;
-        }
-
         public IEnumerable<double> GetFullPhasesBetween(double t1, double t2)
         {
-            yield break;
+            throw new NotImplementedException();
+            //yield break;
         }
 
         public DataPointSet AddDataFile(string file)

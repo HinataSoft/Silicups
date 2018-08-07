@@ -266,9 +266,11 @@ namespace Silicups.Core
     public interface IPeriodDataProvider
     {
         bool CanProvidePeriodData { get; }
+        double GetM0();
+        double GetPeriod();
+        double GetFrequency();
         double GetPhased(double time);
         double GetDephased(double phase);
-        double GetFrequency(double timespan);
         IEnumerable<double> GetFullPhasesBetween(double t1, double t2);
     }
 
@@ -373,6 +375,7 @@ namespace Silicups.Core
                 return;
             }
 
+            double frequency = PeriodDataProvider.GetFrequency();
             foreach (IDataSet originalSet in DataSeries.Series)
             {
                 if (!originalSet.Metadata.Enabled)
@@ -388,7 +391,6 @@ namespace Silicups.Core
                     { set.Add(phase - 1, p.Y - originalSet.Metadata.OffsetY, p.Yerr); }
                 }
 
-                double frequency = PeriodDataProvider.GetFrequency(1);
                 foreach (DataMark m in originalSet.XMarks)
                 {
                     double phase = PeriodDataProvider.GetPhased(m.N);
@@ -472,12 +474,9 @@ namespace Silicups.Core
 
     public class DephaseSeries : DerivedSeriesWithPeriodProvider, IRefreshableDataSeries
     {
-        private IPeriodDataProvider PeriodDataProvider;
-
         public DephaseSeries(IDataSeries dataSeries, IPeriodDataProvider periodDataProvider)
             : base(dataSeries, periodDataProvider)
         {
-            this.PeriodDataProvider = periodDataProvider;
         }
 
         public void Refresh()
@@ -503,6 +502,45 @@ namespace Silicups.Core
                 set.Sort();
             }
             this.Add(set);
+        }
+    }
+
+    public class OCSeries : DerivedSeriesWithPeriodProvider, IRefreshableDataSeries
+    {
+        public OCSeries(IDataSeries dataSeries, IPeriodDataProvider periodDataProvider)
+            : base(dataSeries, periodDataProvider)
+        {
+        }
+
+        public void Refresh()
+        {
+            Clean();
+            if (!PeriodDataProvider.CanProvidePeriodData)
+            {
+                BoundingBox = new BoundingBox(0, 0, 1, 1);
+                return;
+            }
+
+            double period = PeriodDataProvider.GetPeriod();
+            foreach (IDataSet originalSet in DataSeries.Series)
+            {
+                if (!originalSet.Metadata.Enabled)
+                { continue; }
+
+                var set = new DataPointSet(originalSet);
+
+                foreach (DataMark m in originalSet.XMarks)
+                {
+                    double phase = PeriodDataProvider.GetPhased(m.N);
+                    if (phase > 0.5)
+                    { phase = phase - 1; }
+                    set.Add(m.N, phase * period, m.Nerr);
+                }
+
+                InsertPhaseMarks();
+                Add(set);
+                BoundingBox.Union(set.BoundingBox);
+            }
         }
     }
 }
