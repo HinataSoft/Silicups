@@ -186,6 +186,8 @@ namespace Silicups.GUI
             SetDirty();
             if (radioButtonPhased.Checked)
             { SetDataSource(SeriesTypeEnum.Phased, true); }
+            if (radioButtonOC.Checked)
+            { SetDataSource(SeriesTypeEnum.OC, true); }
         }
 
         private void textBoxP_KeyUp(object sender, KeyEventArgs e)

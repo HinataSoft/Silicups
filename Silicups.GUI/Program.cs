@@ -13,8 +13,8 @@ namespace Silicups.GUI
         [STAThread]
         static void Main()
         {
-            if (Environment.OSVersion.Version.Major >= 6)
-            { SetProcessDPIAware(); }
+            //if (Environment.OSVersion.Version.Major >= 6)
+            //{ SetProcessDPIAware(); }
  
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
