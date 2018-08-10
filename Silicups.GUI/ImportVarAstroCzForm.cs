@@ -9,14 +9,15 @@ using System.Windows.Forms;
 
 namespace Silicups.GUI
 {
-    public partial class ImportVarAstroCzForm : Form
+    public partial class ImportVarAstroCzForm : FormEx
     {
-        private static readonly string RegistryPath = @"SOFTWARE\HinataSoft\Silicups\ImportVarAstroCzForm";
+        private static readonly string RegistryPath = Util.RegistryHelper.RegistryPath + @"\ImportVarAstroCzForm";
         public Silicups.Core.Project Project = null; 
 
         public ImportVarAstroCzForm()
         {
             InitializeComponent();
+            InitializeFormEx(RegistryPath);
 
             try
             {

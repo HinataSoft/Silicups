@@ -8,9 +8,9 @@ using System.Windows.Forms;
 
 namespace Silicups.GUI
 {
-    public partial class FilesSelectForm : Form
+    public partial class FilesSelectForm : FormEx
     {
-        private static readonly string RegistryPath = @"SOFTWARE\HinataSoft\Silicups\FileSelectDialog";
+        private static readonly string RegistryPath = Util.RegistryHelper.RegistryPath + @"\FileSelectDialog";
 
         private bool InitedFromRegistry { get; set; }
         public string SelectedDirectory { get; private set; }
@@ -20,6 +20,7 @@ namespace Silicups.GUI
         public FilesSelectForm()
         {
             InitializeComponent();
+            InitializeFormEx(RegistryPath);
 
             try
             {

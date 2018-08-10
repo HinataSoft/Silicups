@@ -12,7 +12,7 @@ using Silicups.Util;
 
 namespace Silicups.GUI
 {
-    public partial class MainForm : Form
+    public partial class MainForm : FormEx
     {
         enum SeriesTypeEnum
         {
@@ -22,7 +22,7 @@ namespace Silicups.GUI
             OC,
         }
 
-        private static readonly string RegistryPath = @"SOFTWARE\HinataSoft\Silicups\MainForm";
+        private static readonly string RegistryPath = RegistryHelper.RegistryPath + @"\MainForm";
 
         private Version Version;
         private List<Project> Solution = new List<Project>();
@@ -42,6 +42,7 @@ namespace Silicups.GUI
         public MainForm()
         {
             InitializeComponent();
+            InitializeFormEx(RegistryPath);
             ResetTitle();
 
             this.Version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;

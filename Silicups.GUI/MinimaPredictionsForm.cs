@@ -11,8 +11,10 @@ using Silicups.Core;
 
 namespace Silicups.GUI
 {
-    public partial class MinimaPredictionsForm : Form
+    public partial class MinimaPredictionsForm : FormEx
     {
+        private static readonly string RegistryPath = Util.RegistryHelper.RegistryPath + @"\MinimaForm";
+
         private double M0;
         private double P;
         private DateTime PredictionsSince;
@@ -21,6 +23,7 @@ namespace Silicups.GUI
         public MinimaPredictionsForm(Project project)
         {
             InitializeComponent();
+            InitializeFormEx(RegistryPath);
             this.M0 = project.M0.Value;
             this.P = project.P.Value;
             this.PredictionsSince = DateTime.UtcNow;

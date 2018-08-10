@@ -11,7 +11,7 @@ using Silicups.Core;
 
 namespace Silicups.GUI
 {
-    public partial class AddMinimaForm : Form
+    public partial class AddMinimaForm : FormEx
     {
         private class DataSetMetadata : IDataSetMetadata
         {
@@ -92,12 +92,15 @@ namespace Silicups.GUI
             }
         }
 
+        private static readonly string RegistryPath = Util.RegistryHelper.RegistryPath + @"\AddMinimaForm";
+
         public DataMark XMark { get; private set; }
         private IDataSet SourceDataSet;
 
         public AddMinimaForm(IDataSet sourceDataSet)
         {
             InitializeComponent();
+            InitializeFormEx(RegistryPath);
             this.SourceDataSet = sourceDataSet;
             this.comboBoxMinType.SelectedIndex = 0;
             UpdateWorkingDataSeries();

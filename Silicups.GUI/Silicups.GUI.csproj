@@ -66,6 +66,9 @@
     <Compile Include="FilesSelectForm.Designer.cs">
       <DependentUpon>FilesSelectForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="FormEx.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Glider.cs">
       <SubType>Component</SubType>
     </Compile>

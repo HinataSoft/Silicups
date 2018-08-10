@@ -6,6 +6,8 @@ namespace Silicups.Util
 {
     public static class RegistryHelper
     {
+        public static readonly string RegistryPath = @"SOFTWARE\HinataSoft\Silicups";
+
         public class GetRegistryAction
         {
             public string Key { get; private set; }

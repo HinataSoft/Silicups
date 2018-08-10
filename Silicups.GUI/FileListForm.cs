@@ -11,7 +11,7 @@ using Silicups.Core;
 
 namespace Silicups.GUI
 {
-    public partial class FileListForm : Form
+    public partial class FileListForm : FormEx
     {
         public enum ActionEnum
         {
@@ -38,9 +38,12 @@ namespace Silicups.GUI
             }
         }
 
+        private static readonly string RegistryPath = Util.RegistryHelper.RegistryPath + @"\FileListForm";
+
         public FileListForm(List<string> paths, Project project)
         {
             InitializeComponent();
+            InitializeFormEx(RegistryPath);
 
             List<FileAction> actions = MakeActions(paths, project);
             foreach (FileAction action in actions)

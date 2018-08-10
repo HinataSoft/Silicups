@@ -11,13 +11,16 @@ using Silicups.Core;
 
 namespace Silicups.GUI
 {
-    public partial class MinimaForm : Form
+    public partial class MinimaForm : FormEx
     {
+        private static readonly string RegistryPath = Util.RegistryHelper.RegistryPath + @"\MinimaForm";
+
         Project CurrentProject;
 
         public MinimaForm(Project project)
         {
             InitializeComponent();
+            InitializeFormEx(RegistryPath);
             this.CurrentProject = project;
             LoadMinimaFromProject(CurrentProject);
         }
